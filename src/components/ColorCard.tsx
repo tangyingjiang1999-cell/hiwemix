@@ -40,7 +40,7 @@ const ColorCard = memo(function ColorCard({
 
   return (
     <div className="mb-3 rounded-xl border border-[#E5E7EB] bg-white transition-shadow duration-200 ease-out hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] last:mb-0">
-      <div className="flex items-center gap-3 px-5 py-4">
+      <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-5 sm:py-4">
         <button
           type="button"
           onClick={toggleExpanded}
@@ -51,10 +51,10 @@ const ColorCard = memo(function ColorCard({
             style={{ backgroundColor: color.hex_preview }}
           />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[18px] font-bold text-[#111827]">
+            <p className="truncate text-base font-bold text-[#111827] sm:text-[18px]">
               {color.color_name}
             </p>
-            <p className="text-[13px] font-normal text-[#9CA3AF]">{color.color_code}</p>
+            <p className="text-xs font-normal text-[#9CA3AF] sm:text-[13px]">{color.color_code}</p>
           </div>
         </button>
 

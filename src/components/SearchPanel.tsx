@@ -171,22 +171,22 @@ export default function SearchPanel({
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* 第一行：四个 pill 输入框 */}
-      <div className="flex gap-4">
+      {/* 第一行：输入框 - 桌面端横排，手机端自动换行 */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <PillSelect
           label={t.make}
           value={makeId}
           onChange={setMakeId}
           options={mockCarMakes.map((m) => ({ value: m.id, label: m.name }))}
           placeholder={t.allMakes}
-          widthClass="w-[20%]"
+          widthClass="w-full"
         />
         <PillInput
           label={t.colorCode}
           value={colorCode}
           onChange={handleColorCodeChange}
           placeholder={t.colorCodePlaceholder}
-          widthClass="w-[20%]"
+          widthClass="w-full"
           maxLength={20}
         />
         <PillInput
@@ -194,14 +194,14 @@ export default function SearchPanel({
           value={colorName}
           onChange={(v) => setColorName(v)}
           placeholder={t.colorNamePlaceholder}
-          widthClass="w-[30%]"
+          widthClass="w-full"
         />
         <PillInput
           label={t.year}
           value={year}
           onChange={(v) => setYear(v)}
           placeholder={t.yearPlaceholder}
-          widthClass="w-[30%]"
+          widthClass="w-full"
           maxLength={9}
         />
       </div>
@@ -210,9 +210,9 @@ export default function SearchPanel({
         <p className="mt-2 text-[12px] text-orange-500">{t.codeTooLong}</p>
       )}
 
-      {/* 第二行：Color type 按钮 + Search + Reset */}
-      <div className="mt-5 flex items-center">
-        <div className="flex gap-2">
+      {/* 第二行：Color type 按钮 + Search + Reset - 移动端自动换行 */}
+      <div className="mt-5 flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap gap-2">
           {COLOR_TYPE_OPTIONS.map((opt) => {
             const isSelected = colorType === opt.value;
             return (
@@ -233,12 +233,12 @@ export default function SearchPanel({
           })}
         </div>
 
-        {/* Search 按钮 - Tesla 风格：实心色、4px 圆角 */}
+        {/* Search 按钮 */}
         <button
           type="submit"
           disabled={isLoading}
           className={[
-            "ml-6 flex items-center gap-2 rounded px-6 py-2.5 text-sm font-medium text-white transition-colors",
+            "flex items-center gap-2 rounded px-6 py-2.5 text-sm font-medium text-white transition-colors",
             "bg-blue-600 hover:bg-blue-700",
             "disabled:cursor-not-allowed disabled:opacity-60",
           ].join(" ")}
@@ -247,13 +247,13 @@ export default function SearchPanel({
           {isLoading ? t.searching : t.search}
         </button>
 
-        {/* Reset 按钮 - Tesla 风格：次要按钮、4px 圆角 */}
+        {/* Reset 按钮 */}
         <button
           type="button"
           onClick={handleReset}
           disabled={isLoading}
           className={[
-            "ml-3 flex items-center gap-2 rounded border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-colors",
+            "flex items-center gap-2 rounded border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-colors",
             "hover:border-blue-600 hover:text-blue-600",
             "disabled:cursor-not-allowed disabled:opacity-60",
           ].join(" ")}
