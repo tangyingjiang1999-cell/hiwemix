@@ -1,6 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse as NextResponseClass } from "next/server";
 import jwt from "jsonwebtoken";
-import { getDb, User } from "@/lib/db";
 
 const JWT_SECRET = process.env.JWT_SECRET || "hiwen-mix-secret-key-change-in-production";
 
@@ -10,7 +9,7 @@ export interface AuthToken {
   role: string;
 }
 
-export function signToken(user: User): string {
+export function signToken(user: { id: number; username: string; role: string }): string {
   return jwt.sign(
     { userId: user.id, username: user.username, role: user.role },
     JWT_SECRET,
@@ -27,32 +26,24 @@ export function verifyToken(token: string): AuthToken | null {
 }
 
 export function getTokenFromRequest(req: NextRequest): string | null {
-  // 优先从 cookie 读取
   const cookie = req.cookies.get("auth_token")?.value;
   if (cookie) return cookie;
-  // 降级从 Authorization header 读取
   const auth = req.headers.get("Authorization");
   if (auth?.startsWith("Bearer ")) return auth.slice(7);
   return null;
 }
 
-export function getUserFromRequest(req: NextRequest): AuthToken | null {
-  const token = getTokenFromRequest(req);
-  if (!token) return null;
-  return verifyToken(token);
-}
-
-export function setAuthCookie(res: NextResponse, token: string) {
+export function setAuthCookie(res: NextResponseClass, token: string): void {
   res.cookies.set("auth_token", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 天
+    maxAge: 60 * 60 * 24 * 7,
     path: "/",
   });
 }
 
-export function clearAuthCookie(res: NextResponse) {
+export function clearAuthCookie(res: NextResponseClass): void {
   res.cookies.set("auth_token", "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -62,21 +53,27 @@ export function clearAuthCookie(res: NextResponse) {
   });
 }
 
-// 检查请求是否已认证，未认证返回 401 响应
-export function requireAuth(req: NextRequest): { user: AuthToken; res: null } | { user: null; res: NextResponse } {
-  const user = getUserFromRequest(req);
-  if (!user) {
-    return { user: null, res: NextResponse.json({ error: "unauthenticated" }, { status: 401 }) };
-  }
-  return { user, res: null };
+// 同步获取当前用户（从请求中提取）
+export function getUserFromRequest(req: NextRequest): AuthToken | null {
+  const token = getTokenFromRequest(req);
+  if (!token) return null;
+  return verifyToken(token);
 }
 
-// 检查是否为管理员，否则返回 403
-export function requireAdmin(req: NextRequest): { user: AuthToken; res: null } | { user: null; res: NextResponse } {
-  const auth = requireAuth(req);
-  if (auth.res) return { user: null, res: auth.res };
-  if (auth.user!.role !== "admin") {
-    return { user: null, res: NextResponse.json({ error: "forbidden" }, { status: 403 }) };
+// 要求认证，否则返回 401 响应
+export function requireAuth(user: AuthToken | null): NextResponseClass | null {
+  if (!user) {
+    return new NextResponseClass(JSON.stringify({ error: "unauthenticated" }), { status: 401, headers: { "Content-Type": "application/json" } });
   }
-  return { user: auth.user!, res: null };
+  return null;
+}
+
+// 要求管理员权限，否则返回 403 响应
+export function requireAdmin(user: AuthToken | null): NextResponseClass | null {
+  const authRes = requireAuth(user);
+  if (authRes) return authRes;
+  if (user!.role !== "admin") {
+    return new NextResponseClass(JSON.stringify({ error: "forbidden" }), { status: 403, headers: { "Content-Type": "application/json" } });
+  }
+  return null;
 }

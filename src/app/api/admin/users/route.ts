@@ -1,85 +1,79 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb, hashPassword } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth";
+import { getUsers, getUserByUsername, createUser, updateUser, deleteUser } from "@/lib/db";
+import { hashPassword } from "@/lib/auth-helpers";
+import { getTokenFromRequest, verifyToken, requireAuth, requireAdmin } from "@/lib/auth";
+
+function getUser(req: NextRequest): { userId: number; username: string; role: string } | null {
+  const token = getTokenFromRequest(req);
+  if (!token) return null;
+  return verifyToken(token);
+}
 
 export async function GET(req: NextRequest) {
-  const auth = requireAdmin(req);
-  if (auth.res) return auth.res;
+  const user = getUser(req);
+  const res = new NextResponse();
+  const forbidden = requireAdmin(user);
+  if (forbidden) return forbidden;
 
-  const db = getDb();
-  const users = db.prepare("SELECT id, username, role, created_at, updated_at FROM users ORDER BY id").all();
+  const users = await getUsers();
   return NextResponse.json(users);
 }
 
 export async function POST(req: NextRequest) {
-  const auth = requireAdmin(req);
-  if (auth.res) return auth.res;
+  const user = getUser(req);
+  const forbidden = requireAdmin(user);
+  if (forbidden) return forbidden;
 
   const { username, password, role } = await req.json();
   if (!username || !password) {
     return NextResponse.json({ error: "用户名和密码不能为空" }, { status: 400 });
   }
 
-  const db = getDb();
-  const existing = db.prepare("SELECT id FROM users WHERE username = ?").get(username);
+  const existing = await getUserByUsername(username);
   if (existing) {
     return NextResponse.json({ error: "用户名已存在" }, { status: 409 });
   }
 
-  const hash = hashPassword(password);
-  db.prepare(
-    "INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)"
-  ).run(username, hash, role || "user");
-
-  return NextResponse.json({ success: true });
+  const userRecord = await createUser(username, hashPassword(password), role || "user");
+  return NextResponse.json({ success: true, user: userRecord });
 }
 
 export async function PUT(req: NextRequest) {
-  const auth = requireAdmin(req);
-  if (auth.res) return auth.res;
+  const user = getUser(req);
+  const forbidden = requireAdmin(user);
+  if (forbidden) return forbidden;
 
   const { id, username, password, role } = await req.json();
   if (!id) {
     return NextResponse.json({ error: "id 不能为空" }, { status: 400 });
   }
 
-  const db = getDb();
-  const updates: string[] = [];
-  const params: any[] = [];
-
   if (username) {
-    const existing = db.prepare("SELECT id FROM users WHERE username = ? AND id != ?").get(username, id);
-    if (existing) {
+    const existing = await getUserByUsername(username);
+    if (existing && existing.id !== id) {
       return NextResponse.json({ error: "用户名已存在" }, { status: 409 });
     }
-    updates.push("username = ?");
-    params.push(username);
   }
-  if (password) {
-    updates.push("password_hash = ?");
-    params.push(hashPassword(password));
-  }
-  if (role) {
-    updates.push("role = ?");
-    params.push(role);
-  }
-  updates.push("updated_at = datetime('now', 'localtime')");
-  params.push(id);
 
-  db.prepare(`UPDATE users SET ${updates.join(", ")} WHERE id = ?`).run(...params);
+  const fields: any = {};
+  if (username) fields.username = username;
+  if (password) fields.password_hash = hashPassword(password);
+  if (role) fields.role = role;
+
+  await updateUser(id, fields);
   return NextResponse.json({ success: true });
 }
 
 export async function DELETE(req: NextRequest) {
-  const auth = requireAdmin(req);
-  if (auth.res) return auth.res;
+  const user = getUser(req);
+  const forbidden = requireAdmin(user);
+  if (forbidden) return forbidden;
 
   const { id } = await req.json();
   if (!id) {
     return NextResponse.json({ error: "id 不能为空" }, { status: 400 });
   }
 
-  const db = getDb();
-  db.prepare("DELETE FROM users WHERE id = ? AND username != 'admin'").run(id);
+  await deleteUser(id);
   return NextResponse.json({ success: true });
 }
