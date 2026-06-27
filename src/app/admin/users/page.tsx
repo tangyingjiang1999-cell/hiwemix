@@ -1,0 +1,258 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+
+interface User {
+  id: number;
+  username: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export default function AdminUsersPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [form, setForm] = useState({ username: "", password: "", role: "user" });
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const fetchUsers = useCallback(async () => {
+    const res = await fetch("/api/admin/users");
+    if (res.ok) {
+      const data = await res.json();
+      setUsers(data);
+    } else if (res.status === 401) {
+      router.push("/login");
+    } else if (res.status === 403) {
+      alert("无权限访问");
+      router.push("/");
+    }
+    setLoading(false);
+  }, [router]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  function openCreate() {
+    setEditingUser(null);
+    setForm({ username: "", password: "", role: "user" });
+    setError("");
+    setShowModal(true);
+  }
+
+  function openEdit(user: User) {
+    setEditingUser(user);
+    setForm({ username: user.username, password: "", role: user.role });
+    setError("");
+    setShowModal(true);
+  }
+
+  async function handleSave() {
+    setError("");
+    const method = editingUser ? "PUT" : "POST";
+    const body = editingUser
+      ? { id: editingUser.id, ...form }
+      : { ...form };
+
+    if (!editingUser && !form.password) {
+      setError("新建用户必须设置密码");
+      return;
+    }
+
+    const res = await fetch("/api/admin/users", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setShowModal(false);
+      fetchUsers();
+    } else {
+      setError(data.error || "操作失败");
+    }
+  }
+
+  async function handleDelete(user: User) {
+    if (user.username === "admin") {
+      alert("不能删除超级管理员");
+      return;
+    }
+    if (!confirm(`确定删除用户 "${user.username}" 吗？`)) return;
+    const res = await fetch("/api/admin/users", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: user.id }),
+    });
+    if (res.ok) {
+      fetchUsers();
+    }
+  }
+
+  async function handleLogout() {
+    await fetch("/api/auth/me", { method: "DELETE" });
+    router.push("/login");
+  }
+
+  if (loading) {
+    return <div className="p-8 text-center text-gray-500">加载中...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F9FAFB]">
+      {/* 顶部 Header */}
+      <header
+        className="flex h-[96px] items-center justify-between px-[40px]"
+        style={{ background: "linear-gradient(to right, #8B5CF6, #0D9488)" }}
+      >
+        <div className="flex items-center gap-4">
+          <img src="/haiwen.png" alt="HAIWEN" className="h-[90px] w-[90px] object-contain" />
+          <span
+            className="text-[28px] font-extrabold text-white"
+            style={{ letterSpacing: "2px", fontFamily: 'var(--font-outfit), "Outfit", sans-serif' }}
+          >
+            HAIWEN MIX · 用户管理
+          </span>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="rounded border border-white/40 px-4 py-1.5 text-sm text-white transition-colors hover:bg-white/10"
+        >
+          退出登录
+        </button>
+      </header>
+
+      <div className="mx-auto max-w-4xl px-8 py-8">
+        {/* 操作栏 */}
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-gray-900">用户列表</h2>
+          <button
+            onClick={openCreate}
+            className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+          >
+            + 新建用户
+          </button>
+        </div>
+
+        {/* 用户表格 */}
+        <div className="overflow-hidden rounded border border-gray-200 bg-white">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th className="px-4 py-3">ID</th>
+                <th className="px-4 py-3">用户名</th>
+                <th className="px-4 py-3">角色</th>
+                <th className="px-4 py-3">创建时间</th>
+                <th className="px-4 py-3 text-right">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user.id} className="border-b border-gray-100 last:border-0">
+                  <td className="px-4 py-3 text-gray-600">{user.id}</td>
+                  <td className="px-4 py-3 font-medium text-gray-900">{user.username}</td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`rounded px-2 py-0.5 text-xs font-medium ${
+                        user.role === "admin"
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {user.role === "admin" ? "管理员" : "普通用户"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-gray-500">{user.created_at}</td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      onClick={() => openEdit(user)}
+                      className="mr-3 text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      编辑
+                    </button>
+                    <button
+                      onClick={() => handleDelete(user)}
+                      className="text-sm text-red-600 hover:text-red-800"
+                      disabled={user.username === "admin"}
+                    >
+                      删除
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* 新建/编辑弹窗 */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="w-[400px] rounded-lg bg-white p-6 shadow-lg">
+            <h3 className="mb-4 text-lg font-semibold text-gray-900">
+              {editingUser ? "编辑用户" : "新建用户"}
+            </h3>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">用户名</label>
+                <input
+                  type="text"
+                  value={form.username}
+                  onChange={(e) => setForm({ ...form, username: e.target.value })}
+                  disabled={!!editingUser}
+                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none disabled:bg-gray-100 focus:border-blue-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  密码 {editingUser ? "（留空表示不修改）" : ""}
+                </label>
+                <input
+                  type="password"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-600"
+                  placeholder={editingUser ? "留空则不修改" : ""}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">角色</label>
+                <select
+                  value={form.role}
+                  onChange={(e) => setForm({ ...form, role: e.target.value })}
+                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-600"
+                >
+                  <option value="user">普通用户</option>
+                  <option value="admin">管理员</option>
+                </select>
+              </div>
+            </div>
+
+            {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleSave}
+                className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              >
+                {editingUser ? "保存" : "创建"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

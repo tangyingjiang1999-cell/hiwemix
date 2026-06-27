@@ -1,0 +1,188 @@
+/* ============================================================
+   HAIWEN MIX - Tesla-Inspired Industrial Design System
+   ============================================================ */
+
+@import "tailwindcss";
+
+/* ============================================================
+   Design Tokens (Tesla-Inspired)
+   ============================================================ */
+
+:root {
+  /* Primary Acsent - Electric Blue */
+  --color-primary: #3E6AE1;
+  --color-primary-hover: #2D5BCO;
+
+  /* Background */
+  --color-bg-primary: #FFFFFF;
+  --color-bg-secondary: #F4F4F4;
+
+  /* Text */
+  --color-text-primary: #171A20;
+  --color-text-secondary: #393C41;
+  --color-text-tertiary: #5C5E62;
+  --color-text-placeholder: #8E8E8E;
+
+  /* Borders */
+  --color-border: #E5E7EB;
+  --color-border-light: #F0F0F0;
+
+  /* Timing */
+  --transition-fast: 0.33s cubic-bezier(0.5, 0, 0, 0.75);
+
+  /* Border Radius */
+  --radius-sharp: 4px;
+  --radius-medium: 8px;
+}
+
+/* ============================================================
+   Base Styles
+   ============================================================ */
+
+body {
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   Typography Scale (Tesla-Inspired)
+   ============================================================ */
+
+.text-hero {
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: normal;
+}
+
+.text-body {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.43;
+}
+
+.text-ui {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* ============================================================
+   Component Base Styles
+   ============================================================ */
+
+/* Buttons - Sharp 4px radius, no shadows */
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 24px;
+  border-radius: var(--radius-sharp);
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 24px;
+  border-radius: var(--radius-sharp);
+  border: 1.5px solid var(--color-border);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-primary);
+}
+
+/* Inputs - Minimal, sharp corners */
+.input-base {
+  height: 44px;
+  padding: 0 16px;
+  font-size: 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sharp);
+  background: white;
+  color: var(--color-text-primary);
+  transition: border-color var(--transition-fast);
+}
+
+.input-base:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.input-base::placeholder {
+  color: var(--color-text-placeholder);
+}
+
+/* Cards - No shadows, minimal borders */
+.card-base {
+  background: white;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-medium);
+  transition: border-color var(--transition-fast);
+}
+
+.card-base:hover {
+  border-color: var(--color-primary);
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 150ms ease-in-out;
+}
+
+/* ============================================================
+   Print Styles (Unchanged)
+   ============================================================ */
+
+@media print {
+  header, aside, footer, nav, button, [aria-hidden="true"], .mobile-fab {
+    display: none !important;
+  }
+
+  body > *, main {
+    display: block !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  [class*="fixed"][class*="right-0"][class*="top-0"][class*="z-50"] {
+    position: static !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  body {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #000;
+    background: #fff;
+  }
+}
