@@ -92,10 +92,11 @@ export default function LoginPage() {
       className="flex min-h-screen"
       style={{
         background: "linear-gradient(135deg, #4ECDC4 0%, #C471ED 60%, #d06af6 100%)",
+        fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
       }}
     >
       {/* ===== 左侧：品牌区域（桌面端） ===== */}
-      <div className="hidden lg:flex lg:w-[45%] flex-col justify-between px-12 py-14 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/3 flex-col justify-between px-12 py-14 relative overflow-hidden">
         {/* 背景装饰圆 */}
         <div
           className="absolute -left-20 -top-32 h-[400px] w-[400px] rounded-full opacity-20 blur-3xl"
@@ -112,7 +113,6 @@ export default function LoginPage() {
             className="text-white font-bold leading-tight"
             style={{
               fontSize: "44px",
-              fontFamily: 'var(--font-outfit), "Outfit", sans-serif',
               letterSpacing: "-0.5px",
             }}
           >
@@ -122,7 +122,6 @@ export default function LoginPage() {
             className="mt-1 text-white font-bold leading-tight"
             style={{
               fontSize: "52px",
-              fontFamily: 'var(--font-outfit), "Outfit", sans-serif',
               letterSpacing: "-1px",
             }}
           >
@@ -132,7 +131,6 @@ export default function LoginPage() {
             className="mt-1 text-white font-bold leading-tight opacity-90"
             style={{
               fontSize: "40px",
-              fontFamily: 'var(--font-outfit), "Outfit", sans-serif',
               letterSpacing: "-0.5px",
             }}
           >
@@ -160,21 +158,16 @@ export default function LoginPage() {
       </div>
 
       {/* ===== 右侧：登录表单 ===== */}
-      <div className="flex w-full items-center justify-center bg-white lg:w-[55%] px-8 py-14 sm:px-14 lg:px-20">
+      <div className="flex w-full items-center justify-center bg-white lg:w-2/3 px-8 py-14 sm:px-14 lg:px-20">
         <div className="w-full max-w-[380px]">
           {/* 移动端 Logo + 标题（仅小屏显示） */}
           <div className="mb-10 text-center lg:hidden">
             <img
               src="/haiwen-logo.png"
               alt="HAIWEN"
-              className="mx-auto h-14 w-auto object-contain"
+              className="mx-auto h-[168px] w-auto object-contain"
             />
-            <h1
-              className="mt-4 text-xl font-bold text-gray-900"
-              style={{
-                fontFamily: 'var(--font-outfit), "Outfit", sans-serif',
-              }}
-            >
+            <h1 className="mt-4 text-xl font-bold text-gray-900">
               Welcome to HAIWE
             </h1>
           </div>
@@ -184,7 +177,7 @@ export default function LoginPage() {
             <img
               src="/haiwen-logo.png"
               alt="HAIWEN"
-              className="h-20 w-auto object-contain"
+              className="h-60 w-auto object-contain"
             />
           </div>
 
