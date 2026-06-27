@@ -16,6 +16,11 @@ function decodeJwtPayload(token: string): Record<string, any> | null {
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
+  // 静态资源文件（图片、字体等）直接放行
+  if (/\.(jpg|jpeg|png|gif|svg|ico|webp|avif|woff2?|ttf|eot)$/i.test(pathname)) {
+    return NextResponse.next();
+  }
+
   // 公开路由，不需要认证
   const publicPaths = ["/login", "/api/auth/login", "/_next", "/favicon.ico"];
   if (publicPaths.some((p) => pathname.startsWith(p))) {
