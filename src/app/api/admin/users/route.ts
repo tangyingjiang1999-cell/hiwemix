@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUsers, getUserByUsername, createUser, updateUser, deleteUser } from "@/lib/db";
-import { hashPassword } from "@/lib/auth-helpers";
-import { getTokenFromRequest, verifyToken, requireAuth, requireAdmin } from "@/lib/auth";
+import { getTokenFromRequest, verifyToken, requireAdmin } from "@/lib/auth";
 
 function getUser(req: NextRequest): { userId: number; username: string; role: string } | null {
   const token = getTokenFromRequest(req);
@@ -9,14 +7,17 @@ function getUser(req: NextRequest): { userId: number; username: string; role: st
   return verifyToken(token);
 }
 
+// 内置用户列表（无需数据库）
+const BUILTIN_USERS = [
+  { id: 1, username: "admin", role: "admin", created_at: new Date().toISOString() },
+];
+
 export async function GET(req: NextRequest) {
   const user = getUser(req);
-  const res = new NextResponse();
   const forbidden = requireAdmin(user);
   if (forbidden) return forbidden;
 
-  const users = await getUsers();
-  return NextResponse.json(users);
+  return NextResponse.json(BUILTIN_USERS);
 }
 
 export async function POST(req: NextRequest) {
@@ -24,18 +25,8 @@ export async function POST(req: NextRequest) {
   const forbidden = requireAdmin(user);
   if (forbidden) return forbidden;
 
-  const { username, password, role } = await req.json();
-  if (!username || !password) {
-    return NextResponse.json({ error: "用户名和密码不能为空" }, { status: 400 });
-  }
-
-  const existing = await getUserByUsername(username);
-  if (existing) {
-    return NextResponse.json({ error: "用户名已存在" }, { status: 409 });
-  }
-
-  const userRecord = await createUser(username, hashPassword(password), role || "user");
-  return NextResponse.json({ success: true, user: userRecord });
+  // 当前为内置账号模式，暂不支持通过 API 新建用户
+  return NextResponse.json({ error: "当前模式不支持创建用户，请修改代码中的 BUILTIN_USERS" }, { status: 501 });
 }
 
 export async function PUT(req: NextRequest) {
@@ -43,25 +34,7 @@ export async function PUT(req: NextRequest) {
   const forbidden = requireAdmin(user);
   if (forbidden) return forbidden;
 
-  const { id, username, password, role } = await req.json();
-  if (!id) {
-    return NextResponse.json({ error: "id 不能为空" }, { status: 400 });
-  }
-
-  if (username) {
-    const existing = await getUserByUsername(username);
-    if (existing && existing.id !== id) {
-      return NextResponse.json({ error: "用户名已存在" }, { status: 409 });
-    }
-  }
-
-  const fields: any = {};
-  if (username) fields.username = username;
-  if (password) fields.password_hash = hashPassword(password);
-  if (role) fields.role = role;
-
-  await updateUser(id, fields);
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ error: "当前模式不支持编辑用户，请修改代码中的 BUILTIN_USERS" }, { status: 501 });
 }
 
 export async function DELETE(req: NextRequest) {
@@ -69,11 +42,5 @@ export async function DELETE(req: NextRequest) {
   const forbidden = requireAdmin(user);
   if (forbidden) return forbidden;
 
-  const { id } = await req.json();
-  if (!id) {
-    return NextResponse.json({ error: "id 不能为空" }, { status: 400 });
-  }
-
-  await deleteUser(id);
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ error: "当前模式不支持删除用户" }, { status: 501 });
 }
