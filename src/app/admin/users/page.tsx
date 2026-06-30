@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import SiteHeader from "@/components/SiteHeader";
+import Navigation from "@/components/Navigation";
 
 interface User {
   id: number;
@@ -94,38 +96,14 @@ export default function AdminUsersPage() {
     }
   }
 
-  async function handleLogout() {
-    await fetch("/api/auth/me", { method: "DELETE" });
-    router.push("/login");
-  }
-
   if (loading) {
     return <div className="p-8 text-center text-gray-500">加载中...</div>;
   }
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      {/* 顶部 Header */}
-      <header
-        className="flex h-[96px] items-center justify-between px-[40px]"
-        style={{ background: "linear-gradient(to right, #8B5CF6, #0D9488)" }}
-      >
-        <div className="flex items-center gap-4">
-          <img src="/haiwen.png" alt="HAIWEN" className="h-[90px] w-[90px] object-contain" />
-          <span
-            className="text-[28px] font-extrabold text-white"
-            style={{ letterSpacing: "2px", fontFamily: 'var(--font-outfit), "Outfit", sans-serif' }}
-          >
-            HAIWEN MIX · 用户管理
-          </span>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="rounded border border-white/40 px-4 py-1.5 text-sm text-white transition-colors hover:bg-white/10"
-        >
-          退出登录
-        </button>
-      </header>
+      <SiteHeader subtitle="· 用户管理" />
+      <Navigation />
 
       <div className="mx-auto max-w-4xl px-8 py-8">
         {/* 操作栏 */}

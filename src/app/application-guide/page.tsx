@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import { guideCategories, guideItems } from "@/lib/guide-data";
 import { useLang } from "@/components/LanguageContext";
+import SiteHeader from "@/components/SiteHeader";
+import Navigation from "@/components/Navigation";
 import type { GuideItem } from "@/lib/guide-data";
 
 // 指南内容组件
@@ -87,17 +89,8 @@ export default function ApplicationGuidePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 顶部 */}
-      <header className="bg-gradient-to-r from-purple-600 to-teal-700 p-6 text-white">
-        <h1 className="text-3xl font-extrabold">HAIWEN MIX</h1>
-        <p className="mt-1 text-lg">Application Guide</p>
-      </header>
-
-      {/* 导航 */}
-      <nav className="border-b bg-white px-6 py-3">
-        <a href="/" className="mr-6 text-sm text-gray-600 hover:text-teal-600">Formula Search</a>
-        <a href="/color-library" className="mr-6 text-sm text-gray-600 hover:text-teal-600">Color Visual Library</a>
-        <a href="/application-guide" className="border-b-2 border-teal-600 pb-3 text-sm font-semibold text-teal-600">Application Guide</a>
-      </nav>
+      <SiteHeader subtitle="Application Guide" />
+      <Navigation />
 
       {/* 搜索栏 */}
       <div className="bg-white px-6 py-4">

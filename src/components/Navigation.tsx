@@ -14,7 +14,7 @@ export default function Navigation() {
   ];
 
   return (
-    <nav className="flex h-[52px] items-center border-b border-[#E5E7EB] bg-white px-[40px]">
+    <nav className="flex h-12 items-center overflow-x-auto border-b border-[#E5E7EB] bg-white px-4 whitespace-nowrap scrollbar-hide sm:px-[40px]">
       {navItems.map((item) => {
         const isActive =
           (item.href === "/" && pathname === "/") ||

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { mockColors, mockCarMakes } from "@/lib/mock-data";
 import { useLang } from "@/components/LanguageContext";
+import SiteHeader from "@/components/SiteHeader";
+import Navigation from "@/components/Navigation";
 import type { Color } from "@/types";
 
 // 颜色卡片组件
@@ -100,17 +102,8 @@ export default function ColorLibraryPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 顶部 */}
-      <header className="bg-gradient-to-r from-purple-600 to-teal-700 p-6 text-white">
-        <h1 className="text-3xl font-extrabold">HAIWEN MIX</h1>
-        <p className="mt-1 text-lg">Color Visual Library</p>
-      </header>
-
-      {/* 导航 */}
-      <nav className="border-b bg-white px-6 py-3">
-        <a href="/" className="mr-6 text-sm text-gray-600 hover:text-teal-600">Formula Search</a>
-        <a href="/color-library" className="mr-6 border-b-2 border-teal-600 pb-3 text-sm font-semibold text-teal-600">Color Visual Library</a>
-        <a href="/application-guide" className="text-sm text-gray-600 hover:text-teal-600">Application Guide</a>
-      </nav>
+      <SiteHeader subtitle="Color Visual Library" />
+      <Navigation />
 
       {/* 筛选栏 */}
       <div className="bg-white px-6 py-4">

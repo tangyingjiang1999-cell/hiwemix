@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-// SVG 图标组件（模块级，避免重渲染）
 function UserIcon({ className = "w-5 h-5" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -36,18 +35,6 @@ function EyeOffIcon() {
       <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
       <line x1="1" y1="1" x2="23" y2="23" />
     </svg>
-  );
-}
-
-function SpinnerIcon() {
-  return (
-    <div className="flex justify-center mt-3">
-      <div
-        className="h-6 w-6 rounded-full border-2 border-indigo-200 border-t-indigo-500"
-        style={{ animation: "spin 0.75s linear infinite" }}
-      />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
   );
 }
 
@@ -88,67 +75,58 @@ export default function LoginPage() {
   }
 
   return (
-    <div
-      className="flex min-h-screen"
-      style={{
-        background: "linear-gradient(135deg, #4ECDC4 0%, #C471ED 60%, #d06af6 100%)",
-        fontFamily: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
-      }}
-    >
-      {/* ===== 左侧：品牌区域（桌面端） ===== */}
-      <div className="hidden lg:flex lg:w-1/3 flex-col justify-between px-12 py-14 relative overflow-hidden">
+    <div className="flex min-h-screen flex-col lg:flex-row">
+      {/* ===== 左侧品牌区 (40%) ===== */}
+      <div
+        className="relative flex flex-col justify-between px-10 py-12 lg:w-[40%]"
+        style={{
+          background: "linear-gradient(135deg, #8B5CF6 0%, #0D9488 100%)",
+          fontFamily: 'var(--font-outfit), "Outfit", sans-serif',
+        }}
+      >
         {/* 背景装饰圆 */}
-        <div
-          className="absolute -left-20 -top-32 h-[400px] w-[400px] rounded-full opacity-20 blur-3xl"
-          style={{ backgroundColor: "#ffffff" }}
-        />
-        <div
-          className="absolute -right-16 -bottom-24 h-[300px] w-[300px] rounded-full opacity-15 blur-3xl"
-          style={{ backgroundColor: "#E879F9" }}
-        />
+        <div className="pointer-events-none absolute -left-20 -top-32 h-[500px] w-[500px] rounded-full bg-white/5 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 -right-16 h-[300px] w-[300px] rounded-full bg-white/10 blur-3xl" />
 
-        {/* 主标题 */}
-        <div className="relative z-10 mt-8">
-          <h1
-            className="text-white font-bold leading-tight"
-            style={{
-              fontSize: "44px",
-              letterSpacing: "-0.5px",
-            }}
-          >
-            Welcome to
-          </h1>
-          <h1
-            className="mt-1 text-white font-bold leading-tight"
-            style={{
-              fontSize: "52px",
-              letterSpacing: "-1px",
-            }}
-          >
-            HAIWE
-          </h1>
-          <h1
-            className="mt-1 text-white font-bold leading-tight opacity-90"
-            style={{
-              fontSize: "40px",
-              letterSpacing: "-0.5px",
-            }}
-          >
-            Color System
-          </h1>
+        {/* 移动端 - 仅在手机显示紧凑头部 */}
+        <div className="relative z-10 flex items-center gap-3 lg:hidden">
+          <img
+            src="/haiwen-logo.png"
+            alt="HAIWEN"
+            className="h-10 w-10 object-contain brightness-0 invert"
+          />
+          <span className="text-lg font-bold tracking-wide text-white">
+            HAIWEN MIX
+          </span>
         </div>
 
-        {/* 左下角网站链接 */}
-        <div className="relative z-10 mb-4">
-          <p className="text-sm text-white/70">Our official website :</p>
+        {/* 桌面端 - 品牌大区 */}
+        <div className="relative z-10 hidden lg:block">
+          <img
+            src="/haiwen-logo.png"
+            alt="HAIWEN"
+            className="mb-8 h-28 w-auto object-contain brightness-0 invert"
+          />
+          <h1 className="text-5xl font-extrabold leading-tight tracking-tight text-white">
+            HAIWEN
+          </h1>
+          <h1 className="text-5xl font-extrabold leading-tight tracking-tight text-white/90">
+            MIX
+          </h1>
+          <p className="mt-4 text-lg font-medium text-white/70">
+            Car Refinish Formula System
+          </p>
+        </div>
+
+        {/* 底部链接 */}
+        <div className="relative z-10">
           <a
             href="https://www.hiwe.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-1 inline-block text-base font-semibold text-white transition-transform duration-200 ease-out hover:scale-110 hover:text-white/90"
+            className="inline-block text-sm font-semibold text-white/70 transition-colors hover:text-white"
             style={{
               textDecoration: "underline",
-              textDecorationColor: "rgba(255,255,255,0.5)",
               textUnderlineOffset: "3px",
             }}
           >
@@ -157,72 +135,87 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ===== 右侧：登录表单 ===== */}
-      <div className="flex w-full items-center justify-center bg-white lg:w-2/3 px-8 py-14 sm:px-14 lg:px-20">
-        <div className="w-full max-w-[380px]">
-          {/* 移动端 Logo + 标题（仅小屏显示） */}
-          <div className="mb-10 text-center lg:hidden">
-            <img
-              src="/haiwen-logo.png"
-              alt="HAIWEN"
-              className="mx-auto h-[168px] w-auto object-contain"
-            />
-            <h1 className="mt-4 text-xl font-bold text-gray-900">
-              Welcome to HAIWE
-            </h1>
+      {/* ===== 右侧表单区 (60%) ===== */}
+      <div className="flex flex-1 items-center justify-center bg-white px-6 py-10 lg:px-16">
+        <div className="w-full max-w-sm">
+          {/* 桌面端小标题 */}
+          <div className="mb-10 hidden lg:block">
+            <p className="text-sm font-medium uppercase tracking-widest text-gray-400">
+              Sign In
+            </p>
+            <h2 className="mt-2 text-2xl font-bold text-gray-900">
+              Welcome back
+            </h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Enter your credentials to access the system
+            </p>
           </div>
 
-          {/* 桌面端 Logo */}
-          <div className="mb-10 hidden lg:flex justify-center">
+          {/* 移动端 - 品牌区不显示的标题 */}
+          <div className="mb-8 lg:hidden">
             <img
               src="/haiwen-logo.png"
               alt="HAIWEN"
-              className="h-60 w-auto object-contain"
+              className="mb-4 h-14 w-auto object-contain"
             />
+            <h1 className="text-xl font-bold text-gray-900">
+              Welcome to HAIWEN
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">Formula Search</p>
           </div>
 
           {/* 表单 */}
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email / Username */}
-            <div className="group relative mb-8">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-0">
-                <UserIcon />
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <UserIcon />
+                </div>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="you@example.com"
+                  autoFocus
+                  className="block h-12 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/10"
+                />
               </div>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Email"
-                autoFocus
-                className="peer h-11 w-full border-b-2 border-gray-200 bg-transparent py-2 pl-9 pr-3 text-[15px] text-gray-800 outline-none placeholder:text-gray-400 focus:border-indigo-400 transition-colors"
-              />
             </div>
 
             {/* Password */}
-            <div className="group relative mb-8">
-              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-0">
-                <LockIcon />
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+                Password
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <LockIcon />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  className="block h-12 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-12 text-sm text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                </button>
               </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="peer h-11 w-full border-b-2 border-gray-200 bg-transparent py-2 pl-9 pr-10 text-[15px] text-gray-800 outline-none placeholder:text-gray-400 focus:border-indigo-400 transition-colors"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-0 top-1/2 -translate-y-1/2 bg-transparent border-none p-0 cursor-pointer"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-              </button>
             </div>
 
             {/* 错误提示 */}
             {error && (
-              <div className="mb-5 rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600 border border-red-100">
+              <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
                 {error}
               </div>
             )}
@@ -231,16 +224,20 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="mt-3 h-12 w-full rounded-lg text-base font-medium text-white shadow-md shadow-indigo-300/50 transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 hover:shadow-lg hover:shadow-indigo-300/60"
-              style={{
-                backgroundColor: loading ? "#7C6FBF" : "#6366F1",
-              }}
+              className="flex h-12 w-full items-center justify-center rounded-lg bg-[#0D9488] text-base font-semibold text-white transition-all duration-200 hover:bg-[#0F766E] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading ? "Signing in..." : "Get started"}
+              {loading ? (
+                <span className="flex items-center gap-2">
+                  <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Signing in...
+                </span>
+              ) : (
+                "Get started"
+              )}
             </button>
-
-            {/* Loading spinner */}
-            {loading && <SpinnerIcon />}
           </form>
         </div>
       </div>
