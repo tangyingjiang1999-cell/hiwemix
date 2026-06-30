@@ -78,13 +78,9 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* ===== 左侧品牌区 (40%) ===== */}
       <div
-        className="relative flex flex-col justify-between px-10 py-12 lg:w-[40%]"
-        style={{
-          background: "linear-gradient(135deg, #8B5CF6 0%, #0D9488 100%)",
-        }}
+        className="fluid-gradient relative flex flex-col justify-between px-10 py-12 lg:w-[33%]"
       >
-        <div className="pointer-events-none absolute -left-20 -top-32 h-[500px] w-[500px] rounded-full bg-white/5 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 -right-16 h-[300px] w-[300px] rounded-full bg-white/10 blur-3xl" />
+        <div className="fluid-blob" />
 
         {/* 移动端 - 紧凑头部 */}
         <div className="relative z-10 flex items-center gap-3 lg:hidden">
@@ -98,37 +94,49 @@ export default function LoginPage() {
           </span>
         </div>
 
-        {/* 桌面端 - 品牌区 */}
-        <div className="relative z-10 hidden lg:block">
-          <img
-            src="/haiwen-logo.png"
-            alt="HAIWEN"
-            className="mb-8 h-28 w-auto object-contain brightness-0 invert"
-          />
-          <h1 className="text-muji-title text-white">
-            HAIWEN
+        {/* 桌面端 - 顶部品牌文字 */}
+        <div className="relative z-10 hidden lg:block text-left">
+          <h1
+            className="text-white"
+            style={{
+              fontFamily: "Arial, sans-serif",
+              fontSize: "52px",
+              fontWeight: 700,
+              letterSpacing: "2px",
+              lineHeight: 1.1,
+            }}
+          >
+            HAIWEN MIX
           </h1>
-          <h1 className="text-muji-title text-white/90">
-            MIX
-          </h1>
-          <p className="mt-4 text-muji-body text-white/70">
-            Car Refinish Formula System
+          <p
+            className="text-white"
+            style={{
+              fontFamily: "Arial, sans-serif",
+              fontSize: "13px",
+              fontWeight: 600,
+              letterSpacing: "3px",
+              marginTop: "4px",
+            }}
+          >
+            CAR REFINISH FORMULA SYSTEM
           </p>
         </div>
 
         {/* 底部链接 */}
-        <div className="relative z-10">
+        <div className="relative z-10 hidden lg:block" style={{ position: "absolute", bottom: "79px", left: "40px" }}>
           <a
             href="https://www.hiwe.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block text-muji-caption font-muji-600 text-white/70 transition-colors hover:text-white"
+            className="inline-block text-muji-body font-muji-600 text-white transition-colors hover:text-white/80"
             style={{
+              color: "white",
               textDecoration: "underline",
               textUnderlineOffset: "3px",
+              fontFamily: "Arial, sans-serif",
             }}
           >
-            www.hiwe.com
+            Official website www.hiwe.com
           </a>
         </div>
       </div>
@@ -137,10 +145,13 @@ export default function LoginPage() {
       <div className="flex flex-1 items-center justify-center bg-white px-6 py-10 lg:px-16">
         <div className="w-full max-w-sm">
           {/* 桌面端小标题 */}
-          <div className="mb-10 hidden lg:block">
-            <p className="text-muji-caption font-muji-600 uppercase tracking-widest text-gray-400">
-              Sign In
-            </p>
+          <div className="mb-10 hidden lg:block text-center">
+            <img
+              src="/haiwen-logo.png"
+              alt="HAIWEN"
+              className="mx-auto h-[104px] w-auto object-contain"
+              style={{ marginBottom: "24px", marginTop: "-80px" }}
+            />
             <h2 className="mt-2 text-muji-title text-gray-900">
               Welcome back
             </h2>

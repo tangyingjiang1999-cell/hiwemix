@@ -151,3 +151,97 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* ============================================================
+   流动液态渐变动画
+   使用素数倍时长(17s/23s/31s)让三层永不同步
+   三者最小公倍数 ≈ 12121s(≈3.4小时)，视觉上永不重复
+   ============================================================ */
+@keyframes fluid-flow-1 {
+  0%    { transform: translate(0%, 0%) scale(1); }
+  10%   { transform: translate(25%, -15%) scale(1.15); }
+  20%   { transform: translate(-10%, 30%) scale(0.9); }
+  30%   { transform: translate(35%, 10%) scale(1.1); }
+  40%   { transform: translate(-20%, -25%) scale(1.25); }
+  50%   { transform: translate(15%, 35%) scale(0.85); }
+  60%   { transform: translate(-30%, 5%) scale(1.2); }
+  70%   { transform: translate(20%, -20%) scale(0.95); }
+  80%   { transform: translate(-5%, 25%) scale(1.1); }
+  90%   { transform: translate(30%, -10%) scale(1.05); }
+  100%  { transform: translate(0%, 0%) scale(1); }
+}
+
+@keyframes fluid-flow-2 {
+  0%    { transform: translate(0%, 0%) scale(1.1); }
+  8%    { transform: translate(-25%, 18%) scale(0.85); }
+  16%   { transform: translate(20%, -22%) scale(1.2); }
+  24%   { transform: translate(-35%, 10%) scale(0.95); }
+  32%   { transform: translate(15%, 30%) scale(1.15); }
+  40%   { transform: translate(-10%, -30%) scale(1); }
+  48%   { transform: translate(30%, 15%) scale(0.9); }
+  56%   { transform: translate(-20%, -10%) scale(1.25); }
+  64%   { transform: translate(10%, 25%) scale(0.8); }
+  72%   { transform: translate(-30%, -20%) scale(1.1); }
+  80%   { transform: translate(25%, 5%) scale(0.95); }
+  88%   { transform: translate(-15%, -25%) scale(1.15); }
+  100%  { transform: translate(0%, 0%) scale(1.1); }
+}
+
+@keyframes fluid-flow-3 {
+  0%    { transform: translate(10%, -10%) scale(0.9); }
+  12%   { transform: translate(-25%, 20%) scale(1.2); }
+  24%   { transform: translate(30%, -5%) scale(0.85); }
+  36%   { transform: translate(-15%, 30%) scale(1.15); }
+  48%   { transform: translate(20%, -25%) scale(1); }
+  60%   { transform: translate(-30%, 10%) scale(1.3); }
+  72%   { transform: translate(15%, 25%) scale(0.9); }
+  84%   { transform: translate(-20%, -15%) scale(1.1); }
+  100%  { transform: translate(10%, -10%) scale(0.9); }
+}
+
+.fluid-gradient {
+  position: relative;
+  overflow: hidden;
+  background: #0D9488;
+}
+
+.fluid-gradient::before,
+.fluid-gradient::after,
+.fluid-gradient > .fluid-blob {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  will-change: transform;
+}
+
+/* 紫色大团 - 缓慢大范围流动 */
+.fluid-gradient::before {
+  top: -30%;
+  left: -30%;
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(circle, #8B5CF6 0%, transparent 70%);
+  animation: fluid-flow-1 17s ease-in-out infinite;
+}
+
+/* 青色中团 - 中速反向流动 */
+.fluid-gradient::after {
+  bottom: -20%;
+  right: -20%;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(circle, #0D9488 0%, transparent 70%);
+  animation: fluid-flow-2 23s ease-in-out infinite;
+}
+
+/* 第三层：淡紫色小团 - 快速无规则穿梭 */
+.fluid-gradient > .fluid-blob {
+  top: 20%;
+  left: 30%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.6) 0%, transparent 70%);
+  animation: fluid-flow-3 31s ease-in-out infinite;
+  z-index: 1;
+}
