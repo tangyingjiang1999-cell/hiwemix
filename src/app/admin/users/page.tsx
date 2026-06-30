@@ -97,7 +97,7 @@ export default function AdminUsersPage() {
   }
 
   if (loading) {
-    return <div className="p-8 text-center text-gray-500">加载中...</div>;
+    return <div className="p-8 text-center text-muji-body text-gray-500">加载中...</div>;
   }
 
   return (
@@ -106,22 +106,20 @@ export default function AdminUsersPage() {
       <Navigation />
 
       <div className="mx-auto max-w-4xl px-8 py-8">
-        {/* 操作栏 */}
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-gray-900">用户列表</h2>
+          <h2 className="text-muji-title text-gray-900">用户列表</h2>
           <button
             onClick={openCreate}
-            className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            className="rounded bg-blue-600 px-4 py-2 text-muji-heading font-muji-600 text-white transition-colors hover:bg-blue-700"
           >
             + 新建用户
           </button>
         </div>
 
-        {/* 用户表格 */}
         <div className="overflow-hidden rounded border border-gray-200 bg-white">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+              <tr className="border-b border-gray-200 bg-gray-50 text-left text-muji-caption font-muji-500 uppercase tracking-wider text-gray-500">
                 <th className="px-4 py-3">ID</th>
                 <th className="px-4 py-3">用户名</th>
                 <th className="px-4 py-3">角色</th>
@@ -132,11 +130,11 @@ export default function AdminUsersPage() {
             <tbody>
               {users.map((user) => (
                 <tr key={user.id} className="border-b border-gray-100 last:border-0">
-                  <td className="px-4 py-3 text-gray-600">{user.id}</td>
-                  <td className="px-4 py-3 font-medium text-gray-900">{user.username}</td>
+                  <td className="px-4 py-3 text-muji-body text-gray-600">{user.id}</td>
+                  <td className="px-4 py-3 text-muji-body font-muji-600 text-gray-900">{user.username}</td>
                   <td className="px-4 py-3">
                     <span
-                      className={`rounded px-2 py-0.5 text-xs font-medium ${
+                      className={`rounded px-2 py-0.5 text-muji-micro font-muji-500 ${
                         user.role === "admin"
                           ? "bg-purple-100 text-purple-800"
                           : "bg-gray-100 text-gray-700"
@@ -145,17 +143,17 @@ export default function AdminUsersPage() {
                       {user.role === "admin" ? "管理员" : "普通用户"}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-500">{user.created_at}</td>
+                  <td className="px-4 py-3 text-muji-body text-gray-500">{user.created_at}</td>
                   <td className="px-4 py-3 text-right">
                     <button
                       onClick={() => openEdit(user)}
-                      className="mr-3 text-sm text-blue-600 hover:text-blue-800"
+                      className="mr-3 text-muji-body text-blue-600 hover:text-blue-800"
                     >
                       编辑
                     </button>
                     <button
                       onClick={() => handleDelete(user)}
-                      className="text-sm text-red-600 hover:text-red-800"
+                      className="text-muji-body text-red-600 hover:text-red-800"
                       disabled={user.username === "admin"}
                     >
                       删除
@@ -168,43 +166,42 @@ export default function AdminUsersPage() {
         </div>
       </div>
 
-      {/* 新建/编辑弹窗 */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="w-[400px] rounded-lg bg-white p-6 shadow-lg">
-            <h3 className="mb-4 text-lg font-semibold text-gray-900">
+            <h3 className="mb-4 text-muji-subtitle text-gray-900">
               {editingUser ? "编辑用户" : "新建用户"}
             </h3>
 
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700">用户名</label>
+                <label className="block text-muji-body font-muji-500 text-gray-700">用户名</label>
                 <input
                   type="text"
                   value={form.username}
                   onChange={(e) => setForm({ ...form, username: e.target.value })}
                   disabled={!!editingUser}
-                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none disabled:bg-gray-100 focus:border-blue-600"
+                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-muji-body text-gray-900 outline-none disabled:bg-gray-100 focus:border-blue-600"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-muji-body font-muji-500 text-gray-700">
                   密码 {editingUser ? "（留空表示不修改）" : ""}
                 </label>
                 <input
                   type="password"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-600"
+                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-muji-body text-gray-900 outline-none focus:border-blue-600"
                   placeholder={editingUser ? "留空则不修改" : ""}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">角色</label>
+                <label className="block text-muji-body font-muji-500 text-gray-700">角色</label>
                 <select
                   value={form.role}
                   onChange={(e) => setForm({ ...form, role: e.target.value })}
-                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 outline-none focus:border-blue-600"
+                  className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-muji-body text-gray-900 outline-none focus:border-blue-600"
                 >
                   <option value="user">普通用户</option>
                   <option value="admin">管理员</option>
@@ -212,18 +209,18 @@ export default function AdminUsersPage() {
               </div>
             </div>
 
-            {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+            {error && <p className="mt-3 text-muji-body text-red-600">{error}</p>}
 
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowModal(false)}
-                className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50"
+                className="rounded border border-gray-300 px-4 py-2 text-muji-body text-gray-700 transition-colors hover:bg-gray-50"
               >
                 取消
               </button>
               <button
                 onClick={handleSave}
-                className="rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                className="rounded bg-blue-600 px-4 py-2 text-muji-heading font-muji-600 text-white transition-colors hover:bg-blue-700"
               >
                 {editingUser ? "保存" : "创建"}
               </button>

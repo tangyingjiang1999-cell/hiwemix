@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { memo, useState } from "react";
 import type { SearchResult, Formula } from "@/types";
@@ -51,24 +51,24 @@ const ColorCard = memo(function ColorCard({
             style={{ backgroundColor: color.hex_preview }}
           />
           <div className="min-w-0 flex-1">
-            <p className="truncate text-base font-bold text-[#111827] sm:text-[18px]">
+            <p className="truncate text-muji-subtitle text-[#111827]">
               {color.color_name}
             </p>
-            <p className="text-xs font-normal text-[#9CA3AF] sm:text-[13px]">{color.color_code}</p>
+            <p className="text-muji-caption">{color.color_code}</p>
           </div>
         </button>
 
         <div className="flex items-center gap-2">
           <span
             className={[
-              "shrink-0 rounded-[6px] px-2 py-0.5 text-[12px] font-medium",
+              "shrink-0 rounded-[6px] px-2 py-0.5 text-muji-micro font-muji-500",
               typeInfo.badge,
             ].join(" ")}
           >
             {typeLabel}
           </span>
 
-          <span className="shrink-0 text-[14px] text-[#6B7280]">
+          <span className="shrink-0 text-muji-body text-[#6B7280]">
             {t.formulasCount(formulas.length)}
           </span>
 
@@ -98,7 +98,7 @@ const ColorCard = memo(function ColorCard({
               e.stopPropagation();
               onOpenDetail(result);
             }}
-            className="shrink-0 rounded-md border border-[#D1D5DB] px-2.5 py-1 text-[12px] font-medium text-[#111827] transition-all duration-200 ease-out hover:bg-[#F9FAFB]"
+            className="shrink-0 rounded-md border border-[#D1D5DB] px-2.5 py-1 text-muji-caption font-muji-500 text-[#111827] transition-all duration-200 ease-out hover:bg-[#F9FAFB]"
           >
             {t.detail}
           </button>
@@ -120,7 +120,7 @@ const ColorCard = memo(function ColorCard({
                   type="button"
                   onClick={() => setActiveFormulaIdx(idx)}
                   className={[
-                    "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all duration-200 ease-out",
+                    "flex items-center gap-1.5 rounded-md px-3 py-1.5 transition-all duration-200 ease-out",
                     idx === activeFormulaIdx
                       ? "bg-[#111827] text-white"
                       : "bg-[#F3F4F6] text-[#6B7280] hover:bg-[#E5E7EB]",
@@ -135,7 +135,7 @@ const ColorCard = memo(function ColorCard({
 
           {activeFormula && (
             <div className="animate-[fadeIn_150ms_ease-in-out]">
-              <div className="mb-3 flex items-center gap-2 text-xs text-[#6B7280]">
+              <div className="mb-3 flex items-center gap-2 text-muji-caption text-[#6B7280]">
                 <span>
                   {color.variants.find(
                     (v) => v.id === activeFormula.variant_id,
@@ -146,7 +146,7 @@ const ColorCard = memo(function ColorCard({
                 <span className="text-[#D1D5DB]">|</span>
                 <span
                   className={[
-                    "rounded px-1.5 py-px text-[10px] font-semibold",
+                    "rounded px-1.5 py-px text-muji-micro font-semibold",
                     activeFormula.paint_system === "2K"
                       ? "bg-blue-100 text-blue-700"
                       : "bg-emerald-100 text-emerald-700",
@@ -159,12 +159,12 @@ const ColorCard = memo(function ColorCard({
               <FormulaComponentsTable formula={activeFormula} />
 
               {activeFormula.notes && (
-                <p className="mt-3 text-xs text-[#6B7280]">
-                  <span className="font-medium text-[#111827]">{t.paintSystemNotes}: </span>
+                <p className="mt-3 text-muji-caption text-[#6B7280]">
+                  <span className="font-muji-600 text-[#111827]">{t.paintSystemNotes}: </span>
                   {activeFormula.notes}
                 </p>
               )}
-              <p className="mt-1 text-[11px] text-[#9CA3AF]">
+              <p className="mt-1 text-muji-caption text-[#9CA3AF]">
                 {t.updatedLabel} {activeFormula.updated_at}
               </p>
             </div>

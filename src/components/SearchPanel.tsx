@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { mockCarMakes } from "@/lib/mock-data";
@@ -11,8 +11,6 @@ export interface SearchPanelProps {
   isLoading: boolean;
   onSubmitRef?: React.MutableRefObject<(() => void) | null>;
 }
-
-// ========== 提取到组件外部，避免每次渲染重建导致输入框失焦 ==========
 
 function PillSelect({
   label,
@@ -32,14 +30,14 @@ function PillSelect({
   return (
     <div className={`relative ${widthClass}`}>
       <div className="flex h-11 items-center border border-gray-300 bg-white px-4 transition-colors hover:border-blue-600">
-        <span className="shrink-0 text-sm font-medium text-gray-600">
+        <span className="shrink-0 text-muji-body text-gray-600">
           {label}
         </span>
         <span className="mx-3 h-4 w-px bg-gray-200 shrink-0" />
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="h-full flex-1 appearance-none bg-transparent text-sm text-gray-900 outline-none cursor-pointer"
+          className="h-full flex-1 appearance-none bg-transparent text-muji-body text-gray-900 outline-none cursor-pointer"
         >
           <option value="">{placeholder || "All"}</option>
           {options.map((opt) => (
@@ -53,7 +51,6 @@ function PillSelect({
   );
 }
 
-// Pill input 组件 - Tesla 风格：4px 圆角、无阴影、精确边框
 function PillInput({
   label,
   value,
@@ -72,7 +69,7 @@ function PillInput({
   return (
     <div className={`relative ${widthClass}`}>
       <div className="flex h-11 items-center border border-gray-300 bg-white px-4 transition-colors hover:border-blue-600">
-        <span className="shrink-0 text-sm font-medium text-gray-600">
+        <span className="shrink-0 text-muji-body text-gray-600">
           {label}
         </span>
         <span className="mx-3 h-4 w-px bg-gray-200 shrink-0" />
@@ -82,7 +79,7 @@ function PillInput({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           maxLength={maxLength}
-          className="h-full flex-1 bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
+          className="h-full flex-1 bg-transparent text-muji-body text-gray-900 outline-none placeholder:text-gray-400"
         />
       </div>
     </div>
@@ -109,8 +106,6 @@ const RefreshIcon = () => (
     <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
   </svg>
 );
-
-// =====================================================================
 
 export default function SearchPanel({
   onSearch,
@@ -170,8 +165,7 @@ export default function SearchPanel({
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {/* 第一行：输入框 - 桌面端横排，手机端自动换行 */}
+    <form onSubmit={(e) => handleSubmit(e)}>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <PillSelect
           label={t.make}
@@ -207,10 +201,9 @@ export default function SearchPanel({
       </div>
 
       {isCodeTooLong && (
-        <p className="mt-2 text-[12px] text-orange-500">{t.codeTooLong}</p>
+        <p className="mt-2 text-muji-micro text-orange-500">{t.codeTooLong}</p>
       )}
 
-      {/* 第二行：Color type 按钮 + Search + Reset - 移动端自动换行 */}
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <div className="flex flex-wrap gap-2">
           {COLOR_TYPE_OPTIONS.map((opt) => {
@@ -221,7 +214,7 @@ export default function SearchPanel({
                 type="button"
                 onClick={() => setColorType(opt.value)}
                 className={[
-                  "rounded border px-4 py-1.5 text-sm transition-colors",
+                  "rounded border px-4 py-1.5 transition-colors",
                   isSelected
                     ? "border-blue-600 bg-blue-600 text-white"
                     : "border-gray-300 bg-white text-gray-700 hover:border-blue-600",
@@ -233,12 +226,11 @@ export default function SearchPanel({
           })}
         </div>
 
-        {/* Search 按钮 */}
         <button
           type="submit"
           disabled={isLoading}
           className={[
-            "flex items-center gap-2 rounded px-6 py-2.5 text-sm font-medium text-white transition-colors",
+            "flex items-center gap-2 rounded px-6 py-2.5 text-muji-heading text-white transition-colors",
             "bg-blue-600 hover:bg-blue-700",
             "disabled:cursor-not-allowed disabled:opacity-60",
           ].join(" ")}
@@ -247,13 +239,12 @@ export default function SearchPanel({
           {isLoading ? t.searching : t.search}
         </button>
 
-        {/* Reset 按钮 */}
         <button
           type="button"
           onClick={handleReset}
           disabled={isLoading}
           className={[
-            "flex items-center gap-2 rounded border border-gray-300 bg-white px-6 py-2.5 text-sm font-medium text-gray-700 transition-colors",
+            "flex items-center gap-2 rounded border border-gray-300 bg-white px-6 py-2.5 text-muji-heading text-gray-700 transition-colors",
             "hover:border-blue-600 hover:text-blue-600",
             "disabled:cursor-not-allowed disabled:opacity-60",
           ].join(" ")}
@@ -265,4 +256,3 @@ export default function SearchPanel({
     </form>
   );
 }
-

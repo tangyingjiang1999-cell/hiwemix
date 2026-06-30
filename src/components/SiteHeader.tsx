@@ -32,7 +32,7 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
 
   return (
     <header
-      className="relative flex h-auto min-h-[64px] flex-col items-center gap-2 px-4 py-3 sm:h-[96px] sm:flex-row sm:px-[40px]"
+      className="flex h-auto min-h-[64px] flex-col items-center gap-2 px-4 py-3 sm:h-[96px] sm:flex-row sm:px-[40px]"
       style={{ background: "linear-gradient(to right, #8B5CF6, #0D9488)" }}
     >
       <div className="flex items-center gap-3">
@@ -41,13 +41,7 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
           alt="HAIWEN"
           className="h-10 w-10 object-contain brightness-0 invert sm:h-[54px] sm:w-[54px]"
         />
-        <span
-          className="text-lg font-extrabold text-white sm:text-[24px]"
-          style={{
-            letterSpacing: "1px",
-            fontFamily: 'var(--font-outfit), "Outfit", sans-serif',
-          }}
-        >
+        <span className="text-muji-title text-white">
           HAIWEN MIX{subtitle ? ` ${subtitle}` : ""}
         </span>
       </div>
@@ -55,12 +49,12 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
       <div className="ml-0 flex items-center gap-3 sm:ml-auto sm:gap-4">
         {authUser && (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-white/80 sm:text-sm">
+            <span className="text-muji-micro text-white/80 sm:text-muji-caption">
               {authUser.username}
               {authUser.role === "admin" && (
                 <a
                   href="/admin/users"
-                  className="ml-1 text-[10px] text-white/60 hover:text-white sm:ml-2 sm:text-xs"
+                  className="ml-1 text-[10px] text-white/60 hover:text-white sm:ml-2"
                 >
                   管理
                 </a>
@@ -68,7 +62,7 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
             </span>
             <button
               onClick={handleLogout}
-              className="rounded border border-white/40 px-2 py-0.5 text-[10px] text-white transition-colors hover:bg-white/10 sm:px-3 sm:py-1 sm:text-xs"
+              className="rounded border border-white/40 px-2 py-0.5 text-muji-micro text-white transition-colors hover:bg-white/10 sm:px-3 sm:py-1"
             >
               退出
             </button>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import type { SearchResult, Formula } from "@/types";
@@ -8,9 +8,6 @@ import { useLang } from "@/components/LanguageContext";
 import FormulaComponentsTable from "./FormulaComponentsTable";
 import Toast from "./Toast";
 
-// ============================================================
-// FormulaDrawer Props
-// ============================================================
 interface FormulaDrawerProps {
   result: SearchResult | null;
   onClose: () => void;
@@ -53,16 +50,12 @@ function formatFormulaAsText(
   return lines.join("\n");
 }
 
-// ============================================================
-// FormulaModal 组件（原 FormulaDrawer 改为居中弹窗）
-// ============================================================
 export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
   const { t, lang } = useLang();
   const [activeFormulaIdx, setActiveFormulaIdx] = useState(0);
   const [visible, setVisible] = useState(false);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  // 语言→类型标签映射
   const typeLabelMap: Record<string, Record<string, string>> = {
     en: {
       solid: t.colorTypeSolidLabel,
@@ -82,7 +75,6 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
     if (result) {
       setActiveFormulaIdx(0);
       requestAnimationFrame(() => setVisible(true));
-      // 弹窗打开时给页面主体添加模糊
       document.getElementById("page-content")?.classList.add("blur-bg");
     } else {
       setVisible(false);
@@ -135,7 +127,6 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
 
   return (
     <>
-      {/* 遮罩层 */}
       <div
         className={[
           "fixed inset-0 bg-black/40 transition-opacity duration-200",
@@ -146,7 +137,6 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
         aria-hidden="true"
       />
 
-      {/* 居中弹窗卡片 */}
       <div
         className={[
           "fixed flex flex-col bg-white overflow-hidden",
@@ -169,17 +159,16 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
           boxShadow: "0 24px 60px rgba(0,0,0,0.2)",
         }}
       >
-        {/* 顶部标题栏 */}
         <div className="flex items-center gap-3 border-b border-[#E2E8F0] px-8 py-5 shrink-0">
           <div
             className="h-10 w-10 shrink-0 rounded-[6px] border border-[#E2E8F0]"
             style={{ backgroundColor: color.hex_preview }}
           />
           <div className="min-w-0 flex-1">
-            <h2 className="truncate text-lg font-bold text-[#0F172A]">
+            <h2 className="truncate text-muji-subtitle text-[#0F172A]">
               {color.color_name}
             </h2>
-            <p className="text-[13px] text-[#94A3B8]">{color.color_code}</p>
+            <p className="text-muji-caption">{color.color_code}</p>
           </div>
           <button
             onClick={handleClose}
@@ -202,11 +191,9 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
           </button>
         </div>
 
-        {/* 可滚动内容区 */}
         <div className="flex-1 overflow-y-auto px-8 py-6" style={{ padding: "24px 32px" }}>
-          {/* Section 1：颜色信息 */}
           <div className="mb-6">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
+            <h3 className="mb-3 text-muji-caption font-muji-600 uppercase tracking-wider text-[#94A3B8]">
               {t.colorInfo}
             </h3>
             <div className="space-y-2 text-sm">
@@ -214,7 +201,7 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
               <KV label={t.typeLabel}>
                 <span
                   className={[
-                    "rounded-[6px] px-2 py-0.5 text-xs font-medium",
+                    "rounded-[6px] px-2 py-0.5 text-muji-micro font-muji-500",
                     typeInfo.badge,
                   ].join(" ")}
                 >
@@ -226,9 +213,8 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
             </div>
           </div>
 
-          {/* Section 2：配方选择 Tab */}
           <div className="mb-5">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
+          <h3 className="mb-3 text-muji-caption font-muji-600 uppercase tracking-wider text-[#94A3B8]">
             {t.formulaVariants}
           </h3>
             <div className="flex flex-col gap-1.5">
@@ -243,16 +229,16 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
                     type="button"
                     onClick={() => setActiveFormulaIdx(idx)}
                     className={[
-                      "flex items-center justify-between rounded-md px-4 py-2.5 text-left text-sm transition-colors",
+                      "flex items-center justify-between rounded-md px-4 py-2.5 text-left transition-colors",
                       isActive
                         ? "bg-[#0F172A]/10 text-[#0F172A] ring-1 ring-[#0F172A]/20"
                         : "bg-slate-50 text-[#64748B] hover:bg-slate-100",
                     ].join(" ")}
                   >
-                    <span className="font-medium">{variantName}</span>
+                    <span className="font-muji-600">{variantName}</span>
                     <span
                       className={[
-                        "rounded px-1.5 py-px text-[11px] font-semibold",
+                        "rounded px-1.5 py-px text-muji-micro font-semibold",
                         f.paint_system === "2K"
                           ? "bg-blue-100 text-blue-700"
                           : "bg-emerald-100 text-emerald-700",
@@ -266,19 +252,18 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
             </div>
           </div>
 
-          {/* Section 3：配方详情 */}
           {activeFormula && (
             <div className="animate-[fadeIn_150ms_ease-in-out]">
-              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#94A3B8]">
+              <h3 className="mb-3 text-muji-caption font-muji-600 uppercase tracking-wider text-[#94A3B8]">
                 {t.components}
               </h3>
 
-              <div className="mb-3 flex items-center gap-2 text-xs text-[#64748B]">
+              <div className="mb-3 flex items-center gap-2 text-muji-caption text-[#64748B]">
                 <span>{t.version} {activeFormula.version}</span>
                 <span className="text-[#CBD5E1]">|</span>
                 <span
                   className={[
-                    "rounded px-1.5 py-px text-[10px] font-semibold",
+                    "rounded px-1.5 py-px text-muji-micro font-semibold",
                     activeFormula.paint_system === "2K"
                       ? "bg-blue-100 text-blue-700"
                       : "bg-emerald-100 text-emerald-700",
@@ -292,25 +277,24 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
 
               {activeFormula.notes && (
                 <div className="mt-4 rounded-md border border-amber-200 bg-amber-50/50 px-4 py-3">
-                  <p className="text-xs font-medium text-amber-800">{t.notesLabel}</p>
-                  <p className="mt-1 text-xs text-amber-700">
+                  <p className="text-muji-caption font-muji-600 text-amber-800">{t.notesLabel}</p>
+                  <p className="mt-1 text-muji-caption text-amber-700">
                     {activeFormula.notes}
                   </p>
                 </div>
               )}
 
-              <p className="mt-3 text-xs text-zinc-400">
+              <p className="mt-3 text-muji-caption text-zinc-400">
                 {t.updatedLabel} {activeFormula.updated_at}
               </p>
             </div>
           )}
         </div>
 
-        {/* Section 4：底部操作栏 */}
         <div className="flex gap-3 border-t border-[#e5e7eb] px-5 py-4">
           <button
             onClick={handlePrint}
-            className="flex flex-1 items-center justify-center gap-2 rounded-md border border-[#e5e7eb] bg-white px-4 py-2.5 text-sm font-medium text-[#1f2937] transition-colors hover:bg-zinc-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md border border-[#e5e7eb] bg-white px-4 py-2.5 text-muji-heading text-[#1f2937] transition-colors hover:bg-zinc-50"
           >
             <svg
               className="h-4 w-4"
@@ -329,7 +313,7 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
           </button>
           <button
             onClick={handleCopy}
-            className="flex flex-1 items-center justify-center gap-2 rounded-md bg-[#1a1a2e] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#1a1a2e]/90"
+            className="flex flex-1 items-center justify-center gap-2 rounded-md bg-[#1a1a2e] px-4 py-2.5 text-muji-heading text-white transition-colors hover:bg-[#1a1a2e]/90"
           >
             <svg
               className="h-4 w-4"
@@ -356,9 +340,6 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
   );
 }
 
-// ============================================================
-// KV 行组件
-// ============================================================
 function KV({
   label,
   value,
@@ -370,8 +351,8 @@ function KV({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="w-[140px] shrink-0 text-xs text-[#6b7280]">{label}</span>
-      {children ?? <span className="text-sm text-[#1f2937]">{value}</span>}
+      <span className="w-[140px] shrink-0 text-muji-caption text-[#6b7280]">{label}</span>
+      {children ?? <span className="text-muji-body text-[#1f2937]">{value}</span>}
     </div>
   );
 }

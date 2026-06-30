@@ -1,12 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import type { Formula, FormulaComponent } from "@/types";
 import { useLang } from "@/components/LanguageContext";
 
-// ============================================================
-// 单位选项
-// ============================================================
 const UNIT_OPTIONS = [
   { value: "g", label: "g" },
   { value: "kg", label: "kg" },
@@ -23,9 +20,6 @@ const UNIT_MULTIPLIER: Record<Unit, number> = {
   liter: 1000,
 };
 
-// ============================================================
-// FormulaComponentsTable Props
-// ============================================================
 interface FormulaComponentsTableProps {
   formula: Formula;
 }
@@ -62,9 +56,8 @@ export default function FormulaComponentsTable({
 
   return (
     <div>
-      {/* 用量换算控制行 */}
       <div className="mb-4 flex items-center gap-2 rounded-lg bg-[#F8FAFC] px-3 py-3">
-        <label className="text-xs font-medium text-[#64748B]">
+        <label className="text-muji-caption font-muji-500 text-[#64748B]">
           {t.volume}
         </label>
 
@@ -77,7 +70,7 @@ export default function FormulaComponentsTable({
           className="h-8 w-[80px] rounded-md border border-[#E2E8F0] bg-white px-2 text-center text-sm text-[#0F172A] outline-none transition-colors focus:border-[#e84545] focus:ring-1 focus:ring-[#e84545]"
         />
 
-        <span className="text-xs text-[#94A3B8]">&times;</span>
+        <span className="text-muji-caption text-[#94A3B8]">&times;</span>
 
         <select
           value={unit}
@@ -92,20 +85,19 @@ export default function FormulaComponentsTable({
         </select>
 
         {hasValidVolume && (
-          <span className="ml-1 text-xs text-[#64748B]">
+          <span className="ml-1 text-muji-caption text-[#64748B]">
             = {totalGrams.toLocaleString()} g total
           </span>
         )}
       </div>
 
-      {/* 成分表格 */}
       <table className="w-full text-xs">
         <thead>
           <tr className="border-b border-[#E2E8F0] text-left text-[#64748B]">
-            <th className="pb-2 pr-2 font-medium">{t.tonerCode}</th>
-            <th className="pb-2 pr-2 font-medium">{t.tonerName}</th>
-            <th className="pb-2 pr-2 font-medium">{t.percentage}</th>
-            <th className="pb-2 font-medium">{t.actualAmount}</th>
+            <th className="pb-2 pr-2 text-muji-caption font-muji-500">{t.tonerCode}</th>
+            <th className="pb-2 pr-2 text-muji-caption font-muji-500">{t.tonerName}</th>
+            <th className="pb-2 pr-2 text-muji-caption font-muji-500">{t.percentage}</th>
+            <th className="pb-2 text-muji-caption font-muji-500">{t.actualAmount}</th>
           </tr>
         </thead>
         <tbody>
@@ -119,10 +111,10 @@ export default function FormulaComponentsTable({
                 key={comp.toner_code}
                 className="border-b border-zinc-100 last:border-b-0"
               >
-                <td className="py-2 pr-2 font-mono text-xs text-[#94A3B8]">
+                <td className="py-2 pr-2 font-mono text-muji-caption text-[#94A3B8]">
                   {comp.toner_code}
                 </td>
-                <td className="py-2 pr-2 text-[#0F172A]">
+                <td className="py-2 pr-2 text-muji-body text-[#0F172A]">
                   {comp.toner_name}
                 </td>
                 <td className="py-2 pr-2">
@@ -130,17 +122,17 @@ export default function FormulaComponentsTable({
                     <div className="h-2.5 w-full max-w-[60px] overflow-hidden rounded-full bg-zinc-100">
                       <div
                       className="h-full rounded-full bg-[#0F172A]"
-                        style={{ width: `${comp.percentage}%` }}
+                      style={{ width: `${comp.percentage}%` }}
                       />
                     </div>
-                    <span className="w-10 text-right tabular-nums text-[#64748B]">
+                    <span className="w-10 text-right tabular-nums text-muji-caption text-[#64748B]">
                       {comp.percentage}%
                     </span>
                   </div>
                 </td>
                 <td className="py-2 tabular-nums">
                   {actualGrams !== null ? (
-                    <span className="font-semibold text-[#0F172A]">
+                    <span className="font-muji-600 text-[#0F172A]">
                       {actualGrams.toFixed(1)}
                     </span>
                   ) : (

@@ -1,34 +1,35 @@
 /* ============================================================
-   HAIWEN MIX - Tesla-Inspired Industrial Design System
+   HAIWEN MIX - MUJI-Inspired Minimal Design System
+   Typography: Arial, 6-level hierarchy, 3 weights
    ============================================================ */
 
 @import "tailwindcss";
 
 /* ============================================================
-   Design Tokens (Tesla-Inspired)
+   Design Tokens
    ============================================================ */
 
 :root {
-  /* Primary Acsent - Electric Blue */
-  --color-primary: #3E6AE1;
-  --color-primary-hover: #2D5BCO;
+  /* Accent */
+  --color-primary: #0D9488;
+  --color-primary-hover: #0F766E;
 
   /* Background */
   --color-bg-primary: #FFFFFF;
-  --color-bg-secondary: #F4F4F4;
+  --color-bg-secondary: #F9FAFB;
 
   /* Text */
-  --color-text-primary: #171A20;
-  --color-text-secondary: #393C41;
-  --color-text-tertiary: #5C5E62;
-  --color-text-placeholder: #8E8E8E;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
+  --color-text-placeholder: #C0C0C0;
 
   /* Borders */
   --color-border: #E5E7EB;
   --color-border-light: #F0F0F0;
 
   /* Timing */
-  --transition-fast: 0.33s cubic-bezier(0.5, 0, 0, 0.75);
+  --transition-fast: 0.2s ease;
 
   /* Border Radius */
   --radius-sharp: 4px;
@@ -36,109 +37,64 @@
 }
 
 /* ============================================================
-   Base Styles
+   Base Body
    ============================================================ */
 
 body {
   color: var(--color-text-primary);
   background: var(--color-bg-primary);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
   font-weight: 400;
+  font-size: 13px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ============================================================
-   Typography Scale (Tesla-Inspired)
+   MUJI Typography Scale — 6 levels
    ============================================================ */
 
-.text-hero {
-  font-size: 40px;
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: normal;
+.text-muji-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
 }
 
-.text-body {
+.text-muji-subtitle {
   font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.text-muji-heading {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.text-muji-body {
+  font-size: 13px;
   font-weight: 400;
-  line-height: 1.43;
+  line-height: 1.6;
 }
 
-.text-ui {
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.2;
-}
-
-/* ============================================================
-   Component Base Styles
-   ============================================================ */
-
-/* Buttons - Sharp 4px radius, no shadows */
-.btn-primary {
-  background: var(--color-primary);
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 10px 24px;
-  border-radius: var(--radius-sharp);
-  border: none;
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-}
-
-.btn-primary:hover {
-  background: var(--color-primary-hover);
-}
-
-.btn-secondary {
-  background: white;
+.text-muji-caption {
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
   color: var(--color-text-secondary);
-  font-size: 14px;
+}
+
+.text-muji-micro {
+  font-size: 10px;
   font-weight: 500;
-  padding: 10px 24px;
-  border-radius: var(--radius-sharp);
-  border: 1.5px solid var(--color-border);
-  cursor: pointer;
-  transition: border-color var(--transition-fast);
+  line-height: 1.4;
 }
 
-.btn-secondary:hover {
-  border-color: var(--color-primary);
-}
-
-/* Inputs - Minimal, sharp corners */
-.input-base {
-  height: 44px;
-  padding: 0 16px;
-  font-size: 14px;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-sharp);
-  background: white;
-  color: var(--color-text-primary);
-  transition: border-color var(--transition-fast);
-}
-
-.input-base:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
-
-.input-base::placeholder {
-  color: var(--color-text-placeholder);
-}
-
-/* Cards - No shadows, minimal borders */
-.card-base {
-  background: white;
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-medium);
-  transition: border-color var(--transition-fast);
-}
-
-.card-base:hover {
-  border-color: var(--color-primary);
-}
+/* Weight helpers */
+.font-muji-400 { font-weight: 400; }
+.font-muji-500 { font-weight: 500; }
+.font-muji-600 { font-weight: 600; }
 
 /* ============================================================
    Animations
@@ -154,7 +110,7 @@ body {
 }
 
 /* ============================================================
-   Print Styles (Unchanged)
+   Print Styles
    ============================================================ */
 
 @media print {

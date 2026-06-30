@@ -25,10 +25,10 @@ export default function Navigation() {
             key={item.label}
             href={item.href}
             className={[
-              "mr-[40px] pb-[14px] pt-[14px] text-[15px] transition-all duration-200 ease-out",
+              "mr-[40px] pb-[14px] pt-[14px] transition-all duration-200 ease-out",
               isActive
-                ? "border-b-[2px] border-[#0D9488] font-semibold text-[#0D9488]"
-                : "font-normal text-[#6B7280] hover:text-[#0D9488]",
+                ? "border-b-[2px] border-[#0D9488] font-muji-600 text-[#0D9488]"
+                : "font-muji-400 text-[#6B7280] hover:text-[#0D9488]",
             ].join(" ")}
           >
             {item.label}
