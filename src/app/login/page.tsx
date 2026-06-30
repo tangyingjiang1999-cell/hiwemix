@@ -186,6 +186,8 @@ export default function LoginPage() {
                 </div>
                 <input
                   type="text"
+                  name="username"
+                  autoComplete="off"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="you@example.com"
@@ -206,6 +208,8 @@ export default function LoginPage() {
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
+                  name="password"
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
