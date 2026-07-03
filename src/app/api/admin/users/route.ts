@@ -78,14 +78,21 @@ export async function DELETE(req: NextRequest) {
   const { id } = body;
 
   if (!id) {
-    return NextResponse.json({ error: "缺少用户 ID" }, { status: 400 });
+    return NextResponse.json({ error: "缺少用户ID" }, { status: 400 });
   }
 
-  // 不能删除 admin 账号
+  // 不能删除自己
+  if (Number(id) === Number(user!.userId)) {
+    return NextResponse.json({ error: "不能删除自己的账号" }, { status: 400 });
+  }
+
+  // 检查目标用户是否存在
   const targetUser = await getUserById(id);
   if (!targetUser) {
     return NextResponse.json({ error: "用户不存在" }, { status: 404 });
   }
+
+  // 不允许删除 admin 账号（超級管理員保护）
   if (targetUser.username === "admin") {
     return NextResponse.json({ error: "不能删除超级管理员" }, { status: 403 });
   }
