@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTokenFromRequest, verifyToken, requireAdmin } from "@/lib/auth";
-import { getUsers, getUserById, updateUser } from "@/lib/db";
+import { getUsers, getUserById, updateUser, createUser, deleteUser, getUserByUsername } from "@/lib/db";
 import { hashPassword } from "@/lib/auth-helpers";
 
 function getUser(req: NextRequest): { userId: number; username: string; role: string } | null {
@@ -22,7 +22,24 @@ export async function POST(req: NextRequest) {
   const forbidden = requireAdmin(user);
   if (forbidden) return forbidden;
 
-  return NextResponse.json({ error: "当前模式不支持创建用户" }, { status: 501 });
+  const body = await req.json();
+  const { username, password, role } = body;
+
+  if (!username || !password) {
+    return NextResponse.json({ error: "用户名和密码不能为空" }, { status: 400 });
+  }
+
+  // 检查用户名是否已存在
+  const existing = await getUserByUsername(username);
+  if (existing) {
+    return NextResponse.json({ error: "用户名已存在" }, { status: 409 });
+  }
+
+  // 创建用户（bcrypt 加密存储）
+  const password_hash = hashPassword(password);
+  const newUser = await createUser(username, password_hash, role || "user");
+
+  return NextResponse.json(newUser, { status: 201 });
 }
 
 export async function PUT(req: NextRequest) {
@@ -57,5 +74,22 @@ export async function DELETE(req: NextRequest) {
   const forbidden = requireAdmin(user);
   if (forbidden) return forbidden;
 
-  return NextResponse.json({ error: "当前模式不支持删除用户" }, { status: 501 });
+  const body = await req.json();
+  const { id } = body;
+
+  if (!id) {
+    return NextResponse.json({ error: "缺少用户 ID" }, { status: 400 });
+  }
+
+  // 不能删除 admin 账号
+  const targetUser = await getUserById(id);
+  if (!targetUser) {
+    return NextResponse.json({ error: "用户不存在" }, { status: 404 });
+  }
+  if (targetUser.username === "admin") {
+    return NextResponse.json({ error: "不能删除超级管理员" }, { status: 403 });
+  }
+
+  await deleteUser(id);
+  return NextResponse.json({ success: true, message: "用户已删除" });
 }
