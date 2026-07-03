@@ -44,7 +44,7 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
           <img
             src="/haiwen.png"
             alt="HAIWEN"
-            className="h-9 w-9 object-contain sm:h-10 sm:w-10"
+            className="h-12 w-12 object-contain sm:h-14 sm:w-14"
           />
           <span className="text-lg font-bold text-[#006565] sm:text-xl">
             HAIWEN MIX{subtitle ? ` ${subtitle}` : ""}
@@ -57,7 +57,7 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
             <a
               key={link.href}
               href={link.href}
-              className="text-sm font-medium text-[#3e4949] transition-colors hover:text-[#006565]"
+              className="text-base font-semibold text-[#3e4949] transition-colors hover:text-[#006565]"
             >
               {link.label}
             </a>
@@ -65,7 +65,7 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
           {authUser?.role === "admin" && (
             <a
               href="/admin/formulas"
-              className="text-sm font-medium text-[#3e4949] transition-colors hover:text-[#006565]"
+              className="rounded-lg border border-[#006565] px-4 py-1.5 text-base font-semibold text-[#006565] transition-colors hover:bg-[#006565]/10"
             >
               Admin
             </a>
@@ -82,7 +82,7 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
               </span>
               <button
                 onClick={handleLogout}
-                className="rounded px-3 py-1.5 text-xs font-medium text-[#006565] transition-colors hover:bg-[#006565]/10"
+                className="rounded-lg border border-[#006565] px-4 py-1.5 text-sm font-semibold text-[#006565] transition-colors hover:bg-[#006565]/10"
               >
                 退出
               </button>
