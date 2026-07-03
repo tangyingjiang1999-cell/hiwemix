@@ -16,58 +16,127 @@ const DEFAULT_SETTINGS: AppSettings = {
   yearMax: 2026,
 };
 
+// ====== 本地内存存储兜底（Vercel KV 未配置时使用）======
+
+let localBrands: CarMake[] | null = null;
+let localColors: Color[] | null = null;
+let localFormulas: Formula[] | null = null;
+let localSettings: AppSettings | null = null;
+
+function isKVAvailable(): boolean {
+  return !!(process.env.KV_URL || process.env.KV_REST_API_URL);
+}
+
+function seedLocalFromMock() {
+  if (!localBrands) localBrands = [...mockCarMakes];
+  if (!localColors) localColors = [...mockColors];
+  if (!localFormulas) localFormulas = [...mockFormulas];
+  if (!localSettings) localSettings = { ...DEFAULT_SETTINGS, finishes: [...DEFAULT_SETTINGS.finishes], types: [...DEFAULT_SETTINGS.types] };
+}
+
 // --- Brands ---
 export async function getBrands(): Promise<CarMake[]> {
-  const stored = await kv.get<string>(KV_BRANDS);
-  if (stored) return JSON.parse(stored);
-  // First time: seed from mock data
-  await kv.set(KV_BRANDS, JSON.stringify(mockCarMakes));
-  return mockCarMakes;
+  try {
+    if (!isKVAvailable()) throw new Error("KV not configured");
+    const stored = await kv.get<string>(KV_BRANDS);
+    if (stored) return JSON.parse(stored);
+    await kv.set(KV_BRANDS, JSON.stringify(mockCarMakes));
+    return mockCarMakes;
+  } catch {
+    seedLocalFromMock();
+    return localBrands!;
+  }
 }
 
 export async function saveBrands(data: CarMake[]): Promise<void> {
-  await kv.set(KV_BRANDS, JSON.stringify(data));
+  try {
+    if (!isKVAvailable()) throw new Error("KV not configured");
+    await kv.set(KV_BRANDS, JSON.stringify(data));
+  } catch {
+    localBrands = [...data];
+  }
 }
 
 // --- Colors ---
 export async function getColors(): Promise<Color[]> {
-  const stored = await kv.get<string>(KV_COLORS);
-  if (stored) return JSON.parse(stored);
-  await kv.set(KV_COLORS, JSON.stringify(mockColors));
-  return mockColors;
+  try {
+    if (!isKVAvailable()) throw new Error("KV not configured");
+    const stored = await kv.get<string>(KV_COLORS);
+    if (stored) return JSON.parse(stored);
+    await kv.set(KV_COLORS, JSON.stringify(mockColors));
+    return mockColors;
+  } catch {
+    seedLocalFromMock();
+    return localColors!;
+  }
 }
 
 export async function saveColors(data: Color[]): Promise<void> {
-  await kv.set(KV_COLORS, JSON.stringify(data));
+  try {
+    if (!isKVAvailable()) throw new Error("KV not configured");
+    await kv.set(KV_COLORS, JSON.stringify(data));
+  } catch {
+    localColors = [...data];
+  }
 }
 
 // --- Formulas ---
 export async function getFormulas(): Promise<Formula[]> {
-  const stored = await kv.get<string>(KV_FORMULAS);
-  if (stored) return JSON.parse(stored);
-  await kv.set(KV_FORMULAS, JSON.stringify(mockFormulas));
-  return mockFormulas;
+  try {
+    if (!isKVAvailable()) throw new Error("KV not configured");
+    const stored = await kv.get<string>(KV_FORMULAS);
+    if (stored) return JSON.parse(stored);
+    await kv.set(KV_FORMULAS, JSON.stringify(mockFormulas));
+    return mockFormulas;
+  } catch {
+    seedLocalFromMock();
+    return localFormulas!;
+  }
 }
 
 export async function saveFormulas(data: Formula[]): Promise<void> {
-  await kv.set(KV_FORMULAS, JSON.stringify(data));
+  try {
+    if (!isKVAvailable()) throw new Error("KV not configured");
+    await kv.set(KV_FORMULAS, JSON.stringify(data));
+  } catch {
+    localFormulas = [...data];
+  }
 }
 
 // --- Settings ---
 export async function getSettings(): Promise<AppSettings> {
-  const stored = await kv.get<string>(KV_SETTINGS);
-  if (stored) return JSON.parse(stored);
-  return DEFAULT_SETTINGS;
+  try {
+    if (!isKVAvailable()) throw new Error("KV not configured");
+    const stored = await kv.get<string>(KV_SETTINGS);
+    if (stored) return JSON.parse(stored);
+    return DEFAULT_SETTINGS;
+  } catch {
+    seedLocalFromMock();
+    return localSettings!;
+  }
 }
 
 export async function saveSettings(data: AppSettings): Promise<void> {
-  await kv.set(KV_SETTINGS, JSON.stringify(data));
+  try {
+    if (!isKVAvailable()) throw new Error("KV not configured");
+    await kv.set(KV_SETTINGS, JSON.stringify(data));
+  } catch {
+    localSettings = { ...data, finishes: [...data.finishes], types: [...data.types] };
+  }
 }
 
 // --- Force seed from mock data ---
 export async function seedFromMockData(): Promise<void> {
-  await kv.set(KV_BRANDS, JSON.stringify(mockCarMakes));
-  await kv.set(KV_COLORS, JSON.stringify(mockColors));
-  await kv.set(KV_FORMULAS, JSON.stringify(mockFormulas));
-  await kv.set(KV_SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
+  try {
+    if (!isKVAvailable()) throw new Error("KV not configured");
+    await kv.set(KV_BRANDS, JSON.stringify(mockCarMakes));
+    await kv.set(KV_COLORS, JSON.stringify(mockColors));
+    await kv.set(KV_FORMULAS, JSON.stringify(mockFormulas));
+    await kv.set(KV_SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
+  } catch {
+    localBrands = [...mockCarMakes];
+    localColors = [...mockColors];
+    localFormulas = [...mockFormulas];
+    localSettings = { ...DEFAULT_SETTINGS, finishes: [...DEFAULT_SETTINGS.finishes], types: [...DEFAULT_SETTINGS.types] };
+  }
 }
