@@ -82,31 +82,9 @@ export default function Home() {
         </div>
 
         <div className="mx-auto w-full max-w-7xl px-5 lg:px-10">
-          <div className="mx-auto max-w-3xl space-y-8 text-center">
-            {/* 徽标 */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-[#006565]/10 px-4 py-1.5">
-              <svg className="h-4 w-4 text-[#006565]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="text-xs font-semibold tracking-widest text-[#006565] uppercase">
-                Professional Standard
-              </span>
-            </div>
-
-            {/* 大标题 */}
-            <h1 className="text-4xl font-bold leading-tight text-[#181c1e] sm:text-5xl lg:text-6xl">
-              Find Your<br />
-              <span className="text-[#006565]">Perfect Match</span>
-            </h1>
-
-            {/* 副标题 */}
-            <p className="mx-auto max-w-lg text-lg leading-relaxed text-[#3e4949]">
-              Access the industry&apos;s most accurate automotive refinishing database.
-              Over 100,000 OEM formulas updated daily.
-            </p>
-
+          <div className="mx-auto max-w-4xl">
             {/* 搜索表单卡片 */}
-            <div className="mx-auto max-w-3xl rounded-xl border border-[#bdc9c8]/50 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-[#bdc9c8]/50 bg-white p-6 shadow-sm">
               <SearchPanel onSearch={handleSearch} isLoading={isLoading} />
             </div>
           </div>
