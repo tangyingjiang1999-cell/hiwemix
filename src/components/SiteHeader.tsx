@@ -62,14 +62,6 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
               {link.label}
             </a>
           ))}
-          {authUser?.role === "admin" && (
-            <a
-              href="/admin/formulas"
-              className="text-base font-semibold text-[#3e4949] transition-colors hover:text-[#006565]"
-            >
-              Admin
-            </a>
-          )}
         </nav>
 
         {/* 右侧操作区 */}
@@ -85,7 +77,7 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
                   href="/admin/formulas"
                   className="rounded-lg bg-[#006565] px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
                 >
-                  Admin
+                  用户管理
                 </a>
               )}
               <button

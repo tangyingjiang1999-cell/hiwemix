@@ -15,7 +15,7 @@ export default function LanguageSwitcher() {
     <button
       type="button"
       onClick={handleToggle}
-      className="rounded-full border border-white/30 px-3 py-1 text-muji-micro font-muji-600 text-white transition-all duration-200 ease-out hover:bg-white/15"
+      className="rounded-full border border-[#006565] px-3 py-1 text-sm font-semibold text-[#006565] transition-all duration-200 ease-out hover:bg-[#006565]/10"
       aria-label={lang === "en" ? "Switch to Chinese" : "切换到英文"}
     >
       {lang === "en" ? "中文" : "EN"}
