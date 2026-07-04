@@ -14,6 +14,7 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
     { href: "/", label: "Formula Search" },
     { href: "/color-library", label: "Color Visual Library" },
     { href: "/application-guide", label: "Application Guide" },
+    { href: "/admin/formulas", label: "Formula Data Management" },
   ];
 
   return (
