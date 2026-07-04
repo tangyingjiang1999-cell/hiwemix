@@ -106,7 +106,7 @@ export default function AdminUsersPage() {
 
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      <SiteHeader subtitle="· 用户管理" />
+      <SiteHeader />
       <Navigation />
 
       <div className="mx-auto max-w-4xl px-8 py-8">
