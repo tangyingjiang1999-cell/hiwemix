@@ -1,34 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-
-interface AuthUser {
-  username: string;
-  role: string;
-}
+import { useAuth } from "@/components/AuthContext";
 
 interface SiteHeaderProps {
   subtitle?: string;
 }
 
 export default function SiteHeader({ subtitle }: SiteHeaderProps) {
-  const [authUser, setAuthUser] = useState<AuthUser | null>(null);
-
-  useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.authenticated) {
-          setAuthUser(data.user);
-        }
-      });
-  }, []);
-
-  async function handleLogout() {
-    await fetch("/api/auth/me", { method: "DELETE" });
-    window.location.href = "/login";
-  }
+  const { user: authUser, logout } = useAuth();
 
   const navLinks = [
     { href: "/", label: "Formula Search" },
@@ -80,7 +60,7 @@ export default function SiteHeader({ subtitle }: SiteHeaderProps) {
                 </a>
               )}
               <button
-                onClick={handleLogout}
+                onClick={logout}
                 className="rounded-lg bg-[#006565] px-4 py-1.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
               >
                 退出

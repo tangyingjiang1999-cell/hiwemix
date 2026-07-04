@@ -8,7 +8,11 @@ function getUser(req: NextRequest) {
   return verifyToken(token);
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const user = getUser(req);
+  const forbidden = requireAdmin(user);
+  if (forbidden) return forbidden;
+
   return NextResponse.json(await getSettings());
 }
 
