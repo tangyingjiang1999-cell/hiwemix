@@ -94,7 +94,7 @@ export default function ApplicationGuidePage() {
   }, [guides, selectedCategory, searchQuery, lang]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-gray-50">
       <SiteHeader />
       <Navigation />
 
@@ -108,7 +108,7 @@ export default function ApplicationGuidePage() {
         />
       </div>
 
-      <div className="flex flex-col lg:flex-row">
+      <div className="flex flex-1 flex-col lg:flex-row">
         <div className="w-full lg:w-64 border-r border-b lg:border-b-0 bg-white p-4">
           <h3 className="mb-3 text-[11px] text-gray-500 font-semibold text-gray-600">
             {t.guideCategories}

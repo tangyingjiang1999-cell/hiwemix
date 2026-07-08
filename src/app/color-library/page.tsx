@@ -107,7 +107,7 @@ export default function ColorLibraryPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="flex min-h-screen flex-col bg-gray-50">
       <SiteHeader />
       <Navigation />
 
@@ -148,7 +148,7 @@ export default function ColorLibraryPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4 lg:p-6">
+      <div className="grid flex-1 grid-cols-2 content-start gap-4 p-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 lg:p-6">
         {filteredColors.map((color) => (
           <ColorCard key={color.id} color={color} onClick={setSelectedColor} />
         ))}
