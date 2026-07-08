@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { COLOR_TYPE_OPTIONS } from "@/lib/constants";
 import { useLang } from "@/components/LanguageContext";
-import type { CarMake, SearchParams } from "@/types";
+import type { CarMake, SearchParams, AppSettings } from "@/types";
 
 export interface SearchPanelProps {
   onSearch: (params: SearchParams) => void;
@@ -114,6 +114,9 @@ export default function SearchPanel({
   const [year, setYear] = useState("");
   // 品牌列表从公开 API 加载，使 Data Management 的增删改能同步到下拉框
   const [carMakes, setCarMakes] = useState<CarMake[]>([]);
+  // 漆面类型选项：默认用常量，异步从 settings 加载自定义参数
+  const [colorTypeOptions, setColorTypeOptions] =
+    useState<{ value: string; label: string }[]>(COLOR_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label })));
 
   useEffect(() => {
     fetch("/api/brands")
@@ -121,6 +124,21 @@ export default function SearchPanel({
       .then((data: CarMake[]) => setCarMakes(data))
       .catch(() => setCarMakes([]));
   }, []);
+
+  // 从 settings 加载自定义漆面类型，失败则保持常量默认值
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: AppSettings | null) => {
+        if (data?.finishes?.length) {
+          setColorTypeOptions([
+            { value: "", label: t.colorTypeAll },
+            ...data.finishes.map((f: string) => ({ value: f.toLowerCase(), label: f })),
+          ]);
+        }
+      })
+      .catch(() => {});
+  }, [t.colorTypeAll]);
 
   const isCodeTooLong = colorCode.replace(/\s/g, "").length > 10;
 
@@ -208,7 +226,7 @@ label={t.colorCode}
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <div className="flex flex-wrap gap-2">
-          {COLOR_TYPE_OPTIONS.map((opt) => {
+          {colorTypeOptions.map((opt) => {
             const isSelected = colorType === opt.value;
             return (
               <button

@@ -70,3 +70,23 @@ export interface AppSettings {
   yearMin: number
   yearMax: number
 }
+
+// 应用指南分类
+export interface GuideCategory {
+  id: string
+  name: string           // 英文分类名
+  nameZh: string         // 中文分类名
+  sortOrder: number
+}
+
+// 应用指南文章
+export interface Guide {
+  id: string
+  categoryId: string
+  title: string          // 英文标题
+  titleZh: string        // 中文标题
+  content: string        // 英文正文
+  contentZh: string      // 中文正文
+  sortOrder: number
+  updatedAt: string
+}

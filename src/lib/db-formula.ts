@@ -1,4 +1,5 @@
 import { supabase } from "./supabase-client";
+import { supabaseAdmin } from "./supabase-server";
 import type {
   CarMake,
   Color,
@@ -24,6 +25,17 @@ export async function getBrands(): Promise<CarMake[]> {
     .order("name", { ascending: true });
   if (error) throw error;
   return (data ?? []) as CarMake[];
+}
+
+// ====== Color Variants ======
+
+export async function getVariants(): Promise<ColorVariant[]> {
+  const { data, error } = await supabase
+    .from("color_variants")
+    .select("*")
+    .order("name", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as ColorVariant[];
 }
 
 // ====== Colors ======
@@ -113,5 +125,156 @@ function mapFormulaRow(row: Record<string, unknown>): Formula {
     components,
     notes: (row.notes as string) ?? "",
     updated_at: row.updated_at as string,
+  };
+}
+
+// ====== 写操作（仅服务端，用 supabaseAdmin，BYPASSRLS）======
+
+// --- Brands ---
+
+export async function saveBrand(brand: CarMake): Promise<CarMake> {
+  const { data, error } = await supabaseAdmin
+    .from("brands")
+    .upsert({ id: brand.id, name: brand.name, region: brand.region })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as CarMake;
+}
+
+export async function deleteBrand(id: string): Promise<void> {
+  const { error } = await supabaseAdmin.from("brands").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Color Variants ---
+
+export async function saveVariant(variant: ColorVariant): Promise<ColorVariant> {
+  const { data, error } = await supabaseAdmin
+    .from("color_variants")
+    .upsert({ id: variant.id, name: variant.name, year_range: variant.year_range })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as ColorVariant;
+}
+
+export async function deleteVariant(id: string): Promise<void> {
+  const { error } = await supabaseAdmin.from("color_variants").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Colors（含变体多对多同步）---
+
+export async function saveColor(
+  color: Omit<Color, "variants">,
+  variantIds: string[]
+): Promise<Color> {
+  // 1. upsert 颜色主行
+  const { data, error } = await supabaseAdmin
+    .from("colors")
+    .upsert({
+      id: color.id,
+      make_id: color.make_id,
+      color_code: color.color_code,
+      color_name: color.color_name,
+      color_type: color.color_type,
+      hex_preview: color.hex_preview,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+
+  // 2. 同步 color_variant_map：先删后插
+  const { error: delErr } = await supabaseAdmin
+    .from("color_variant_map")
+    .delete()
+    .eq("color_id", color.id);
+  if (delErr) throw delErr;
+
+  if (variantIds.length > 0) {
+    const rows = variantIds.map((variant_id) => ({ color_id: color.id, variant_id }));
+    const { error: insErr } = await supabaseAdmin.from("color_variant_map").insert(rows);
+    if (insErr) throw insErr;
+  }
+
+  return data as Color;
+}
+
+export async function deleteColor(id: string): Promise<void> {
+  const { error } = await supabaseAdmin.from("colors").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Formulas（含色母组件全量同步）---
+
+export async function saveFormula(formula: Formula): Promise<Formula> {
+  // 1. upsert 配方主行（variant_id 空字符串转 null）
+  const { data, error } = await supabaseAdmin
+    .from("formulas")
+    .upsert({
+      id: formula.id,
+      color_id: formula.color_id,
+      variant_id: formula.variant_id || null,
+      version: formula.version,
+      paint_system: formula.paint_system,
+      formula_type: formula.formula_type,
+      notes: formula.notes ?? "",
+    })
+    .select()
+    .single();
+  if (error) throw error;
+
+  // 2. 全量同步 components：先删后插（id 是 SERIAL 自增，无稳定客户端 id）
+  const { error: delErr } = await supabaseAdmin
+    .from("formula_components")
+    .delete()
+    .eq("formula_id", formula.id);
+  if (delErr) throw delErr;
+
+  if (formula.components.length > 0) {
+    const rows = formula.components.map((c) => ({
+      formula_id: formula.id,
+      toner_code: c.toner_code,
+      toner_name: c.toner_name,
+      percentage: c.percentage,
+      grams_per_100g: c.grams_per_100g,
+      density: c.density ?? null,
+      rgb_r: c.rgb_r ?? null,
+      rgb_g: c.rgb_g ?? null,
+      rgb_b: c.rgb_b ?? null,
+    }));
+    const { error: insErr } = await supabaseAdmin.from("formula_components").insert(rows);
+    if (insErr) throw insErr;
+  }
+
+  return data as Formula;
+}
+
+export async function deleteFormula(id: string): Promise<void> {
+  const { error } = await supabaseAdmin.from("formulas").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// --- Settings ---
+
+export async function saveSettings(settings: AppSettings): Promise<AppSettings> {
+  const { data, error } = await supabaseAdmin
+    .from("settings")
+    .upsert({
+      id: 1,
+      finishes: settings.finishes,
+      types: settings.types,
+      year_min: settings.yearMin,
+      year_max: settings.yearMax,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return {
+    finishes: data.finishes ?? [],
+    types: data.types ?? [],
+    yearMin: data.year_min,
+    yearMax: data.year_max,
   };
 }

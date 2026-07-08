@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useLang } from "@/components/LanguageContext";
 import SiteHeader from "@/components/SiteHeader";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
 import type { CarMake, Color } from "@/types";
 
 function ColorCard({ color, onClick }: { color: Color; onClick: (color: Color) => void }) {
@@ -156,6 +157,7 @@ export default function ColorLibraryPage() {
       {selectedColor && (
         <ColorDetailModal color={selectedColor} onClose={() => setSelectedColor(null)} carMakes={carMakes} />
       )}
+      <Footer />
     </div>
   );
 }

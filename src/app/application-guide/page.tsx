@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { guideCategories, guideItems } from "@/lib/guide-data";
+import { useState, useEffect, useMemo } from "react";
 import { useLang } from "@/components/LanguageContext";
 import SiteHeader from "@/components/SiteHeader";
 import Navigation from "@/components/Navigation";
-import type { GuideItem } from "@/lib/guide-data";
+import Footer from "@/components/Footer";
+import type { Guide, GuideCategory } from "@/types";
 
-function GuideContent({ guide }: { guide: GuideItem }) {
+function GuideContent({ guide }: { guide: Guide }) {
   const { lang } = useLang();
 
   const content = lang === "zh" ? guide.contentZh : guide.content;
@@ -55,27 +55,43 @@ function GuideContent({ guide }: { guide: GuideItem }) {
 export default function ApplicationGuidePage() {
   const { t, lang } = useLang();
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [selectedGuide, setSelectedGuide] = useState<GuideItem | null>(null);
+  const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [categories, setCategories] = useState<GuideCategory[]>([]);
+  const [guides, setGuides] = useState<Guide[]>([]);
+
+  // 从公开 API 加载指南数据（Supabase），使 Data Management 的增删改能同步
+  useEffect(() => {
+    fetch("/api/guides")
+      .then((r) => (r.ok ? r.json() : { categories: [], guides: [] }))
+      .then((data: { categories: GuideCategory[]; guides: Guide[] }) => {
+        setCategories(data.categories ?? []);
+        setGuides(data.guides ?? []);
+      })
+      .catch(() => {
+        setCategories([]);
+        setGuides([]);
+      });
+  }, []);
 
   const filteredGuides = useMemo(() => {
-    let guides = guideItems;
+    let result = guides;
 
     if (selectedCategory) {
-      guides = guides.filter((g) => g.category === selectedCategory);
+      result = result.filter((g) => g.categoryId === selectedCategory);
     }
 
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      guides = guides.filter((g) => {
+      result = result.filter((g) => {
         const title = lang === "zh" ? g.titleZh : g.title;
         const content = lang === "zh" ? g.contentZh : g.content;
         return title.toLowerCase().includes(query) || content.toLowerCase().includes(query);
       });
     }
 
-    return guides;
-  }, [selectedCategory, searchQuery, lang]);
+    return result;
+  }, [guides, selectedCategory, searchQuery, lang]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -108,7 +124,7 @@ export default function ApplicationGuidePage() {
                 {t.guideAllCategories}
               </button>
             </li>
-            {guideCategories.map((cat) => (
+            {categories.map((cat) => (
               <li key={cat.id}>
                 <button
                   onClick={() => setSelectedCategory(cat.id)}
@@ -140,7 +156,7 @@ export default function ApplicationGuidePage() {
               >
                 <p className="text-xs font-semibold">{lang === "zh" ? guide.titleZh : guide.title}</p>
                 <p className="mt-1 text-[11px] text-gray-500 text-gray-500">
-                  {guideCategories.find((c) => c.id === guide.category)?.[lang === "zh" ? "nameZh" : "name"] || guide.category}
+                  {categories.find((c) => c.id === guide.categoryId)?.[lang === "zh" ? "nameZh" : "name"] || guide.categoryId}
                 </p>
               </li>
             ))}
@@ -157,6 +173,8 @@ export default function ApplicationGuidePage() {
           )}
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }
