@@ -13,8 +13,17 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
   }
 }
 
+const NEW_DOMAIN = "hiwemix.com";
+const OLD_DOMAIN = "hiwe-formula-search.vercel.app";
+
 export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  const { pathname, host } = req.nextUrl;
+
+  // 旧域名 301 永久重定向到新域名
+  if (host === OLD_DOMAIN) {
+    const newUrl = new URL(pathname + req.nextUrl.search, `https://${NEW_DOMAIN}`);
+    return NextResponse.redirect(newUrl, 301);
+  }
 
   // 静态资源文件（图片、字体等）直接放行
   if (/\.(jpg|jpeg|png|gif|svg|ico|webp|avif|woff2?|ttf|eot)$/i.test(pathname)) {
