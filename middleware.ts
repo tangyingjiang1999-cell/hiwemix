@@ -14,13 +14,13 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 }
 
 const NEW_DOMAIN = "hiwemix.com";
-const OLD_DOMAIN = "hiwe-formula-search.vercel.app";
+const REDIRECT_HOSTS = ["hiwe-formula-search.vercel.app", "www.hiwemix.com"];
 
 export function middleware(req: NextRequest) {
   const { pathname, host } = req.nextUrl;
 
-  // 旧域名 301 永久重定向到新域名
-  if (host === OLD_DOMAIN) {
+  // 旧域名 / www 统一 301 永久重定向到主域名
+  if (REDIRECT_HOSTS.includes(host)) {
     const newUrl = new URL(pathname + req.nextUrl.search, `https://${NEW_DOMAIN}`);
     return NextResponse.redirect(newUrl, 301);
   }
