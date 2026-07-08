@@ -138,7 +138,8 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
 
       <div
         className={[
-          "fixed flex flex-col bg-white overflow-hidden",
+          "fixed left-1/2 top-1/2 flex flex-col overflow-hidden rounded-2xl bg-white shadow-2xl",
+          "w-[92vw] max-w-2xl max-h-[80vh]",
           "transition-all duration-200 ease-out",
           visible
             ? "opacity-100 scale-100"
@@ -146,19 +147,12 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
         ].join(" ")}
         style={{
           zIndex: 1000,
-          top: "50%",
-          left: "50%",
           transform: visible
             ? "translate(-50%, -50%) scale(1)"
             : "translate(-50%, -50%) scale(0.96)",
-          width: "700px",
-          maxWidth: "90vw",
-          maxHeight: "80vh",
-          borderRadius: "16px",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.2)",
         }}
       >
-        <div className="flex items-center gap-3 border-b border-[#E2E8F0] px-8 py-5 shrink-0">
+        <div className="flex items-center gap-3 border-b border-[#E2E8F0] px-4 py-4 sm:px-8 sm:py-5 shrink-0">
           <div
             className="h-10 w-10 shrink-0 rounded-[6px] border border-[#E2E8F0]"
             style={{ backgroundColor: color.hex_preview }}
@@ -190,7 +184,7 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-8 py-6" style={{ padding: "24px 32px" }}>
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-8 sm:py-6">
           <div className="mb-6">
             <h3 className="mb-3 text-[11px] text-gray-500 font-semibold uppercase tracking-wider text-[#94A3B8]">
               {t.colorInfo}
@@ -290,7 +284,7 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
           )}
         </div>
 
-        <div className="flex gap-3 border-t border-[#e5e7eb] px-5 py-4">
+        <div className="flex gap-3 border-t border-[#e5e7eb] px-4 py-3 sm:px-5 sm:py-4">
           <button
             onClick={handlePrint}
             className="flex flex-1 items-center justify-center gap-2 rounded-md border border-[#e5e7eb] bg-white px-4 py-2.5 text-xs font-semibold text-[#1f2937] transition-colors hover:bg-zinc-50"
@@ -350,7 +344,7 @@ function KV({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="w-[140px] shrink-0 text-[11px] text-gray-500 text-[#6b7280]">{label}</span>
+      <span className="w-24 shrink-0 text-[11px] text-gray-500 text-[#6b7280] sm:w-36">{label}</span>
       {children ?? <span className="text-xs text-[#1f2937]">{value}</span>}
     </div>
   );

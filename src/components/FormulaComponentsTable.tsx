@@ -56,7 +56,7 @@ export default function FormulaComponentsTable({
 
   return (
     <div>
-      <div className="mb-4 flex items-center gap-2 rounded-lg bg-[#F8FAFC] px-3 py-3">
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg bg-[#F8FAFC] px-3 py-3">
         <label className="text-[11px] text-gray-500 font-medium text-[#64748B]">
           {t.volume}
         </label>
@@ -91,8 +91,9 @@ export default function FormulaComponentsTable({
         )}
       </div>
 
-      <table className="w-full text-xs">
-        <thead>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[360px] text-xs">
+          <thead>
           <tr className="border-b border-[#E2E8F0] text-left text-[#64748B]">
             <th className="pb-2 pr-2 text-[11px] text-gray-500 font-medium">{t.tonerCode}</th>
             <th className="pb-2 pr-2 text-[11px] text-gray-500 font-medium">{t.tonerName}</th>
@@ -144,6 +145,7 @@ export default function FormulaComponentsTable({
           })}
         </tbody>
       </table>
+    </div>
     </div>
   );
 }

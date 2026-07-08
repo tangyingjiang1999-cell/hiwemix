@@ -216,7 +216,7 @@ label={t.colorCode}
                 type="button"
                 onClick={() => setColorType(opt.value)}
                 className={[
-                  "rounded border px-4 py-1.5 transition-colors",
+                  "rounded border px-3 py-1.5 transition-colors sm:px-4",
                   isSelected
                     ? "border-[#0D9488] bg-[#0D9488] text-white"
                     : "border-gray-300 bg-white text-gray-700 hover:border-[#0D9488]",
@@ -232,7 +232,7 @@ label={t.colorCode}
           type="submit"
           disabled={isLoading}
           className={[
-            "flex items-center gap-2 rounded px-6 py-2.5 text-xs font-semibold text-white transition-colors",
+            "flex items-center gap-2 rounded px-4 py-2.5 text-xs font-semibold text-white transition-colors sm:px-6",
             "bg-[#0D9488] hover:bg-[#0F766E]",
             "disabled:cursor-not-allowed disabled:opacity-60",
           ].join(" ")}
@@ -246,7 +246,7 @@ label={t.colorCode}
           onClick={handleReset}
           disabled={isLoading}
           className={[
-            "flex items-center gap-2 rounded border border-gray-300 bg-white px-6 py-2.5 text-xs font-semibold text-gray-700 transition-colors",
+            "flex items-center gap-2 rounded border border-gray-300 bg-white px-4 py-2.5 text-xs font-semibold text-gray-700 transition-colors sm:px-6",
             "hover:border-[#0D9488] hover:text-[#0D9488]",
             "disabled:cursor-not-allowed disabled:opacity-60",
           ].join(" ")}

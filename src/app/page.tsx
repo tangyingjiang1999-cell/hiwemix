@@ -85,24 +85,24 @@ export default function Home() {
       <SiteHeader />
 
       {/* Hero + Search */}
-      <section className="relative flex min-h-[50vh] flex-1 items-center overflow-hidden pt-12 pb-8 -mt-[200px]">
+      <section className="relative flex min-h-[50vh] flex-1 items-center overflow-hidden pt-20 pb-8 md:pt-24">
         <div className="absolute inset-0 -z-10">
           <div className="absolute inset-0 bg-gradient-to-br from-[#f7fafc] via-[#f7fafc] to-[#0D9488]/5" />
         </div>
 
-        <div className="mx-auto w-full max-w-7xl px-5 lg:px-10">
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-5 lg:px-10">
           <div className="mx-auto w-full space-y-6 text-center">
             <h1 className="text-3xl font-bold leading-tight text-[#181c1e] sm:text-4xl lg:text-5xl">
               {t.heroTitlePrefix} <span className="text-[#0D9488]">{t.heroTitleHighlight}</span>
             </h1>
 
-            <div className="rounded-xl border border-[#bdc9c8]/50 bg-white p-6 shadow-sm">
+            <div className="rounded-xl border border-[#bdc9c8]/50 bg-white p-4 shadow-sm sm:p-6">
               <SearchPanel onSearch={handleSearch} isLoading={isLoading} />
             </div>
 
             {/* Search results inline below search box */}
             {hasSearched && (
-              <div className="mt-4 rounded-xl border border-[#bdc9c8]/50 bg-white p-6 text-left shadow-sm">
+              <div className="mt-4 rounded-xl border border-[#bdc9c8]/50 bg-white p-4 text-left shadow-sm sm:p-6">
                 <SearchResults
                   results={searchResults}
                   isLoading={isLoading}

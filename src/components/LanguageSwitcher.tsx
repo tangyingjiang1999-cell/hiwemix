@@ -32,7 +32,7 @@ export default function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-full border border-[#0D9488] bg-white px-3 py-1.5 text-sm font-semibold text-[#0D9488] transition-all duration-200 hover:bg-[#0D9488]/5"
+        className="flex items-center gap-2 rounded-full border border-[#0D9488] bg-white px-2 py-1.5 text-sm font-semibold text-[#0D9488] transition-all duration-200 hover:bg-[#0D9488]/5 sm:px-3"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label="Select language"
@@ -40,7 +40,7 @@ export default function LanguageSwitcher() {
         <span className="text-base leading-none" aria-hidden="true">
           {current.flag}
         </span>
-        <span>{current.code.toUpperCase()}</span>
+        <span className="hidden sm:inline">{current.code.toUpperCase()}</span>
         <svg
           className={["h-3.5 w-3.5 transition-transform", open ? "rotate-180" : ""].join(" ")}
           viewBox="0 0 24 24"

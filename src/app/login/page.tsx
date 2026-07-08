@@ -81,7 +81,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* ===== 左侧渐变区 (40%) ===== */}
       <div
-        className="fluid-gradient relative flex flex-col justify-between px-10 py-12 lg:w-[40%]"
+        className="fluid-gradient relative flex flex-col justify-between px-6 py-8 lg:px-10 lg:py-12 lg:w-[40%]"
       >
         <div className="fluid-blob" />
 

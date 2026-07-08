@@ -113,7 +113,7 @@ const ColorCard = memo(function ColorCard({
       >
         <div className="border-t border-[#E5E7EB] px-5 pb-4 pt-3">
           {formulas.length > 1 ? (
-            <div className="mb-3 flex gap-1.5">
+            <div className="mb-3 flex flex-wrap gap-1.5">
               {formulas.map((f, idx) => (
                 <button
                   key={f.id}

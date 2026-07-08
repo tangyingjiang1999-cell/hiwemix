@@ -111,7 +111,7 @@ export default function AdminUsersPage() {
       <SiteHeader />
       <Navigation />
 
-      <div className="mx-auto max-w-4xl px-8 py-8">
+      <div className="mx-auto max-w-4xl px-4 py-6 sm:px-8 sm:py-8">
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-base font-semibold text-gray-900">{t.adminTitle}</h2>
           <button
@@ -122,8 +122,8 @@ export default function AdminUsersPage() {
           </button>
         </div>
 
-        <div className="overflow-hidden rounded border border-gray-200 bg-white">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto rounded border border-gray-200 bg-white">
+          <table className="w-full min-w-[600px] text-sm">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-left text-[11px] text-gray-500 font-medium uppercase tracking-wider text-gray-500">
                 <th className="px-4 py-3">{t.adminColId}</th>
@@ -175,7 +175,7 @@ export default function AdminUsersPage() {
       {toastElement}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="w-[400px] rounded-lg bg-white p-6 shadow-lg">
+          <div className="w-[90%] max-w-[400px] rounded-lg bg-white p-6 shadow-lg">
             <h3 className="mb-4 text-sm font-semibold text-gray-900">
               {editingUser ? t.adminEditTitle : t.adminNewUser}
             </h3>
