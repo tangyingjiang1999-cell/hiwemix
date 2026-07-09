@@ -41,52 +41,95 @@ function EyeOffIcon() {
   );
 }
 
+function ArrowLeftIcon({ className = "w-5 h-5" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12" />
+      <polyline points="12 19 5 12 12 5" />
+    </svg>
+  );
+}
+
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isRegister, setIsRegister] = useState(false);
   const router = useRouter();
   const { t } = useLang();
   const { login } = useAuth();
 
+  async function attemptLogin() {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      if (data.user) login(data.user);
+      router.push("/");
+      return true;
+    }
+    setError(data.error || t.loginErrorFailed);
+    return false;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
     if (!username || !password) {
       setError(t.loginErrorEmpty);
       return;
     }
+
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        if (data.user) {
-          login(data.user);
+      if (isRegister) {
+        if (password.length < 8) {
+          setError(t.registerErrorPassword);
+          return;
         }
-        router.push("/");
+        if (password !== confirmPassword) {
+          setError(t.registerErrorMismatch);
+          return;
+        }
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password, confirmPassword }),
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          await attemptLogin();
+        } else {
+          setError(data.error || t.registerErrorFailed);
+        }
       } else {
-        setError(data.error || t.loginErrorFailed);
+        await attemptLogin();
       }
     } catch {
-      setError(t.loginErrorNetwork);
+      setError(isRegister ? t.registerErrorFailed : t.loginErrorNetwork);
     } finally {
       setLoading(false);
     }
   }
 
+  const primaryColor = isRegister ? "#7C3AED" : "#0D9488";
+  const hoverColor = isRegister ? "#6D28D9" : "#0F766E";
+  const focusClasses = isRegister
+    ? "focus:border-[#7C3AED] focus:ring-[#7C3AED]/10"
+    : "focus:border-[#0D9488] focus:ring-[#0D9488]/10";
+
   return (
     <div className="flex min-h-screen flex-col lg:flex-row">
       {/* ===== 左侧渐变区 (40%) ===== */}
-      <div
-        className="fluid-gradient relative flex flex-col justify-between px-6 py-8 lg:px-10 lg:py-12 lg:w-[40%]"
-      >
+      <div className="fluid-gradient relative flex flex-col justify-between px-6 py-8 lg:px-10 lg:py-12 lg:w-[40%]">
         <div className="fluid-blob" />
 
         {/* Logo - 移动端 */}
@@ -98,9 +141,7 @@ export default function LoginPage() {
             height={40}
             className="h-10 w-10 object-contain brightness-0 invert"
           />
-          <span className="text-base font-semibold text-white">
-            HAIWEN MIX
-          </span>
+          <span className="text-base font-semibold text-white">HAIWEN MIX</span>
         </div>
 
         {/* 主标题 - 桌面端展示 */}
@@ -151,7 +192,23 @@ export default function LoginPage() {
       </div>
 
       {/* ===== 右侧表单区 (60%) ===== */}
-      <div className="flex flex-1 items-center justify-center bg-white px-6 py-10 lg:px-16">
+      <div className="relative flex flex-1 items-center justify-center bg-white px-6 py-10 lg:px-16">
+        {/* 注册模式返回箭头 */}
+        {isRegister && (
+          <button
+            type="button"
+            onClick={() => {
+              setIsRegister(false);
+              setError("");
+              setConfirmPassword("");
+            }}
+            className="absolute left-6 top-6 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 lg:left-10 lg:top-10"
+          >
+            <ArrowLeftIcon className="h-4 w-4" />
+            <span className="hidden sm:inline">{t.backToLogin}</span>
+          </button>
+        )}
+
         <div className="w-full max-w-sm">
           {/* 主标题与副标题 */}
           <div className="mb-10 hidden lg:block text-center">
@@ -163,10 +220,10 @@ export default function LoginPage() {
               className="mx-auto h-20 w-auto object-contain mb-6"
             />
             <h2 className="mt-2 text-base font-semibold text-gray-900">
-              {t.loginWelcome}
+              {isRegister ? t.registerWelcome : t.loginWelcome}
             </h2>
             <p className="mt-1 text-xs text-gray-500">
-              {t.loginSubtitle}
+              {isRegister ? t.registerSubtitle : t.loginSubtitle}
             </p>
           </div>
 
@@ -180,14 +237,16 @@ export default function LoginPage() {
               className="mb-4 h-14 w-auto object-contain"
             />
             <h1 className="text-base font-semibold text-gray-900">
-              {t.loginMobileTitle}
+              {isRegister ? t.registerWelcome : t.loginMobileTitle}
             </h1>
-            <p className="mt-1 text-xs text-gray-500">{t.panelTitle}</p>
+            <p className="mt-1 text-xs text-gray-500">
+              {isRegister ? t.registerSubtitle : t.panelTitle}
+            </p>
           </div>
 
-          {/* 登录表单 */}
+          {/* 表单 */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email / Username */}
+            {/* 用户名 */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-gray-700">
                 {t.loginEmail}
@@ -204,12 +263,12 @@ export default function LoginPage() {
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder={t.loginPlaceholderEmail}
                   autoFocus
-                  className="block h-12 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-xs text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/10"
+                  className={`block h-12 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-xs text-gray-900 outline-none transition-colors placeholder:text-gray-400 ${focusClasses}`}
                 />
               </div>
             </div>
 
-            {/* Password */}
+            {/* 密码 */}
             <div>
               <label className="mb-1.5 block text-xs font-medium text-gray-700">
                 {t.loginPassword}
@@ -221,11 +280,11 @@ export default function LoginPage() {
                 <input
                   type={showPassword ? "text" : "password"}
                   name="password"
-                  autoComplete="new-password"
+                  autoComplete={isRegister ? "new-password" : "current-password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={t.loginPlaceholderPassword}
-                  className="block h-12 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-12 text-xs text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-[#0D9488] focus:ring-2 focus:ring-[#0D9488]/10"
+                  className={`block h-12 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-12 text-xs text-gray-900 outline-none transition-colors placeholder:text-gray-400 ${focusClasses}`}
                 />
                 <button
                   type="button"
@@ -238,6 +297,37 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* 确认密码（仅注册） */}
+            {isRegister && (
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-gray-700">
+                  {t.registerConfirmLabel}
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                    <LockIcon />
+                  </div>
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder={t.registerConfirmPlaceholder}
+                    className={`block h-12 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-12 text-xs text-gray-900 outline-none transition-colors placeholder:text-gray-400 ${focusClasses}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2"
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* 错误提示 */}
             {error && (
               <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-xs text-red-600">
@@ -245,11 +335,14 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Get started */}
+            {/* 提交按钮 */}
             <button
               type="submit"
               disabled={loading}
-              className="flex h-12 w-full items-center justify-center rounded-lg bg-[#0D9488] text-xs font-semibold font-semibold text-white transition-all duration-200 hover:bg-[#0F766E] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex h-12 w-full items-center justify-center rounded-lg text-xs font-semibold text-white transition-all duration-200 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+              style={{ backgroundColor: primaryColor }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = hoverColor)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = primaryColor)}
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -257,16 +350,44 @@ export default function LoginPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  {t.loginSigningIn}
                 </span>
               ) : (
-                t.loginButton
+                isRegister ? t.registerButton : t.loginButton
               )}
             </button>
 
-            {/* 注册入口 */}
+            {/* 底部切换链接 */}
             <p className="text-center text-xs text-gray-500">
-              <a href="/register" className="font-medium text-[#0D9488] hover:text-[#0F766E]">{t.loginRegisterLink}</a>
+              {isRegister ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRegister(false);
+                    setError("");
+                    setConfirmPassword("");
+                  }}
+                  className="font-medium transition-colors"
+                  style={{ color: primaryColor }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = hoverColor)}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = primaryColor)}
+                >
+                  {t.registerLoginLink}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsRegister(true);
+                    setError("");
+                  }}
+                  className="font-medium transition-colors"
+                  style={{ color: primaryColor }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = hoverColor)}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = primaryColor)}
+                >
+                  {t.loginRegisterLink}
+                </button>
+              )}
             </p>
           </form>
         </div>

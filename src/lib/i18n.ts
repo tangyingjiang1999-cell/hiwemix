@@ -64,11 +64,16 @@ interface I18nDict {
   loginErrorNetwork: string;
   loginErrorFailed: string;
   loginRegisterLink: string;
+  registerWelcome: string;
+  registerSubtitle: string;
   registerTitle: string;
   registerButton: string;
   registerConfirmLabel: string;
   registerConfirmPlaceholder: string;
   registerSuccess: string;
+  backToLogin: string;
+  haveAccount: string;
+  loginLink: string;
   registerErrorExists: string;
   registerErrorFormat: string;
   registerErrorPassword: string;
@@ -184,9 +189,10 @@ const plural = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : 
 const dict = (d: Omit<I18nDict,
   "formulasCount" | "foundCount" | "truncatedHint" | "totalFormula" | "colorsBadge" | "formulasBadge"
   | "loginEmail" | "loginPlaceholderEmail"
-  | "loginRegisterLink" | "registerTitle" | "registerButton" | "registerConfirmLabel"
-  | "registerConfirmPlaceholder" | "registerSuccess" | "registerErrorExists" | "registerErrorFormat"
-  | "registerErrorPassword" | "registerErrorMismatch" | "registerLoginLink" | "registerErrorFailed"
+  | "loginRegisterLink" | "registerWelcome" | "registerSubtitle" | "registerTitle"
+  | "registerButton" | "registerConfirmLabel" | "registerConfirmPlaceholder" | "registerSuccess"
+  | "registerErrorExists" | "registerErrorFormat" | "registerErrorPassword" | "registerErrorMismatch"
+  | "registerLoginLink" | "registerErrorFailed" | "backToLogin" | "haveAccount" | "loginLink"
 > & {
   formulasCount?: (n: number) => string;
   foundCount?: (n: number) => string;
@@ -197,11 +203,16 @@ const dict = (d: Omit<I18nDict,
   loginEmail?: string;
   loginPlaceholderEmail?: string;
   loginRegisterLink?: string;
+  registerWelcome?: string;
+  registerSubtitle?: string;
   registerTitle?: string;
   registerButton?: string;
   registerConfirmLabel?: string;
   registerConfirmPlaceholder?: string;
   registerSuccess?: string;
+  backToLogin?: string;
+  haveAccount?: string;
+  loginLink?: string;
   registerErrorExists?: string;
   registerErrorFormat?: string;
   registerErrorPassword?: string;
@@ -219,6 +230,8 @@ const dict = (d: Omit<I18nDict,
   loginEmail: d.loginEmail ?? "Username",
   loginPlaceholderEmail: d.loginPlaceholderEmail ?? "Enter your username",
   loginRegisterLink: d.loginRegisterLink ?? "No account? Register",
+  registerWelcome: d.registerWelcome ?? "Welcome New Friend",
+  registerSubtitle: d.registerSubtitle ?? "Create your account to get started",
   registerTitle: d.registerTitle ?? "Create account",
   registerButton: d.registerButton ?? "Register",
   registerConfirmLabel: d.registerConfirmLabel ?? "Confirm Password",
@@ -230,6 +243,9 @@ const dict = (d: Omit<I18nDict,
   registerErrorMismatch: d.registerErrorMismatch ?? "Passwords do not match",
   registerLoginLink: d.registerLoginLink ?? "Already have an account? Sign in",
   registerErrorFailed: d.registerErrorFailed ?? "Registration failed",
+  backToLogin: d.backToLogin ?? "Back to login",
+  haveAccount: d.haveAccount ?? "Already have an account?",
+  loginLink: d.loginLink ?? "Log in",
   ...d,
 });
 
@@ -261,15 +277,32 @@ export const i18n: Record<Lang, I18nDict> = {
 
     loginWelcome: "Welcome back",
     loginSubtitle: "Enter your credentials to access the system",
-    loginEmail: "Email",
+    loginEmail: "Username",
     loginPassword: "Password",
-    loginPlaceholderEmail: "you@example.com",
+    loginPlaceholderEmail: "Enter your username",
     loginPlaceholderPassword: "Enter your password",
     loginButton: "Get started",
     loginSigningIn: "Signing in...",
     loginErrorEmpty: "Please enter username and password",
     loginErrorNetwork: "Network error, please retry",
     loginErrorFailed: "Login failed",
+    loginRegisterLink: "No account? Register",
+    registerWelcome: "Welcome New Friend",
+    registerSubtitle: "Create your account to get started",
+    registerTitle: "Create account",
+    registerButton: "Register",
+    registerConfirmLabel: "Confirm Password",
+    registerConfirmPlaceholder: "Re-enter password",
+    registerSuccess: "Registration successful, signing in...",
+    registerErrorExists: "Username already exists",
+    registerErrorFormat: "Username must be 3-20 chars: start with a letter, only letters/numbers/_",
+    registerErrorPassword: "Password must be at least 8 characters",
+    registerErrorMismatch: "Passwords do not match",
+    registerLoginLink: "Already have an account? Sign in",
+    registerErrorFailed: "Registration failed",
+    backToLogin: "Back to login",
+    haveAccount: "Already have an account?",
+    loginLink: "Log in",
 
     panelTitle: "Formula Search",
     make: "Make", colorCode: "Color Code", colorName: "Color Name", colorType: "Color Type",
@@ -360,6 +393,8 @@ export const i18n: Record<Lang, I18nDict> = {
     loginEmail: "用户名",
     loginPlaceholderEmail: "请输入用户名",
     loginRegisterLink: "还没有账号？立即注册",
+    registerWelcome: "欢迎新朋友",
+    registerSubtitle: "创建账号开始使用",
     registerTitle: "注册账号",
     registerButton: "注册",
     registerConfirmLabel: "确认密码",
@@ -371,6 +406,9 @@ export const i18n: Record<Lang, I18nDict> = {
     registerErrorMismatch: "两次输入的密码不一致",
     registerLoginLink: "已有账号？去登录",
     registerErrorFailed: "注册失败",
+    backToLogin: "返回登录",
+    haveAccount: "已有账号？",
+    loginLink: "去登录",
 
     panelTitle: "配方搜索",
     make: "品牌", colorCode: "颜色代码", colorName: "颜色名称", colorType: "漆面类型",
