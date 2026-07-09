@@ -31,7 +31,7 @@ export function middleware(req: NextRequest) {
   }
 
   // 公开路由，不需要认证
-  const publicPaths = ["/login", "/api/auth/login", "/_next", "/favicon.ico"];
+  const publicPaths = ["/login", "/api/auth/login", "/api/auth/register", "/_next", "/favicon.ico"];
   if (publicPaths.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
