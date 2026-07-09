@@ -135,13 +135,12 @@ export default function LoginPage() {
         {/* Logo - 移动端 */}
         <div className="relative z-10 flex items-center gap-3 lg:hidden">
           <Image
-            src="/haiwen-logo.png"
-            alt="HAIWEN"
-            width={40}
-            height={40}
-            className="h-10 w-10 object-contain brightness-0 invert"
+            src="/hiwe.png"
+            alt="HIWE"
+            width={1206}
+            height={334}
+            className="h-8 w-auto object-contain brightness-0 invert"
           />
-          <span className="text-base font-semibold text-white">HAIWEN MIX</span>
         </div>
 
         {/* 主标题 - 桌面端展示 */}
@@ -213,11 +212,11 @@ export default function LoginPage() {
           {/* 主标题与副标题 */}
           <div className="mb-10 hidden lg:block text-center">
             <Image
-              src="/haiwen-logo.png"
-              alt="HAIWEN"
-              width={80}
-              height={80}
-              className="mx-auto h-20 w-auto object-contain mb-6"
+              src="/hiwe.png"
+              alt="HIWE"
+              width={1206}
+              height={334}
+              className="mx-auto h-16 w-auto object-contain mb-6"
             />
             <h2 className="mt-2 text-base font-semibold text-gray-900">
               {isRegister ? t.registerWelcome : t.loginWelcome}
@@ -230,11 +229,11 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="mb-8 lg:hidden">
             <Image
-              src="/haiwen-logo.png"
-              alt="HAIWEN"
-              width={56}
-              height={56}
-              className="mb-4 h-14 w-auto object-contain"
+              src="/hiwe.png"
+              alt="HIWE"
+              width={1206}
+              height={334}
+              className="mb-4 h-10 w-auto object-contain"
             />
             <h1 className="text-base font-semibold text-gray-900">
               {isRegister ? t.registerWelcome : t.loginMobileTitle}
