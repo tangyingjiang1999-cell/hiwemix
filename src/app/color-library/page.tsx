@@ -1,162 +1,130 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useLang } from "@/components/LanguageContext";
 import SiteHeader from "@/components/SiteHeader";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import type { CarMake, Color } from "@/types";
+import { TONERS, TONER_CATEGORIES } from "@/data/toners";
+import type { TonerCategory } from "@/types";
 
-function ColorCard({ color, onClick }: { color: Color; onClick: (color: Color) => void }) {
-  const { t } = useLang();
-
-  const typeLabels: Record<string, string> = {
-    solid: t.colorTypeSolidLabel, metallic: t.colorTypeMetallicLabel,
-    pearl: t.colorTypePearlLabel, matte: t.colorTypeMatteLabel,
-    candy: t.colorTypeCandyLabel, special: t.colorTypeSpecialLabel,
-  };
-
+function TonerCard({ code, tradeName, nameZh, hex }: { code: string; tradeName: string; nameZh: string; hex: string }) {
   return (
-    <div
-      className="cursor-pointer rounded-lg border border-gray-200 bg-white p-4 transition-all hover:border-teal-600 hover:shadow-lg"
-      onClick={() => onClick(color)}
-    >
+    <div className="group cursor-pointer rounded-lg border border-gray-200 bg-white transition-all hover:border-teal-500 hover:shadow-md">
+      {/* 颜色色块 */}
       <div
-        className="mb-3 h-32 rounded-md"
-        style={{ backgroundColor: color.hex_preview }}
+        className="h-20 rounded-t-lg"
+        style={{ backgroundColor: hex }}
       />
 
-      <div className="space-y-1">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold text-gray-900">{color.color_code}</span>
-          <span className="rounded bg-gray-100 px-2 py-0.5 text-[11px] text-gray-500 font-medium text-gray-600">
-            {typeLabels[color.color_type] || color.color_type}
-          </span>
-        </div>
-        <p className="text-xs text-gray-700">{color.color_name}</p>
+      {/* 信息区 */}
+      <div className="space-y-0.5 p-3">
+        <p className="font-mono text-[11px] font-semibold text-gray-800">{code}</p>
+        <p className="text-xs font-medium text-gray-900 truncate">{tradeName}</p>
+        <p className="text-[11px] text-gray-500">{nameZh}</p>
       </div>
     </div>
   );
 }
 
-function ColorDetailModal({ color, onClose, carMakes }: { color: Color; onClose: () => void; carMakes: CarMake[] }) {
+export default function TonerPage() {
   const { t } = useLang();
-  const make = carMakes.find((m) => m.id === color.make_id);
+  const [activeCategory, setActiveCategory] = useState<TonerCategory>("2K_BASECOAT");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={onClose}>
-      <div className="mx-4 max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white p-4 sm:mx-0 sm:p-6" onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} className="mb-4 text-xs text-gray-500 hover:text-gray-700">
-          {t.close}
-        </button>
-
-        <div
-          className="mb-6 h-48 rounded-lg"
-          style={{ backgroundColor: color.hex_preview }}
-        />
-
-        <h2 className="mb-4 text-sm font-semibold font-bold text-gray-900">{color.color_name}</h2>
-        <div className="space-y-2 text-xs">
-          <p><strong>{t.makeLabel}:</strong> {make?.name || color.make_id}</p>
-          <p><strong>{t.codeLabel}:</strong> {color.color_code}</p>
-          <p><strong>{t.typeLabel}:</strong> {color.color_type}</p>
-        </div>
-
-        <div className="mt-6">
-          <h3 className="mb-2 text-sm font-semibold font-semibold">{t.formulaVariants}</h3>
-          {color.variants.map((variant) => (
-            <div key={variant.id} className="mb-2 rounded border p-3">
-              <p className="text-xs font-semibold">{variant.name}</p>
-              <p className="text-[11px] text-gray-500 text-gray-600">{t.yearsLabel}: {variant.year_range}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function ColorLibraryPage() {
-  const { t } = useLang();
-  const [selectedColor, setSelectedColor] = useState<Color | null>(null);
-  const [filterMake, setFilterMake] = useState("");
-  const [filterType, setFilterType] = useState("");
-  // 从公开 API 加载，使 Data Management 的增删改能同步
-  const [colors, setColors] = useState<Color[]>([]);
-  const [carMakes, setCarMakes] = useState<CarMake[]>([]);
-
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/colors").then((r) => (r.ok ? r.json() : [])),
-      fetch("/api/brands").then((r) => (r.ok ? r.json() : [])),
-    ])
-      .then(([c, m]: [Color[], CarMake[]]) => {
-        setColors(c);
-        setCarMakes(m);
-      })
-      .catch(() => {
-        setColors([]);
-        setCarMakes([]);
-      });
-  }, []);
-
-  const filteredColors = colors.filter((color) => {
-    if (filterMake && color.make_id !== filterMake) return false;
-    if (filterType && color.color_type !== filterType) return false;
-    return true;
-  });
+  const filteredToners = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    return TONERS.filter((toner) => {
+      if (toner.category !== activeCategory) return false;
+      if (!q) return true;
+      return (
+        toner.code.toLowerCase().includes(q) ||
+        toner.tradeName.toLowerCase().includes(q) ||
+        toner.nameZh.includes(q)
+      );
+    });
+  }, [activeCategory, searchQuery]);
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
       <SiteHeader />
       <Navigation />
 
-      <div className="bg-gray-50 border-b border-gray-200 px-4 pt-20 pb-3 lg:px-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <select
-            value={filterMake}
-            onChange={(e) => setFilterMake(e.target.value)}
-            className="rounded border px-3 py-2 text-xs"
-          >
-            <option value="">{t.allMakes}</option>
-            {carMakes.map((make) => (
-              <option key={make.id} value={make.id}>{make.name}</option>
-            ))}
-          </select>
+      {/* 标题栏 */}
+      <div className="bg-white border-b border-gray-200 px-4 pt-20 pb-0 lg:px-6">
+        <h1 className="text-lg font-bold text-gray-900">Toner</h1>
+      </div>
 
+      {/* 分类按钮 + 搜索 */}
+      <div className="sticky top-[72px] z-30 bg-white border-b border-gray-200 px-4 py-3 lg:px-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          {/* 分类按钮 */}
           <div className="flex flex-wrap gap-2">
-            {(["", "solid", "metallic", "pearl", "matte", "candy"] as const).map((type) => {
-              const labels: Record<string, string> = {
-                "": t.colorTypeAll, solid: t.colorTypeSolid, metallic: t.colorTypeMetallic,
-                pearl: t.colorTypePearl, matte: t.colorTypeMatte, candy: t.colorTypeCandy,
-              };
-              return (
-                <button
-                  key={type}
-                  onClick={() => setFilterType(type)}
-                  className={`rounded-full border px-4 py-1.5 transition-all ${
-                    filterType === type
-                      ? "border-gray-800 bg-gray-800 text-white"
-                      : "border-gray-300 bg-white text-gray-700 hover:border-teal-600"
-                  }`}
-                >
-                  {labels[type] ?? type}
-                </button>
-              );
-            })}
+            {TONER_CATEGORIES.map((cat) => (
+              <button
+                key={cat.key}
+                onClick={() => setActiveCategory(cat.key)}
+                className={`rounded-lg border px-4 py-2 text-xs font-medium transition-all ${
+                  activeCategory === cat.key
+                    ? "border-teal-600 bg-teal-600 text-white shadow-sm"
+                    : "border-gray-200 bg-white text-gray-700 hover:border-teal-400 hover:text-teal-700"
+                }`}
+              >
+                {cat.label}
+                <span className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
+                  activeCategory === cat.key
+                    ? "bg-teal-500/30 text-white"
+                    : "bg-gray-100 text-gray-500"
+                }`}>
+                  {cat.count}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* 搜索框 */}
+          <div className="relative w-full sm:w-64">
+            <svg
+              className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search code or name..."
+              className="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-xs text-gray-900 outline-none transition-colors placeholder:text-gray-400 focus:border-teal-500 focus:bg-white"
+            />
           </div>
         </div>
       </div>
 
-      <div className="grid flex-1 grid-cols-2 content-start gap-4 p-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 lg:p-6">
-        {filteredColors.map((color) => (
-          <ColorCard key={color.id} color={color} onClick={setSelectedColor} />
-        ))}
+      {/* 色母卡片网格 */}
+      <div className="flex-1 px-4 py-5 lg:px-6">
+        {filteredToners.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+            <p className="text-sm">No toners found</p>
+            <p className="mt-1 text-xs">Try a different search or category</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            {filteredToners.map((toner) => (
+              <TonerCard
+                key={toner.code}
+                code={toner.code}
+                tradeName={toner.tradeName}
+                nameZh={toner.nameZh}
+                hex={toner.hex}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {selectedColor && (
-        <ColorDetailModal color={selectedColor} onClose={() => setSelectedColor(null)} carMakes={carMakes} />
-      )}
       <Footer />
     </div>
   );

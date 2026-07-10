@@ -79,6 +79,18 @@ export interface GuideCategory {
   sortOrder: number
 }
 
+// 色母分类
+export type TonerCategory = "2K_BASECOAT" | "1K_BASECOAT" | "1K_SILVER_BASECOAT" | "1K_PEARL_BASECOAT";
+
+// 色母
+export interface Toner {
+  code: string            // 色母编号，例如 "2K-2001"
+  tradeName: string       // 英文商品名，例如 "White"
+  nameZh: string          // 中文品名，例如 "纯白"
+  category: TonerCategory
+  hex: string             // 颜色预览 hex，例如 "#FFFFFF"
+}
+
 // 应用指南文章
 export interface Guide {
   id: string
