@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { CarMake } from "@/types";
+import { generateBrandId } from "@/lib/id-generator";
 
 const REGIONS = ["JPN", "EUR", "USA", "CHN", "KOR"] as const;
 
@@ -12,6 +13,14 @@ export default function BrandsPanel() {
   const [editing, setEditing] = useState<CarMake | null>(null);
   const [form, setForm] = useState({ id: "", name: "", region: "JPN" as CarMake["region"] });
   const [error, setError] = useState("");
+  const idManuallyEdited = useRef(false);
+
+  // 新建时：名称变化自动生成 ID（手动编辑后停止自动覆盖）
+  useEffect(() => {
+    if (!editing && !idManuallyEdited.current && form.name) {
+      setForm((prev) => ({ ...prev, id: generateBrandId(form.name) }));
+    }
+  }, [form.name, editing]);
 
   const fetchBrands = useCallback(async () => {
     const res = await fetch("/api/admin/brands");
@@ -27,6 +36,7 @@ export default function BrandsPanel() {
     setEditing(null);
     setForm({ id: "", name: "", region: "JPN" });
     setError("");
+    idManuallyEdited.current = false;
     setShowModal(true);
   }
 
@@ -109,8 +119,8 @@ export default function BrandsPanel() {
             <h3 className="mb-4 text-sm font-semibold text-gray-900">{editing ? "编辑品牌" : "新增品牌"}</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700">ID（英文 slug，如 toyota）</label>
-                <input type="text" value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value })} disabled={!!editing} className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-xs outline-none disabled:bg-gray-100 focus:border-[#0D9488]" />
+                <label className="block text-xs font-medium text-gray-700">ID（自动从名称生成，可手动修改）</label>
+                <input type="text" value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-xs outline-none disabled:bg-gray-100 focus:border-[#0D9488]" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700">名称</label>

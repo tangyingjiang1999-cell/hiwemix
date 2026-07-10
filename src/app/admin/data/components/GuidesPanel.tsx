@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { Guide, GuideCategory } from "@/types";
+import { generateGuideId, generateGuideCategoryId } from "@/lib/id-generator";
 
 export default function GuidesPanel() {
   const [guides, setGuides] = useState<Guide[]>([]);
@@ -14,6 +15,22 @@ export default function GuidesPanel() {
   const [form, setForm] = useState({ id: "", categoryId: "", title: "", titleZh: "", content: "", contentZh: "" });
   const [error, setError] = useState("");
   const [catForm, setCatForm] = useState({ id: "", name: "", nameZh: "" });
+  const guideIdEdited = useRef(false);
+  const catIdEdited = useRef(false);
+
+  // 新建指南时：英文标题变化自动生成 ID
+  useEffect(() => {
+    if (!editing && !guideIdEdited.current && form.title) {
+      setForm((prev) => ({ ...prev, id: generateGuideId(form.title) }));
+    }
+  }, [form.title, editing]);
+
+  // 新建分类时：英文名变化自动生成 ID
+  useEffect(() => {
+    if (!catIdEdited.current && catForm.name) {
+      setCatForm((prev) => ({ ...prev, id: generateGuideCategoryId(catForm.name) }));
+    }
+  }, [catForm.name]);
 
   const fetchGuides = useCallback(async () => {
     const res = await fetch("/api/admin/guides");
@@ -35,6 +52,7 @@ export default function GuidesPanel() {
     setEditing(null);
     setForm({ id: "", categoryId: categories[0]?.id || "", title: "", titleZh: "", content: "", contentZh: "" });
     setError("");
+    guideIdEdited.current = false;
     setShowModal(true);
   }
 
@@ -91,6 +109,7 @@ export default function GuidesPanel() {
       body: JSON.stringify({ ...catForm, sortOrder: 0 }),
     });
     setCatForm({ id: "", name: "", nameZh: "" });
+    catIdEdited.current = false;
     fetchCategories();
   }
 
@@ -157,8 +176,8 @@ export default function GuidesPanel() {
             <h3 className="mb-4 text-sm font-semibold text-gray-900">{editing ? "编辑指南" : "新增指南"}</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700">ID</label>
-                <input type="text" value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value })} disabled={!!editing} className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-xs outline-none disabled:bg-gray-100 focus:border-[#0D9488]" />
+                <label className="block text-xs font-medium text-gray-700">ID（自动从英文标题生成，可手动修改）</label>
+                <input type="text" value={form.id} onChange={(e) => { guideIdEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-xs outline-none disabled:bg-gray-100 focus:border-[#0D9488]" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700">分类</label>
@@ -210,7 +229,7 @@ export default function GuidesPanel() {
             </div>
             <div className="space-y-2 rounded bg-gray-50 p-3">
               <div className="flex gap-2">
-                <input type="text" value={catForm.id} onChange={(e) => setCatForm({ ...catForm, id: e.target.value })} placeholder="ID" className="w-20 rounded border border-gray-300 px-2 py-1.5 text-xs outline-none focus:border-[#0D9488]" />
+                <input type="text" value={catForm.id} onChange={(e) => { catIdEdited.current = true; setCatForm({ ...catForm, id: e.target.value }); }} placeholder="自动生成" className="w-20 rounded border border-gray-300 px-2 py-1.5 text-xs outline-none focus:border-[#0D9488]" />
                 <input type="text" value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })} placeholder="英文名" className="flex-1 rounded border border-gray-300 px-2 py-1.5 text-xs outline-none focus:border-[#0D9488]" />
                 <input type="text" value={catForm.nameZh} onChange={(e) => setCatForm({ ...catForm, nameZh: e.target.value })} placeholder="中文名" className="flex-1 rounded border border-gray-300 px-2 py-1.5 text-xs outline-none focus:border-[#0D9488]" />
               </div>

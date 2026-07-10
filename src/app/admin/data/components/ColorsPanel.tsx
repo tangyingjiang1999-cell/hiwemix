@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { CarMake, Color, ColorVariant } from "@/types";
+import { generateColorId } from "@/lib/id-generator";
 
 const COLOR_TYPES = ["solid", "metallic", "pearl", "matte", "candy", "special"] as const;
 
@@ -22,6 +23,14 @@ export default function ColorsPanel() {
   });
   const [variantIds, setVariantIds] = useState<string[]>([]);
   const [error, setError] = useState("");
+  const idManuallyEdited = useRef(false);
+
+  // 新建时：品牌 + 颜色代码变化自动生成 ID
+  useEffect(() => {
+    if (!editing && !idManuallyEdited.current && form.make_id && form.color_code) {
+      setForm((prev) => ({ ...prev, id: generateColorId(form.make_id, form.color_code) }));
+    }
+  }, [form.make_id, form.color_code, editing]);
 
   const fetchColors = useCallback(async () => {
     const res = await fetch("/api/admin/colors");
@@ -40,6 +49,7 @@ export default function ColorsPanel() {
     setForm({ id: "", make_id: "", color_code: "", color_name: "", color_type: "solid", hex_preview: "#FFFFFF" });
     setVariantIds([]);
     setError("");
+    idManuallyEdited.current = false;
     setShowModal(true);
   }
 
@@ -144,8 +154,8 @@ export default function ColorsPanel() {
             <h3 className="mb-4 text-sm font-semibold text-gray-900">{editing ? "编辑颜色" : "新增颜色"}</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700">ID</label>
-                <input type="text" value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value })} disabled={!!editing} className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-xs outline-none disabled:bg-gray-100 focus:border-[#0D9488]" />
+                <label className="block text-xs font-medium text-gray-700">ID（自动从品牌+颜色代码生成，可手动修改）</label>
+                <input type="text" value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-xs outline-none disabled:bg-gray-100 focus:border-[#0D9488]" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700">品牌</label>

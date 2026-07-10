@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { Formula, FormulaComponent, Color, ColorVariant } from "@/types";
+import { generateFormulaId } from "@/lib/id-generator";
 
 const PAINT_SYSTEMS = ["1K", "2K"] as const;
 const FORMULA_TYPES = ["Basecoat", "Clearcoat", "Single Stage", "Primer", "Topcoat"] as const;
@@ -31,6 +32,14 @@ export default function FormulasPanel() {
   const [components, setComponents] = useState<FormulaComponent[]>([]);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const idManuallyEdited = useRef(false);
+
+  // 新建时：颜色 + 变体 + 版本变化自动生成 ID
+  useEffect(() => {
+    if (!selectedId && !idManuallyEdited.current && form.color_id && form.version) {
+      setForm((prev) => ({ ...prev, id: generateFormulaId(form.color_id, form.variant_id, form.version) }));
+    }
+  }, [form.color_id, form.variant_id, form.version, selectedId]);
 
   const fetchFormulas = useCallback(async () => {
     const res = await fetch("/api/admin/formulas");
@@ -74,6 +83,7 @@ export default function FormulasPanel() {
     setComponents([]);
     setError("");
     setMessage("");
+    idManuallyEdited.current = false;
   }
 
   function addComponent() {
@@ -164,8 +174,8 @@ export default function FormulasPanel() {
       <div className="flex-1 rounded border border-gray-200 bg-white p-4">
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[11px] font-medium text-gray-600">配方 ID</label>
-            <input type="text" value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value })} disabled={!!selectedId} className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-xs outline-none disabled:bg-gray-100 focus:border-[#0D9488]" />
+            <label className="block text-[11px] font-medium text-gray-600">配方 ID（自动生成，可手动修改）</label>
+            <input type="text" value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!selectedId} className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-xs outline-none disabled:bg-gray-100 focus:border-[#0D9488]" />
           </div>
           <div>
             <label className="block text-[11px] font-medium text-gray-600">关联颜色</label>

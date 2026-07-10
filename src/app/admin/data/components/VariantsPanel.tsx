@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type { ColorVariant } from "@/types";
+import { generateVariantId } from "@/lib/id-generator";
 
 export default function VariantsPanel() {
   const [variants, setVariants] = useState<ColorVariant[]>([]);
@@ -10,6 +11,14 @@ export default function VariantsPanel() {
   const [editing, setEditing] = useState<ColorVariant | null>(null);
   const [form, setForm] = useState({ id: "", name: "", year_range: "" });
   const [error, setError] = useState("");
+  const idManuallyEdited = useRef(false);
+
+  // 新建时：名称变化自动生成 ID
+  useEffect(() => {
+    if (!editing && !idManuallyEdited.current && form.name) {
+      setForm((prev) => ({ ...prev, id: generateVariantId(form.name) }));
+    }
+  }, [form.name, editing]);
 
   const fetchVariants = useCallback(async () => {
     const res = await fetch("/api/admin/variants");
@@ -25,6 +34,7 @@ export default function VariantsPanel() {
     setEditing(null);
     setForm({ id: "", name: "", year_range: "" });
     setError("");
+    idManuallyEdited.current = false;
     setShowModal(true);
   }
 
@@ -107,8 +117,8 @@ export default function VariantsPanel() {
             <h3 className="mb-4 text-sm font-semibold text-gray-900">{editing ? "编辑变体" : "新增变体"}</h3>
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-medium text-gray-700">ID（如 v_std）</label>
-                <input type="text" value={form.id} onChange={(e) => setForm({ ...form, id: e.target.value })} disabled={!!editing} className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-xs outline-none disabled:bg-gray-100 focus:border-[#0D9488]" />
+                <label className="block text-xs font-medium text-gray-700">ID（自动从名称生成，可手动修改）</label>
+                <input type="text" value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-xs outline-none disabled:bg-gray-100 focus:border-[#0D9488]" />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700">名称</label>
