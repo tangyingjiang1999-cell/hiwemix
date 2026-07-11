@@ -12,6 +12,15 @@ export interface SearchResultsProps {
   onOpenFormula: (row: FormulaTableRow) => void;
 }
 
+// 生成 Kapci 风格渐变色：主色为底，中间高光过渡，两侧同色相阴影
+function colorSwatchStyle(hex: string): React.CSSProperties {
+  return {
+    backgroundColor: hex,
+    backgroundImage:
+      "linear-gradient(to right, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0) 28%, rgba(255,255,255,0.38) 50%, rgba(0,0,0,0) 72%, rgba(0,0,0,0.28) 100%)",
+  };
+}
+
 function SkeletonRows() {
   return (
     <div className="space-y-0">
@@ -123,10 +132,10 @@ export default function SearchResults({
       <div className="overflow-x-auto rounded-lg border border-[#E5E7EB]">
         <table className="w-full min-w-[760px] table-fixed text-left text-xs">
           <colgroup>
-            <col className="w-[5%]" />
-            <col className="w-[22%]" />
-            <col className="w-[13%]" />
-            <col className="w-[25%]" />
+            <col className="w-[10%]" />
+            <col className="w-[20%]" />
+            <col className="w-[12%]" />
+            <col className="w-[23%]" />
             <col className="w-[15%]" />
             <col className="w-[13%]" />
             <col className="w-[7%]" />
@@ -148,11 +157,11 @@ export default function SearchResults({
                 key={row.formula.id}
                 className="border-b border-zinc-100 last:border-b-0 transition-colors hover:bg-[#F8FAFC]"
               >
-                {/* 色块 */}
+                {/* 色块 — 3:1 渐变 */}
                 <td className="px-2 py-2.5">
                   <div
-                    className="h-8 w-8 rounded border border-[#E5E7EB]"
-                    style={{ backgroundColor: row.color.hex_preview }}
+                    className="h-7 w-full rounded border border-[#E5E7EB]"
+                    style={colorSwatchStyle(row.color.hex_preview)}
                   />
                 </td>
                 {/* Manufacturer */}
