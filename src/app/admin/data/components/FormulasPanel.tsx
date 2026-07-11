@@ -9,7 +9,7 @@ import type {
   Color,
   ColorVariant,
 } from "@/types";
-import type { Toner } from "@/types";
+import type { Toner, CarMake } from "@/types";
 import { generateFormulaId } from "@/lib/id-generator";
 import { TONERS } from "@/data/toners";
 
@@ -33,22 +33,38 @@ function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
 }
 
-// 模糊匹配色母
+// 模糊匹配色母（空查询时返回全部）
 function matchingToners(query: string): Toner[] {
   const q = query.toLowerCase().trim();
-  if (!q) return TONERS.slice(0, 8);
+  if (!q) return TONERS;
   return TONERS.filter(
     (t) =>
       t.code.toLowerCase().includes(q) ||
       t.tradeName.toLowerCase().includes(q) ||
       t.nameZh.includes(q)
-  ).slice(0, 8);
+  );
+}
+
+// 模糊匹配颜色
+function matchingColors(query: string, colors: Color[], brands: CarMake[]): Color[] {
+  const q = query.toLowerCase().trim();
+  if (!q) return colors;
+  const brandMap = new Map(brands.map((b) => [b.id, b.name]));
+  return colors.filter((c) => {
+    if (c.color_code.toLowerCase().includes(q)) return true;
+    if (c.color_name.toLowerCase().includes(q)) return true;
+    if (c.color_type.toLowerCase().includes(q)) return true;
+    const brandName = brandMap.get(c.make_id) ?? "";
+    if (brandName.toLowerCase().includes(q)) return true;
+    return false;
+  });
 }
 
 export default function FormulasPanel() {
   const [formulas, setFormulas] = useState<Formula[]>([]);
   const [colors, setColors] = useState<Color[]>([]);
   const [variants, setVariants] = useState<ColorVariant[]>([]);
+  const [brands, setBrands] = useState<CarMake[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -65,24 +81,30 @@ export default function FormulasPanel() {
   const [message, setMessage] = useState("");
   const idManuallyEdited = useRef(false);
 
-  // 色母搜索下拉状态
+  // 关联颜色搜索下拉
+  const [colorQuery, setColorQuery] = useState("");
+  const [colorDropdownOpen, setColorDropdownOpen] = useState(false);
+  const colorBlurRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 色母搜索下拉
   const [tonerDropdownFor, setTonerDropdownFor] = useState<number | null>(null);
   const [tonerQuery, setTonerQuery] = useState("");
-  const blurTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tonerBlurRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 打开 dropdown（清除待定的 blur 关闭）
+  // 选中颜色后的预览文本
+  const selectedColor = colors.find((c) => c.id === form.color_id);
+  const brandMap = new Map(brands.map((b) => [b.id, b.name]));
+  const colorDisplay = selectedColor
+    ? `${selectedColor.color_code} - ${selectedColor.color_name} (${brandMap.get(selectedColor.make_id) ?? selectedColor.make_id})`
+    : "";
+
   function openTonerDropdown(index: number, currentCode: string) {
-    if (blurTimerRef.current) {
-      clearTimeout(blurTimerRef.current);
-      blurTimerRef.current = null;
-    }
+    if (tonerBlurRef.current) { clearTimeout(tonerBlurRef.current); tonerBlurRef.current = null; }
     setTonerDropdownFor(index);
     setTonerQuery(currentCode);
   }
-
-  // 延迟关闭 dropdown（给点击选项留时间）
   function scheduleCloseTonerDropdown() {
-    blurTimerRef.current = setTimeout(() => setTonerDropdownFor(null), 150);
+    tonerBlurRef.current = setTimeout(() => setTonerDropdownFor(null), 150);
   }
 
   // 新建时：颜色 + 变体 + 版本变化自动生成 ID
@@ -109,6 +131,9 @@ export default function FormulasPanel() {
     fetch("/api/admin/variants")
       .then((r) => (r.ok ? r.json() : []))
       .then(setVariants);
+    fetch("/api/admin/brands")
+      .then((r) => (r.ok ? r.json() : []))
+      .then(setBrands);
   }, [fetchFormulas]);
 
   function selectFormula(formula: Formula) {
@@ -125,6 +150,7 @@ export default function FormulasPanel() {
     setComponents(formula.components.map((c) => ({ ...c })));
     setError("");
     setMessage("");
+    setColorQuery("");
   }
 
   function newFormula() {
@@ -141,6 +167,7 @@ export default function FormulasPanel() {
     setComponents([]);
     setError("");
     setMessage("");
+    setColorQuery("");
     idManuallyEdited.current = false;
   }
 
@@ -190,7 +217,6 @@ export default function FormulasPanel() {
     );
   }
 
-  // 选择色母：自动填入编号、名称、RGB
   function selectToner(index: number, toner: Toner) {
     const rgb = hexToRgb(toner.hex);
     setComponents((prev) =>
@@ -219,25 +245,34 @@ export default function FormulasPanel() {
       setError("配方 ID 和关联颜色不能为空");
       return;
     }
+    // 自动补齐 grams_per_100g
+    const comps = components.map((c) => ({
+      ...c,
+      grams_per_100g: c.grams_per_100g || c.percentage,
+    }));
     const payload: Formula = {
       ...form,
       variant_id: form.variant_id || "",
-      components,
+      components: comps,
       updated_at: "",
     };
     const method = selectedId ? "PUT" : "POST";
-    const res = await fetch("/api/admin/formulas", {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-      setMessage("保存成功");
-      fetchFormulas();
-      setSelectedId(payload.id);
-    } else {
-      const data = await res.json();
-      setError(data.error || "保存失败");
+    try {
+      const res = await fetch("/api/admin/formulas", {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        setMessage("保存成功");
+        fetchFormulas();
+        setSelectedId(payload.id);
+      } else {
+        const data = await res.json();
+        setError(data.error || "保存失败");
+      }
+    } catch {
+      setError("网络错误，请重试");
     }
   }
 
@@ -278,7 +313,6 @@ export default function FormulasPanel() {
                 <th className="px-2 py-2">色母编号</th>
                 <th className="px-2 py-2">名称</th>
                 <th className="px-2 py-2">百分比</th>
-                <th className="px-2 py-2">克/100g</th>
                 <th className="px-2 py-2">RGB</th>
                 <th className="px-2 py-2"></th>
               </tr>
@@ -287,7 +321,7 @@ export default function FormulasPanel() {
               {filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={5}
                     className="px-2 py-4 text-center text-[11px] text-gray-400"
                   >
                     暂无色母，点击「添加色母」
@@ -313,7 +347,7 @@ export default function FormulasPanel() {
                       />
                       {tonerDropdownFor === globalIndex &&
                         matchingToners(tonerQuery).length > 0 && (
-                          <div className="absolute left-0 top-full z-50 mt-0.5 max-h-40 w-52 overflow-y-auto rounded border border-gray-200 bg-white shadow-lg">
+                          <div className="absolute left-0 top-full z-50 mt-0.5 max-h-60 w-56 overflow-y-auto rounded border border-gray-200 bg-white shadow-lg">
                             {matchingToners(tonerQuery).map((toner) => (
                               <button
                                 key={toner.code}
@@ -355,21 +389,6 @@ export default function FormulasPanel() {
                         value={c.percentage}
                         onChange={(e) =>
                           updateComponent(globalIndex, "percentage", Number(e.target.value))
-                        }
-                        className="w-16 rounded border border-gray-300 px-1 py-1 text-[11px] outline-none focus:border-[#0D9488]"
-                      />
-                    </td>
-                    {/* 克/100g — 手动输入 */}
-                    <td className="px-2 py-1">
-                      <input
-                        type="number"
-                        value={c.grams_per_100g}
-                        onChange={(e) =>
-                          updateComponent(
-                            globalIndex,
-                            "grams_per_100g",
-                            Number(e.target.value)
-                          )
                         }
                         className="w-16 rounded border border-gray-300 px-1 py-1 text-[11px] outline-none focus:border-[#0D9488]"
                       />
@@ -486,20 +505,62 @@ export default function FormulasPanel() {
               className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-xs outline-none disabled:bg-gray-100 focus:border-[#0D9488]"
             />
           </div>
-          <div>
+          {/* 关联颜色 — 模糊搜索 */}
+          <div className="relative">
             <label className="block text-[11px] font-medium text-gray-600">关联颜色</label>
-            <select
-              value={form.color_id}
-              onChange={(e) => setForm({ ...form, color_id: e.target.value })}
+            <input
+              type="text"
+              value={colorQuery}
+              onChange={(e) => {
+                setColorQuery(e.target.value);
+                setColorDropdownOpen(true);
+                if (colorBlurRef.current) { clearTimeout(colorBlurRef.current); colorBlurRef.current = null; }
+              }}
+              onFocus={() => {
+                setColorDropdownOpen(true);
+                if (colorBlurRef.current) { clearTimeout(colorBlurRef.current); colorBlurRef.current = null; }
+              }}
+              onBlur={() => {
+                colorBlurRef.current = setTimeout(() => setColorDropdownOpen(false), 150);
+              }}
+              placeholder={colorDisplay || "搜索颜色代码、名称、品牌、类型..."}
               className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-xs outline-none focus:border-[#0D9488]"
-            >
-              <option value="">请选择</option>
-              {colors.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.color_code} - {c.color_name}
-                </option>
-              ))}
-            </select>
+            />
+            {colorDropdownOpen && matchingColors(colorQuery, colors, brands).length > 0 && (
+              <div className="absolute left-0 right-0 top-full z-50 mt-0.5 max-h-48 overflow-y-auto rounded border border-gray-200 bg-white shadow-lg">
+                {matchingColors(colorQuery, colors, brands).map((c) => {
+                  const brandName = brandMap.get(c.make_id) ?? c.make_id;
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onMouseDown={() => {
+                        setForm((prev) => ({ ...prev, color_id: c.id }));
+                        setColorQuery("");
+                        setColorDropdownOpen(false);
+                      }}
+                      className={`flex w-full items-center gap-2 px-2 py-1.5 text-left text-[11px] hover:bg-teal-50 ${
+                        c.id === form.color_id ? "bg-teal-100" : ""
+                      }`}
+                    >
+                      <div
+                        className="h-4 w-5 shrink-0 rounded border border-gray-200"
+                        style={{ backgroundColor: c.hex_preview }}
+                      />
+                      <span className="font-mono text-gray-700">{c.color_code}</span>
+                      <span className="text-gray-600 truncate">{c.color_name}</span>
+                      <span className="ml-auto text-[10px] text-gray-400">{brandName}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {/* 已选中颜色预览 */}
+            {selectedColor && (
+              <p className="mt-0.5 truncate text-[10px] text-teal-600">
+                {colorDisplay}
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-[11px] font-medium text-gray-600">关联变体（可选）</label>
