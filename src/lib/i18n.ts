@@ -162,6 +162,14 @@ interface I18nDict {
   colorsBadge: (n: number) => string;
   formulasBadge: (n: number) => string;
 
+  // SearchResults table
+  versionLabel: string;
+  pageSizeLabel: string;
+  previousPage: string;
+  nextPage: string;
+  pageOf: (current: number, total: number) => string;
+  foundFormulas: (n: number) => string;
+
   // Guide
   guideSearchPlaceholder: string;
   guideCategories: string;
@@ -209,6 +217,7 @@ const dict = (d: Omit<I18nDict,
   | "weight" | "accum" | "massTone" | "colorPreview" | "hexInputLabel"
   | "tabColorInfo" | "tabColorDocs" | "tabPlasticParts"
   | "manufacturerLabel" | "emptyState" | "totalWeightLabel"
+  | "versionLabel" | "pageSizeLabel" | "previousPage" | "nextPage" | "pageOf" | "foundFormulas"
 > & {
   formulasCount?: (n: number) => string;
   foundCount?: (n: number) => string;
@@ -246,6 +255,12 @@ const dict = (d: Omit<I18nDict,
   manufacturerLabel?: string;
   emptyState?: string;
   totalWeightLabel?: string;
+  versionLabel?: string;
+  pageSizeLabel?: string;
+  previousPage?: string;
+  nextPage?: string;
+  pageOf?: (current: number, total: number) => string;
+  foundFormulas?: (n: number) => string;
 }): I18nDict => ({
   formulasCount: d.formulasCount ?? ((n) => plural(n, "formula", "formulas")),
   foundCount: d.foundCount ?? ((n) => `Found ${n} color${n > 1 ? "s" : ""}`),
@@ -285,6 +300,12 @@ const dict = (d: Omit<I18nDict,
   manufacturerLabel: d.manufacturerLabel ?? "Manufacturer",
   emptyState: d.emptyState ?? "No data available",
   totalWeightLabel: d.totalWeightLabel ?? "Total",
+  versionLabel: d.versionLabel ?? "Version",
+  pageSizeLabel: d.pageSizeLabel ?? "Rows per page",
+  previousPage: d.previousPage ?? "Previous",
+  nextPage: d.nextPage ?? "Next",
+  pageOf: d.pageOf ?? ((current, total) => `Page ${current} of ${total}`),
+  foundFormulas: d.foundFormulas ?? ((n) => `Found ${n} formula${n > 1 ? "s" : ""}`),
   ...d,
 });
 
@@ -371,6 +392,9 @@ export const i18n: Record<Lang, I18nDict> = {
     colorPreview: "Color Preview", hexInputLabel: "Hex Color",
     tabColorInfo: "Color Information", tabColorDocs: "Color Documents", tabPlasticParts: "Plastic Parts",
     manufacturerLabel: "Manufacturer", emptyState: "No data available", totalWeightLabel: "Total",
+    versionLabel: "Version", pageSizeLabel: "Rows per page", previousPage: "Previous", nextPage: "Next",
+    pageOf: (current, total) => `Page ${current} of ${total}`,
+    foundFormulas: (n) => `Found ${n} formula${n > 1 ? "s" : ""}`,
 
     searchHint: "Enter search criteria on the left",
     noResults: "No matching colors found",
@@ -482,6 +506,9 @@ export const i18n: Record<Lang, I18nDict> = {
     colorPreview: "颜色预览", hexInputLabel: "色值",
     tabColorInfo: "颜色信息", tabColorDocs: "颜色文档", tabPlasticParts: "塑料件",
     manufacturerLabel: "品牌厂商", emptyState: "暂无数据", totalWeightLabel: "总计",
+    versionLabel: "版本", pageSizeLabel: "每页", previousPage: "上一页", nextPage: "下一页",
+    pageOf: (current, total) => `第 ${current} / ${total} 页`,
+    foundFormulas: (n) => `找到 ${n} 个配方`,
 
     searchHint: "请在左侧输入搜索条件",
     noResults: "未找到匹配的颜色配方",

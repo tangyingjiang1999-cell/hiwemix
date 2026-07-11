@@ -7,26 +7,30 @@ import FormulaDrawer from "@/components/FormulaDrawer";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import { useLang } from "@/components/LanguageContext";
-import type { Color, Formula, SearchParams, SearchResult } from "@/types";
+import type { CarMake, Color, Formula, SearchParams, SearchResult, FormulaTableRow } from "@/types";
 
 export default function Home() {
   const { t } = useLang();
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [tableRows, setTableRows] = useState<FormulaTableRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [drawerResult, setDrawerResult] = useState<SearchResult | null>(null);
+  const [drawerInitialIdx, setDrawerInitialIdx] = useState(0);
 
-  // colors + formulas 只加载一次，后续搜索复用缓存（避免每次搜索都请求 API）
-  const dataPromiseRef = useRef<Promise<{ colors: Color[]; formulas: Formula[] }> | null>(null);
+  // colors + formulas + brands 只加载一次，后续搜索复用缓存
+  const dataPromiseRef = useRef<Promise<{ colors: Color[]; formulas: Formula[]; brands: CarMake[] }> | null>(null);
 
   function loadData() {
     if (!dataPromiseRef.current) {
       dataPromiseRef.current = Promise.all([
         fetch("/api/colors").then((r) => (r.ok ? r.json() : [])),
         fetch("/api/formulas").then((r) => (r.ok ? r.json() : [])),
-      ]).then(([c, f]) => ({
+        fetch("/api/brands").then((r) => (r.ok ? r.json() : [])),
+      ]).then(([c, f, b]) => ({
         colors: c as Color[],
         formulas: f as Formula[],
+        brands: b as CarMake[],
       }));
     }
     return dataPromiseRef.current;
@@ -42,7 +46,7 @@ export default function Home() {
     setIsLoading(true);
     setHasSearched(true);
     loadData()
-      .then(({ colors, formulas }) => {
+      .then(({ colors, formulas, brands }) => {
         let filtered = colors;
         if (params.make_id) filtered = filtered.filter((c) => c.make_id === params.make_id);
         if (params.color_code) {
@@ -62,7 +66,23 @@ export default function Home() {
           color,
           formulas: formulas.filter((f) => f.color_id === color.id),
         }));
+
+        // 展平为每配方一行，解析厂商名与年份
+        const brandsMap = new Map(brands.map((b) => [b.id, b.name]));
+        const rows: FormulaTableRow[] = [];
+        for (const result of results) {
+          for (const formula of result.formulas) {
+            rows.push({
+              color: result.color,
+              formula,
+              variant: result.color.variants.find((v) => v.id === formula.variant_id),
+              makeName: brandsMap.get(result.color.make_id) ?? result.color.make_id,
+            });
+          }
+        }
+
         setSearchResults(results);
+        setTableRows(rows);
       })
       .catch((err) => {
         console.error(err);
@@ -71,8 +91,12 @@ export default function Home() {
       .finally(() => setIsLoading(false));
   }
 
-  function handleOpenDetail(result: SearchResult) {
+  function handleOpenFormula(row: FormulaTableRow) {
+    const result = searchResults.find((r) => r.color.id === row.color.id);
+    if (!result) return;
+    const idx = result.formulas.findIndex((f) => f.id === row.formula.id);
     setDrawerResult(result);
+    setDrawerInitialIdx(idx >= 0 ? idx : 0);
   }
 
   function handleCloseDrawer() {
@@ -103,10 +127,10 @@ export default function Home() {
             {hasSearched && (
               <div className="mt-4 rounded-xl border border-[#bdc9c8]/50 bg-white p-4 text-left shadow-sm sm:p-6">
                 <SearchResults
-                  results={searchResults}
+                  rows={tableRows}
                   isLoading={isLoading}
                   hasSearched={hasSearched}
-                  onOpenDetail={handleOpenDetail}
+                  onOpenFormula={handleOpenFormula}
                 />
               </div>
             )}
@@ -117,7 +141,7 @@ export default function Home() {
       {/* Footer */}
       <Footer />
 
-      <FormulaDrawer result={drawerResult} onClose={handleCloseDrawer} />
+      <FormulaDrawer result={drawerResult} initialFormulaIdx={drawerInitialIdx} onClose={handleCloseDrawer} />
     </div>
   );
 }

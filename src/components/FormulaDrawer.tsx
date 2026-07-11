@@ -11,6 +11,7 @@ import Toast from "./Toast";
 interface FormulaDrawerProps {
   result: SearchResult | null;
   onClose: () => void;
+  initialFormulaIdx?: number;
 }
 
 function formatFormulaAsText(
@@ -165,7 +166,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
+export default function FormulaDrawer({ result, onClose, initialFormulaIdx }: FormulaDrawerProps) {
   const { t } = useLang();
   const [activeFormulaIdx, setActiveFormulaIdx] = useState(0);
   const [visible, setVisible] = useState(false);
@@ -190,7 +191,7 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
     if (result) {
       // result 变化时重置选中配方索引与 hex 输入
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveFormulaIdx(0);
+      setActiveFormulaIdx(initialFormulaIdx ?? 0);
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setHexInput(result.color.hex_preview);
       requestAnimationFrame(() => setVisible(true));
@@ -202,7 +203,7 @@ export default function FormulaDrawer({ result, onClose }: FormulaDrawerProps) {
     return () => {
       document.getElementById("page-content")?.classList.remove("blur-bg");
     };
-  }, [result]);
+  }, [result, initialFormulaIdx]);
 
   const handleClose = useCallback(() => {
     setVisible(false);

@@ -63,6 +63,14 @@ export interface SearchResult {
   formulas: Formula[]
 }
 
+// 表格行：每个配方一行（展平 SearchResult）
+export interface FormulaTableRow {
+  color: Color
+  formula: Formula
+  variant: ColorVariant | undefined  // 通过 formula.variant_id 在 color.variants 中查找
+  makeName: string                    // 通过 brands 解析 make_id -> name
+}
+
 // 系统设置
 export interface AppSettings {
   finishes: string[]
