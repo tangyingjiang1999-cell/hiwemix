@@ -12,12 +12,12 @@ export interface SearchResultsProps {
   onOpenFormula: (row: FormulaTableRow) => void;
 }
 
-// 生成 Kapci 风格渐变色：主色为底，水平方向中间高光，上下同色相阴影
+// 生成 Kapci 风格渐变色：主色为底，水平方向中间宽高光，上下同色相阴影
 function colorSwatchStyle(hex: string): React.CSSProperties {
   return {
     backgroundColor: hex,
     backgroundImage:
-      "linear-gradient(to bottom, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0) 35%, rgba(255,255,255,0.42) 50%, rgba(0,0,0,0) 65%, rgba(0,0,0,0.22) 100%)",
+      "linear-gradient(to bottom, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.12) 16%, rgba(0,0,0,0) 32%, rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.50) 50%, rgba(255,255,255,0.28) 58%, rgba(0,0,0,0) 68%, rgba(0,0,0,0.12) 84%, rgba(0,0,0,0.32) 100%)",
   };
 }
 
@@ -157,12 +157,14 @@ export default function SearchResults({
                 key={row.formula.id}
                 className="border-b border-zinc-100 last:border-b-0 transition-colors hover:bg-[#F8FAFC]"
               >
-                {/* 色块 — 3:1 渐变 */}
+                {/* 色块 — 3:2 宽高比，Kapci 水平中高光 */}
                 <td className="px-2 py-2.5">
-                  <div
-                    className="h-7 w-full rounded border border-[#E5E7EB]"
-                    style={colorSwatchStyle(row.color.hex_preview)}
-                  />
+                  <div className="relative w-full pb-[66.67%]">
+                    <div
+                      className="absolute inset-0 rounded border border-[#E5E7EB]"
+                      style={colorSwatchStyle(row.color.hex_preview)}
+                    />
+                  </div>
                 </td>
                 {/* Manufacturer */}
                 <td className="overflow-hidden px-2 py-2.5">
