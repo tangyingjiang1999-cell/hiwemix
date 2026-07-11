@@ -9,7 +9,9 @@ import type {
   Color,
   ColorVariant,
 } from "@/types";
+import type { Toner } from "@/types";
 import { generateFormulaId } from "@/lib/id-generator";
+import { TONERS } from "@/data/toners";
 
 const PAINT_SYSTEMS = ["1K", "2K"] as const;
 const FORMULA_TYPES: FormulaType[] = ["Single Stage", "Two Stages", "Pearl Paint"];
@@ -23,6 +25,25 @@ const EMPTY_COMPONENT: FormulaComponent = {
   percentage: 0,
   grams_per_100g: 0,
 };
+
+// hex → RGB 转换
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!m) return null;
+  return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
+}
+
+// 模糊匹配色母
+function matchingToners(query: string): Toner[] {
+  const q = query.toLowerCase().trim();
+  if (!q) return TONERS.slice(0, 8);
+  return TONERS.filter(
+    (t) =>
+      t.code.toLowerCase().includes(q) ||
+      t.tradeName.toLowerCase().includes(q) ||
+      t.nameZh.includes(q)
+  ).slice(0, 8);
+}
 
 export default function FormulasPanel() {
   const [formulas, setFormulas] = useState<Formula[]>([]);
@@ -43,6 +64,10 @@ export default function FormulasPanel() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const idManuallyEdited = useRef(false);
+
+  // 色母搜索下拉状态：跟踪哪个色母行正在显示下拉 + 搜索文本
+  const [tonerDropdownFor, setTonerDropdownFor] = useState<number | null>(null);
+  const [tonerQuery, setTonerQuery] = useState("");
 
   // 新建时：颜色 + 变体 + 版本变化自动生成 ID
   useEffect(() => {
@@ -108,7 +133,6 @@ export default function FormulasPanel() {
       const nextType = next === "2K" ? AUTO_2K_TYPE : prev.formula_type;
       return { ...prev, paint_system: next, formula_type: nextType };
     });
-    // 2K 体系下不允许 component_group
     if (next === "2K") {
       setComponents((prev) =>
         prev.map((c) => {
@@ -121,7 +145,6 @@ export default function FormulasPanel() {
 
   function handleFormulaTypeChange(next: FormulaType) {
     setForm((prev) => ({ ...prev, formula_type: next }));
-    // 切换到非 Pearl Paint 时清空分组
     if (next !== "Pearl Paint") {
       setComponents((prev) =>
         prev.map((c) => {
@@ -148,6 +171,24 @@ export default function FormulasPanel() {
       prev.map((c, i) =>
         i === index ? ({ ...c, [field]: value } as FormulaComponent) : c
       )
+    );
+  }
+
+  // 选择色母：自动填入编号、名称、RGB
+  function selectToner(index: number, toner: Toner) {
+    const rgb = hexToRgb(toner.hex);
+    setComponents((prev) =>
+      prev.map((c, i) => {
+        if (i !== index) return c;
+        return {
+          ...c,
+          toner_code: toner.code,
+          toner_name: toner.tradeName,
+          rgb_r: rgb?.r,
+          rgb_g: rgb?.g,
+          rgb_b: rgb?.b,
+        };
+      })
     );
   }
 
@@ -222,7 +263,6 @@ export default function FormulasPanel() {
                 <th className="px-2 py-2">名称</th>
                 <th className="px-2 py-2">百分比</th>
                 <th className="px-2 py-2">克/100g</th>
-                <th className="px-2 py-2">密度</th>
                 <th className="px-2 py-2">RGB</th>
                 <th className="px-2 py-2"></th>
               </tr>
@@ -231,7 +271,7 @@ export default function FormulasPanel() {
               {filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={6}
                     className="px-2 py-4 text-center text-[11px] text-gray-400"
                   >
                     暂无色母，点击「添加色母」
@@ -242,16 +282,49 @@ export default function FormulasPanel() {
                 const globalIndex = components.indexOf(c);
                 return (
                   <tr key={globalIndex} className="border-b border-gray-100 last:border-0">
-                    <td className="px-2 py-1">
+                    {/* 色母编号 — 带模糊搜索下拉 */}
+                    <td className="relative px-2 py-1">
                       <input
                         type="text"
                         value={c.toner_code}
-                        onChange={(e) =>
-                          updateComponent(globalIndex, "toner_code", e.target.value)
-                        }
+                        onChange={(e) => {
+                          updateComponent(globalIndex, "toner_code", e.target.value);
+                          setTonerQuery(e.target.value);
+                        }}
+                        onFocus={() => {
+                          setTonerDropdownFor(globalIndex);
+                          setTonerQuery(c.toner_code);
+                        }}
+                        onBlur={() => setTimeout(() => setTonerDropdownFor(null), 150)}
                         className="w-20 rounded border border-gray-300 px-1 py-1 text-[11px] outline-none focus:border-[#0D9488]"
                       />
+                      {tonerDropdownFor === globalIndex &&
+                        matchingToners(tonerQuery).length > 0 && (
+                          <div className="absolute left-0 top-full z-50 mt-0.5 max-h-40 w-52 overflow-y-auto rounded border border-gray-200 bg-white shadow-lg">
+                            {matchingToners(tonerQuery).map((toner) => (
+                              <button
+                                key={toner.code}
+                                type="button"
+                                onMouseDown={() => {
+                                  selectToner(globalIndex, toner);
+                                  setTonerDropdownFor(null);
+                                }}
+                                className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-[11px] hover:bg-teal-50"
+                              >
+                                <div
+                                  className="h-4 w-6 shrink-0 rounded border border-gray-200"
+                                  style={{ backgroundColor: toner.hex }}
+                                />
+                                <span className="font-mono text-gray-700">
+                                  {toner.code}
+                                </span>
+                                <span className="text-gray-500">{toner.tradeName}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
                     </td>
+                    {/* 名称 */}
                     <td className="px-2 py-1">
                       <input
                         type="text"
@@ -262,6 +335,7 @@ export default function FormulasPanel() {
                         className="w-24 rounded border border-gray-300 px-1 py-1 text-[11px] outline-none focus:border-[#0D9488]"
                       />
                     </td>
+                    {/* 百分比 — 手动输入 */}
                     <td className="px-2 py-1">
                       <input
                         type="number"
@@ -272,30 +346,22 @@ export default function FormulasPanel() {
                         className="w-16 rounded border border-gray-300 px-1 py-1 text-[11px] outline-none focus:border-[#0D9488]"
                       />
                     </td>
+                    {/* 克/100g — 手动输入 */}
                     <td className="px-2 py-1">
                       <input
                         type="number"
                         value={c.grams_per_100g}
                         onChange={(e) =>
-                          updateComponent(globalIndex, "grams_per_100g", Number(e.target.value))
+                          updateComponent(
+                            globalIndex,
+                            "grams_per_100g",
+                            Number(e.target.value)
+                          )
                         }
                         className="w-16 rounded border border-gray-300 px-1 py-1 text-[11px] outline-none focus:border-[#0D9488]"
                       />
                     </td>
-                    <td className="px-2 py-1">
-                      <input
-                        type="number"
-                        value={c.density ?? ""}
-                        onChange={(e) =>
-                          updateComponent(
-                            globalIndex,
-                            "density",
-                            e.target.value === "" ? undefined : Number(e.target.value)
-                          )
-                        }
-                        className="w-14 rounded border border-gray-300 px-1 py-1 text-[11px] outline-none focus:border-[#0D9488]"
-                      />
-                    </td>
+                    {/* RGB — 自动填入（也可手动修改） */}
                     <td className="px-2 py-1">
                       <div className="flex gap-1">
                         <input
