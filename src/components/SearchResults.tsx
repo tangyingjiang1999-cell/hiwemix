@@ -157,9 +157,9 @@ export default function SearchResults({
                 key={row.formula.id}
                 className="border-b border-zinc-100 last:border-b-0 transition-colors hover:bg-[#F8FAFC]"
               >
-                {/* 色块 — 3:2 宽高比，Kapci 水平中高光 */}
+                {/* 色块 — 2:1 宽高比，Kapci 水平中高光 */}
                 <td className="px-2 py-2.5">
-                  <div className="relative w-full pb-[66.67%]">
+                  <div className="relative w-full pb-[50%]">
                     <div
                       className="absolute inset-0 rounded border border-[#E5E7EB]"
                       style={colorSwatchStyle(row.color.hex_preview)}
