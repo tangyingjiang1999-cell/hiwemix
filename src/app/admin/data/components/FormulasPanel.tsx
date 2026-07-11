@@ -65,9 +65,25 @@ export default function FormulasPanel() {
   const [message, setMessage] = useState("");
   const idManuallyEdited = useRef(false);
 
-  // 色母搜索下拉状态：跟踪哪个色母行正在显示下拉 + 搜索文本
+  // 色母搜索下拉状态
   const [tonerDropdownFor, setTonerDropdownFor] = useState<number | null>(null);
   const [tonerQuery, setTonerQuery] = useState("");
+  const blurTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 打开 dropdown（清除待定的 blur 关闭）
+  function openTonerDropdown(index: number, currentCode: string) {
+    if (blurTimerRef.current) {
+      clearTimeout(blurTimerRef.current);
+      blurTimerRef.current = null;
+    }
+    setTonerDropdownFor(index);
+    setTonerQuery(currentCode);
+  }
+
+  // 延迟关闭 dropdown（给点击选项留时间）
+  function scheduleCloseTonerDropdown() {
+    blurTimerRef.current = setTimeout(() => setTonerDropdownFor(null), 150);
+  }
 
   // 新建时：颜色 + 变体 + 版本变化自动生成 ID
   useEffect(() => {
@@ -291,11 +307,8 @@ export default function FormulasPanel() {
                           updateComponent(globalIndex, "toner_code", e.target.value);
                           setTonerQuery(e.target.value);
                         }}
-                        onFocus={() => {
-                          setTonerDropdownFor(globalIndex);
-                          setTonerQuery(c.toner_code);
-                        }}
-                        onBlur={() => setTimeout(() => setTonerDropdownFor(null), 150)}
+                        onFocus={() => openTonerDropdown(globalIndex, c.toner_code)}
+                        onBlur={() => scheduleCloseTonerDropdown()}
                         className="w-20 rounded border border-gray-300 px-1 py-1 text-[11px] outline-none focus:border-[#0D9488]"
                       />
                       {tonerDropdownFor === globalIndex &&
