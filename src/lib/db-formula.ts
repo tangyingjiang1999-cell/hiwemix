@@ -236,18 +236,23 @@ export async function saveFormula(formula: Formula): Promise<Formula> {
   if (delErr) throw delErr;
 
   if (formula.components.length > 0) {
-    const rows = formula.components.map((c) => ({
-      formula_id: formula.id,
-      toner_code: c.toner_code,
-      toner_name: c.toner_name,
-      percentage: c.percentage,
-      grams_per_100g: c.grams_per_100g,
-      density: c.density ?? null,
-      rgb_r: c.rgb_r ?? null,
-      rgb_g: c.rgb_g ?? null,
-      rgb_b: c.rgb_b ?? null,
-      component_group: c.component_group ?? null,
-    }));
+    const rows = formula.components.map((c) => {
+      const row: Record<string, unknown> = {
+        formula_id: formula.id,
+        toner_code: c.toner_code,
+        toner_name: c.toner_name,
+        percentage: c.percentage,
+        grams_per_100g: c.grams_per_100g,
+        density: c.density ?? null,
+        rgb_r: c.rgb_r ?? null,
+        rgb_g: c.rgb_g ?? null,
+        rgb_b: c.rgb_b ?? null,
+      };
+      if (c.component_group != null) {
+        row.component_group = c.component_group;
+      }
+      return row;
+    });
     const { error: insErr } = await supabaseAdmin.from("formula_components").insert(rows);
     if (insErr) throw insErr;
   }
