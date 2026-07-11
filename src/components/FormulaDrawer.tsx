@@ -265,7 +265,8 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx }: Fo
 
   const previewColor = parseHexInput(hexInput, color.hex_preview);
 
-  const displayedFormula: Formula = useMemo(() => {
+  const displayedFormula: Formula | null = useMemo(() => {
+    if (!activeFormula) return null;
     if (activeFormula.formula_type !== "Pearl Paint") return activeFormula;
     return {
       ...activeFormula,
@@ -326,7 +327,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx }: Fo
             <p className="text-xs text-gray-500">{color.color_code}</p>
           </div>
 
-          {activeFormula.formula_type === "Pearl Paint" && (
+          {activeFormula?.formula_type === "Pearl Paint" && (
             <div className="hidden items-center gap-1.5 sm:flex">
               {(["Pearl Paint", "Ground Paint"] as ComponentGroup[]).map((g) => (
                 <button
@@ -368,7 +369,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx }: Fo
         </div>
 
         {/* 移动端 Pearl Paint 切换（小屏幕放到内容区上方） */}
-        {activeFormula.formula_type === "Pearl Paint" && (
+        {activeFormula?.formula_type === "Pearl Paint" && (
           <div className="flex items-center gap-1.5 border-b border-[#E2E8F0] px-5 py-2 sm:hidden">
             {(["Pearl Paint", "Ground Paint"] as ComponentGroup[]).map((g) => (
               <button
@@ -417,7 +418,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx }: Fo
               </div>
             )}
 
-            {activeFormula && (
+            {activeFormula && displayedFormula && (
               <div className="animate-[fadeIn_150ms_ease-in-out]">
                 <div className="mb-3 flex items-center gap-2 text-[11px] text-[#6B7280]">
                   <span>
