@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import type { SearchResult, Formula, FormulaComponent, Color, ComponentGroup } from "@/types";
 import { COLOR_TYPE_MAP } from "@/lib/constants";
 import { useLang } from "@/components/LanguageContext";
@@ -265,14 +265,14 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx }: Fo
 
   const previewColor = parseHexInput(hexInput, color.hex_preview);
 
-  const displayedFormula: Formula | null = useMemo(() => {
-    if (!activeFormula) return null;
-    if (activeFormula.formula_type !== "Pearl Paint") return activeFormula;
-    return {
+  // 根据分组过滤组件（仅 Pearl Paint 使用）
+  let displayedFormula: Formula | null = activeFormula ?? null;
+  if (activeFormula && activeFormula.formula_type === "Pearl Paint") {
+    displayedFormula = {
       ...activeFormula,
       components: activeFormula.components.filter((c) => c.component_group === activeGroup),
     };
-  }, [activeFormula, activeGroup]);
+  }
 
   function handleCopy() {
     if (!activeFormula) return;
