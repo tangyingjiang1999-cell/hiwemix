@@ -12,6 +12,17 @@ import type {
 import type { Toner, CarMake } from "@/types";
 import { generateFormulaId } from "@/lib/id-generator";
 import { TONERS } from "@/data/toners";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
 
 const PAINT_SYSTEMS = ["1K", "2K"] as const;
 const FORMULA_TYPES: FormulaType[] = ["Single Stage", "Two Stages", "Pearl Paint"];
@@ -296,375 +307,199 @@ export default function FormulasPanel() {
       ? components.filter((c) => c.component_group === group)
       : components;
     return (
-      <div className="mt-4" key={group ?? "regular"}>
-        <div className="mb-2 flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-gray-700">{title}</h4>
-          <button
-            onClick={() => addComponent(group)}
-            className="rounded border border-gray-300 px-2 py-1 text-sm text-gray-600 hover:bg-gray-50"
-          >
-            + 添加色母
-          </button>
-        </div>
-        <div className="min-h-[320px] overflow-x-auto rounded border border-gray-200">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50 text-left text-sm uppercase text-gray-500">
-                <th className="px-2 py-2">色母编号</th>
-                <th className="px-2 py-2">名称</th>
-                <th className="px-2 py-2">百分比</th>
-                <th className="px-2 py-2">RGB</th>
-                <th className="px-2 py-2"></th>
-              </tr>
-            </thead>
-            <tbody>
+      <Box key={group ?? "regular"} sx={{ mt: 2 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+          <Box sx={{ fontWeight: 600, fontSize: "0.8125rem", color: "text.secondary" }}>{title}</Box>
+          <Button onClick={() => addComponent(group)} variant="outlined" size="small">+ 添加色母</Button>
+        </Box>
+        <TableContainer component={Paper} variant="outlined" sx={{ minHeight: 320 }}>
+          <Table size="small">
+            <TableHead>
+              <TableRow sx={{ bgcolor: "grey.50" }}>
+                <TableCell sx={{ fontWeight: 500, fontSize: "0.6875rem" }}>色母编号</TableCell>
+                <TableCell sx={{ fontWeight: 500, fontSize: "0.6875rem" }}>名称</TableCell>
+                <TableCell sx={{ fontWeight: 500, fontSize: "0.6875rem" }}>百分比</TableCell>
+                <TableCell sx={{ fontWeight: 500, fontSize: "0.6875rem" }}>RGB</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
               {filtered.length === 0 && (
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="px-2 py-4 text-center text-sm text-gray-400"
-                  >
+                <TableRow>
+                  <TableCell colSpan={5} align="center" sx={{ color: "text.disabled", fontSize: "0.8125rem", py: 4 }}>
                     暂无色母，点击「添加色母」
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
               {filtered.map((c) => {
                 const globalIndex = components.indexOf(c);
                 return (
-                  <tr key={globalIndex} className="border-b border-gray-100 last:border-0">
-                    {/* 色母编号 — 带模糊搜索下拉 */}
-                    <td className="relative px-2 py-1">
+                  <TableRow key={globalIndex}>
+                    <TableCell sx={{ position: "relative", py: 0.5, px: 1 }}>
                       <input
                         type="text"
                         value={c.toner_code}
-                        onChange={(e) => {
-                          updateComponent(globalIndex, "toner_code", e.target.value);
-                          setTonerQuery(e.target.value);
-                        }}
+                        onChange={(e) => { updateComponent(globalIndex, "toner_code", e.target.value); setTonerQuery(e.target.value); }}
                         onFocus={() => openTonerDropdown(globalIndex, c.toner_code)}
                         onBlur={() => scheduleCloseTonerDropdown()}
-                        className="w-20 rounded border border-gray-300 px-1 py-1 text-sm outline-none focus:border-[#0D9488]"
+                        style={{ width: 80, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }}
                       />
-                      {tonerDropdownFor === globalIndex &&
-                        matchingToners(tonerQuery).length > 0 && (
-                          <div className="absolute left-0 top-full z-50 mt-0.5 max-h-60 w-56 overflow-y-auto rounded border border-gray-200 bg-white shadow-lg">
-                            {matchingToners(tonerQuery).map((toner) => (
-                              <button
-                                key={toner.code}
-                                type="button"
-                                onMouseDown={() => {
-                                  selectToner(globalIndex, toner);
-                                  setTonerDropdownFor(null);
-                                }}
-                                className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm hover:bg-teal-50"
-                              >
-                                <div
-                                  className="h-4 w-6 shrink-0 rounded border border-gray-200"
-                                  style={{ backgroundColor: toner.hex }}
-                                />
-                                <span className="font-mono text-gray-700">
-                                  {toner.code}
-                                </span>
-                                <span className="text-gray-500">{toner.tradeName}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                    </td>
-                    {/* 名称 */}
-                    <td className="px-2 py-1">
-                      <input
-                        type="text"
-                        value={c.toner_name}
-                        onChange={(e) =>
-                          updateComponent(globalIndex, "toner_name", e.target.value)
-                        }
-                        className="w-24 rounded border border-gray-300 px-1 py-1 text-sm outline-none focus:border-[#0D9488]"
-                      />
-                    </td>
-                    {/* 百分比 — 手动输入 */}
-                    <td className="px-2 py-1">
-                      <input
-                        type="number"
-                        value={c.percentage}
-                        onChange={(e) =>
-                          updateComponent(globalIndex, "percentage", Number(e.target.value))
-                        }
-                        className="w-16 rounded border border-gray-300 px-1 py-1 text-sm outline-none focus:border-[#0D9488]"
-                      />
-                    </td>
-                    {/* RGB — 自动填入（也可手动修改） */}
-                    <td className="px-2 py-1">
-                      <div className="flex gap-1">
-                        <input
-                          type="number"
-                          value={c.rgb_r ?? ""}
-                          onChange={(e) =>
-                            updateComponent(
-                              globalIndex,
-                              "rgb_r",
-                              e.target.value === "" ? undefined : Number(e.target.value)
-                            )
-                          }
-                          className="w-12 rounded border border-gray-300 px-1 py-1 text-sm outline-none focus:border-[#0D9488]"
-                          placeholder="R"
-                        />
-                        <input
-                          type="number"
-                          value={c.rgb_g ?? ""}
-                          onChange={(e) =>
-                            updateComponent(
-                              globalIndex,
-                              "rgb_g",
-                              e.target.value === "" ? undefined : Number(e.target.value)
-                            )
-                          }
-                          className="w-12 rounded border border-gray-300 px-1 py-1 text-sm outline-none focus:border-[#0D9488]"
-                          placeholder="G"
-                        />
-                        <input
-                          type="number"
-                          value={c.rgb_b ?? ""}
-                          onChange={(e) =>
-                            updateComponent(
-                              globalIndex,
-                              "rgb_b",
-                              e.target.value === "" ? undefined : Number(e.target.value)
-                            )
-                          }
-                          className="w-12 rounded border border-gray-300 px-1 py-1 text-sm outline-none focus:border-[#0D9488]"
-                          placeholder="B"
-                        />
-                      </div>
-                    </td>
-                    <td className="px-2 py-1">
-                      <button
-                        onClick={() => removeComponent(globalIndex)}
-                        className="text-sm text-red-600 hover:text-red-800"
-                      >
-                        删除
-                      </button>
-                    </td>
-                  </tr>
+                      {tonerDropdownFor === globalIndex && matchingToners(tonerQuery).length > 0 && (
+                        <Paper sx={{ position: "absolute", left: 8, top: "100%", zIndex: 50, mt: 0.25, maxHeight: 240, width: 224, overflow: "auto" }}>
+                          {matchingToners(tonerQuery).map((toner) => (
+                            <Button
+                              key={toner.code}
+                              onMouseDown={() => { selectToner(globalIndex, toner); setTonerDropdownFor(null); }}
+                              fullWidth
+                              sx={{ justifyContent: "flex-start", gap: 1, px: 1, py: 0.75, borderRadius: 0, fontSize: "0.6875rem", textTransform: "none", "&:hover": { bgcolor: "rgba(13,148,136,0.06)" } }}
+                            >
+                              <Box sx={{ width: 24, height: 16, borderRadius: 0.5, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: toner.hex }} />
+                              <Box component="span" sx={{ fontFamily: "monospace", color: "text.primary" }}>{toner.code}</Box>
+                              <Box component="span" sx={{ color: "text.secondary" }}>{toner.tradeName}</Box>
+                            </Button>
+                          ))}
+                        </Paper>
+                      )}
+                    </TableCell>
+                    <TableCell sx={{ py: 0.5, px: 1 }}>
+                      <input type="text" value={c.toner_name} onChange={(e) => updateComponent(globalIndex, "toner_name", e.target.value)}
+                        style={{ width: 96, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }} />
+                    </TableCell>
+                    <TableCell sx={{ py: 0.5, px: 1 }}>
+                      <input type="number" value={c.percentage} onChange={(e) => updateComponent(globalIndex, "percentage", Number(e.target.value))}
+                        style={{ width: 64, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }} />
+                    </TableCell>
+                    <TableCell sx={{ py: 0.5, px: 1 }}>
+                      <Box sx={{ display: "flex", gap: 0.25 }}>
+                        <input type="number" value={c.rgb_r ?? ""} onChange={(e) => updateComponent(globalIndex, "rgb_r", e.target.value === "" ? undefined : Number(e.target.value))}
+                          placeholder="R" style={{ width: 48, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }} />
+                        <input type="number" value={c.rgb_g ?? ""} onChange={(e) => updateComponent(globalIndex, "rgb_g", e.target.value === "" ? undefined : Number(e.target.value))}
+                          placeholder="G" style={{ width: 48, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }} />
+                        <input type="number" value={c.rgb_b ?? ""} onChange={(e) => updateComponent(globalIndex, "rgb_b", e.target.value === "" ? undefined : Number(e.target.value))}
+                          placeholder="B" style={{ width: 48, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }} />
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ py: 0.5, px: 1 }}>
+                      <Button onClick={() => removeComponent(globalIndex)} size="small" color="error" sx={{ fontSize: "0.6875rem" }}>删除</Button>
+                    </TableCell>
+                  </TableRow>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     );
   }
 
-  if (loading) return <div className="text-center text-sm text-gray-500">加载中...</div>;
+  if (loading) return <Box sx={{ textAlign: "center", py: 2 }}><Button disabled>加载中...</Button></Box>;
 
   return (
-    <div className="flex flex-col gap-4 lg:flex-row">
+    <Box sx={{ display: "flex", gap: 2, flexDirection: { xs: "column", lg: "row" } }}>
       {/* 左栏：配方列表 */}
-      <div className="w-full shrink-0 lg:w-64">
-        <button
-          onClick={newFormula}
-          className="mb-3 w-full rounded bg-[#0D9488] px-3 py-2 text-sm font-semibold text-white hover:bg-[#0F766E]"
-        >
-          + 新增配方
-        </button>
-        <div className="max-h-[600px] overflow-y-auto rounded border border-gray-200 bg-white">
-          {formulas.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => selectFormula(f)}
-              className={`block w-full border-b border-gray-100 px-3 py-2 text-left text-sm last:border-0 ${
-                selectedId === f.id
-                  ? "bg-teal-50 font-semibold text-teal-700"
-                  : "text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <span className="block">{f.id}</span>
-              <span className="block text-sm text-gray-400">
-                {colors.find((c) => c.id === f.color_id)?.color_code || f.color_id}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
+      <Box sx={{ width: { lg: 256 }, flexShrink: 0 }}>
+        <Button onClick={newFormula} variant="contained" fullWidth sx={{ mb: 1.5 }}>+ 新增配方</Button>
+        <Paper variant="outlined" sx={{ maxHeight: 600, overflow: "auto" }}>
+          {formulas.map((f) => {
+            const isSel = selectedId === f.id;
+            return (
+              <Button
+                key={f.id} onClick={() => selectFormula(f)}
+                fullWidth
+                sx={{
+                  display: "block", textAlign: "left", px: 2, py: 1.5, borderRadius: 0,
+                  borderBottom: 1, borderColor: "grey.100", color: isSel ? "primary.main" : "text.primary",
+                  bgcolor: isSel ? "rgba(13,148,136,0.06)" : "transparent",
+                  fontWeight: isSel ? 600 : 400, fontSize: "0.8125rem", textTransform: "none",
+                  "&:hover": { bgcolor: isSel ? "rgba(13,148,136,0.08)" : "grey.50" },
+                }}
+              >
+                <Box component="span" sx={{ display: "block" }}>{f.id}</Box>
+                <Box component="span" sx={{ display: "block", color: "text.disabled", fontSize: "0.75rem" }}>
+                  {colors.find((c) => c.id === f.color_id)?.color_code || f.color_id}
+                </Box>
+              </Button>
+            );
+          })}
+        </Paper>
+      </Box>
 
       {/* 右栏：配方编辑 */}
-      <div className="flex-1 rounded border border-gray-200 bg-white p-4">
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-medium text-gray-600">
-              配方 ID（自动生成，可手动修改）
-            </label>
-            <input
-              type="text"
-              value={form.id}
-              onChange={(e) => {
-                idManuallyEdited.current = true;
-                setForm({ ...form, id: e.target.value });
-              }}
-              disabled={!!selectedId}
-              className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none disabled:bg-gray-100 focus:border-[#0D9488]"
-            />
-          </div>
-          {/* 关联颜色 — 模糊搜索 */}
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-600">关联颜色</label>
-            <input
-              type="text"
-              value={colorQuery}
-              onChange={(e) => {
-                setColorQuery(e.target.value);
-                setColorDropdownOpen(true);
-                if (colorBlurRef.current) { clearTimeout(colorBlurRef.current); colorBlurRef.current = null; }
-              }}
-              onFocus={() => {
-                setColorDropdownOpen(true);
-                if (colorBlurRef.current) { clearTimeout(colorBlurRef.current); colorBlurRef.current = null; }
-              }}
-              onBlur={() => {
-                colorBlurRef.current = setTimeout(() => setColorDropdownOpen(false), 150);
-              }}
+      <Paper variant="outlined" sx={{ flex: 1, p: 2 }}>
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 1.5 }}>
+          <TextField label="配方 ID（自动生成）" value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!selectedId} size="small" fullWidth />
+          <Box sx={{ position: "relative" }}>
+            <TextField
+              label="关联颜色" value={colorQuery}
+              onChange={(e) => { setColorQuery(e.target.value); setColorDropdownOpen(true); if (colorBlurRef.current) { clearTimeout(colorBlurRef.current); colorBlurRef.current = null; } }}
+              onFocus={() => { setColorDropdownOpen(true); if (colorBlurRef.current) { clearTimeout(colorBlurRef.current); colorBlurRef.current = null; } }}
+              onBlur={() => { colorBlurRef.current = setTimeout(() => setColorDropdownOpen(false), 150); }}
               placeholder={colorDisplay || "搜索颜色代码、名称、品牌、类型..."}
-              className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-[#0D9488]"
+              size="small" fullWidth
             />
             {colorDropdownOpen && matchingColors(colorQuery, colors, brands).length > 0 && (
-              <div className="absolute left-0 right-0 top-full z-50 mt-0.5 max-h-48 overflow-y-auto rounded border border-gray-200 bg-white shadow-lg">
+              <Paper sx={{ position: "absolute", left: 0, right: 0, top: "100%", zIndex: 50, mt: 0.5, maxHeight: 192, overflow: "auto" }}>
                 {matchingColors(colorQuery, colors, brands).map((c) => {
                   const brandName = brandMap.get(c.make_id) ?? c.make_id;
                   return (
-                    <button
+                    <Button
                       key={c.id}
-                      type="button"
-                      onMouseDown={() => {
-                        setForm((prev) => ({ ...prev, color_id: c.id }));
-                        setColorQuery("");
-                        setColorDropdownOpen(false);
+                      onMouseDown={() => { setForm((prev) => ({ ...prev, color_id: c.id })); setColorQuery(""); setColorDropdownOpen(false); }}
+                      fullWidth
+                      sx={{
+                        justifyContent: "flex-start", gap: 1, px: 1, py: 1, borderRadius: 0,
+                        fontSize: "0.75rem", textTransform: "none",
+                        bgcolor: c.id === form.color_id ? "rgba(13,148,136,0.08)" : "transparent",
+                        "&:hover": { bgcolor: "rgba(13,148,136,0.06)" },
                       }}
-                      className={`flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm hover:bg-teal-50 ${
-                        c.id === form.color_id ? "bg-teal-100" : ""
-                      }`}
                     >
-                      <div
-                        className="h-4 w-5 shrink-0 rounded border border-gray-200"
-                        style={{ backgroundColor: c.hex_preview }}
-                      />
-                      <span className="font-mono text-gray-700">{c.color_code}</span>
-                      <span className="text-gray-600 truncate">{c.color_name}</span>
-                      <span className="ml-auto text-sm text-gray-400">{brandName}</span>
-                    </button>
+                      <Box sx={{ width: 20, height: 16, borderRadius: 0.5, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: c.hex_preview }} />
+                      <Box component="span" sx={{ fontFamily: "monospace", color: "text.primary", fontSize: "0.75rem" }}>{c.color_code}</Box>
+                      <Box component="span" sx={{ color: "text.secondary", fontSize: "0.75rem", overflow: "hidden", textOverflow: "ellipsis" }}>{c.color_name}</Box>
+                      <Box component="span" sx={{ ml: "auto", color: "text.disabled", fontSize: "0.6875rem" }}>{brandName}</Box>
+                    </Button>
                   );
                 })}
-              </div>
+              </Paper>
             )}
-            {/* 已选中颜色预览 */}
-            {selectedColor && (
-              <p className="mt-0.5 truncate text-sm text-teal-600">
-                {colorDisplay}
-              </p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-600">关联变体（可选）</label>
-            <select
-              value={form.variant_id}
-              onChange={(e) => setForm({ ...form, variant_id: e.target.value })}
-              className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-[#0D9488]"
-            >
-              <option value="">无</option>
-              {variants.map((v) => (
-                <option key={v.id} value={v.id}>
-                  {v.name} ({v.year_range})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-600">版本</label>
-            <input
-              type="text"
-              value={form.version}
-              onChange={(e) => setForm({ ...form, version: e.target.value })}
-              className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-[#0D9488]"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-600">体系</label>
-            <select
-              value={form.paint_system}
-              onChange={(e) =>
-                handlePaintSystemChange(e.target.value as Formula["paint_system"])
-              }
-              className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-[#0D9488]"
-            >
-              {PAINT_SYSTEMS.map((s) => (
-                <option key={s} value={s}>
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-600">配方类型</label>
-            {form.paint_system === "2K" ? (
-              <input
-                type="text"
-                value={AUTO_2K_TYPE}
-                disabled
-                className="mt-1 w-full rounded border border-gray-300 bg-gray-100 px-2 py-1.5 text-sm text-gray-600 outline-none"
-              />
-            ) : (
-              <select
-                value={form.formula_type}
-                onChange={(e) => handleFormulaTypeChange(e.target.value as FormulaType)}
-                className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-[#0D9488]"
-              >
-                {MANUAL_1K_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-        </div>
-        <div className="mt-3">
-          <label className="block text-sm font-medium text-gray-600">施工备注</label>
-          <textarea
-            value={form.notes}
-            onChange={(e) => setForm({ ...form, notes: e.target.value })}
-            rows={2}
-            className="mt-1 w-full rounded border border-gray-300 px-2 py-1.5 text-sm outline-none focus:border-[#0D9488]"
-          />
-        </div>
+            {selectedColor && <Box sx={{ mt: 0.25, color: "primary.main", fontSize: "0.6875rem", overflow: "hidden", textOverflow: "ellipsis" }}>{colorDisplay}</Box>}
+          </Box>
+          <TextField select label="关联变体（可选）" value={form.variant_id} onChange={(e) => setForm({ ...form, variant_id: e.target.value })} size="small" fullWidth>
+            <MenuItem value="">无</MenuItem>
+            {variants.map((v) => <MenuItem key={v.id} value={v.id}>{v.name} ({v.year_range})</MenuItem>)}
+          </TextField>
+          <TextField label="版本" value={form.version} onChange={(e) => setForm({ ...form, version: e.target.value })} size="small" fullWidth />
+          <TextField select label="体系" value={form.paint_system} onChange={(e) => handlePaintSystemChange(e.target.value as Formula["paint_system"])} size="small" fullWidth>
+            {PAINT_SYSTEMS.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+          </TextField>
+          <TextField select label="配方类型" value={form.paint_system === "2K" ? AUTO_2K_TYPE : form.formula_type}
+            onChange={(e) => handleFormulaTypeChange(e.target.value as FormulaType)}
+            disabled={form.paint_system === "2K"} size="small" fullWidth
+          >
+            {(form.paint_system === "2K" ? [AUTO_2K_TYPE] : MANUAL_1K_TYPES).map((t) => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+          </TextField>
+        </Box>
+        <TextField label="施工备注" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} size="small" multiline rows={2} fullWidth sx={{ mt: 1.5 }} />
 
         {/* 色母组件表 */}
         {form.formula_type === "Pearl Paint" ? (
-          <div className="flex flex-col gap-4">
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {PEARL_GROUPS.map((g) => renderComponentTable(g))}
-          </div>
+          </Box>
         ) : (
           renderComponentTable()
         )}
 
-        {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-        {message && <p className="mt-3 text-sm text-green-600">{message}</p>}
+        {error && <Box sx={{ color: "error.main", fontSize: "0.8125rem", mt: 2 }}>{error}</Box>}
+        {message && <Box sx={{ color: "success.main", fontSize: "0.8125rem", mt: 2 }}>{message}</Box>}
 
-        <div className="mt-4 flex justify-end gap-3">
+        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, mt: 2 }}>
           {selectedId && (
-            <button
-              onClick={handleDelete}
-              className="rounded border border-red-300 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-            >
-              删除配方
-            </button>
+            <Button onClick={handleDelete} variant="outlined" color="error" size="small">删除配方</Button>
           )}
-          <button
-            onClick={handleSave}
-            className="rounded bg-[#0D9488] px-4 py-2 text-sm font-semibold text-white hover:bg-[#0F766E]"
-          >
-            保存配方
-          </button>
-        </div>
-      </div>
-    </div>
+          <Button onClick={handleSave} variant="contained" size="small">保存配方</Button>
+        </Box>
+      </Paper>
+    </Box>
   );
 }
