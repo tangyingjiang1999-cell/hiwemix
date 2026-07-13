@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
-import Navigation from "@/components/Navigation";
 import { useAuth } from "@/components/AuthContext";
 import BrandsPanel from "./components/BrandsPanel";
 import ColorsPanel from "./components/ColorsPanel";
@@ -42,9 +41,8 @@ export default function DataManagementPage() {
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       <SiteHeader />
-      <Navigation />
 
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-8">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-8 pt-16">
         <h2 className="mb-4 text-base font-semibold text-gray-900">数据管理</h2>
 
         <div className="mb-6 overflow-x-auto scrollbar-hide">

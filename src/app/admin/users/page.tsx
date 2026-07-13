@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
-import Navigation from "@/components/Navigation";
 import { useToast } from "@/components/Toast";
 import { useLang } from "@/components/LanguageContext";
 
@@ -109,7 +108,6 @@ export default function AdminUsersPage() {
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       <SiteHeader />
-      <Navigation />
 
       <div className="mx-auto max-w-4xl px-4 py-6 sm:px-8 sm:py-8">
         <div className="mb-6 flex items-center justify-between">

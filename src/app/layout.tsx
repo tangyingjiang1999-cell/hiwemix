@@ -27,7 +27,7 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${notoSansSC.variable} ${notoSansArabic.variable} ${notoSansHebrew.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#F9FAFB] text-[#111827]">
+      <body className="min-h-full">
         <LanguageProvider>
           <AuthProvider>
             {children}

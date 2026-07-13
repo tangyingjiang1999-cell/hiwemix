@@ -24,7 +24,7 @@ export default function SiteHeader({}: SiteHeaderProps) {
   ];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-[#bdc9c8] bg-white/95 backdrop-blur-sm">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-[#EBEBEB] bg-white/95 backdrop-blur-sm">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-10 lg:px-20">
         {/* Logo - 左侧 */}
         <Link href="/" className="flex items-center">

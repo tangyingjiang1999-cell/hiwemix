@@ -129,7 +129,7 @@ export default function SearchResults({
       </p>
 
       {/* 表格 */}
-      <div className="overflow-x-auto rounded-lg border border-[#E5E7EB]">
+      <div className="overflow-x-auto rounded-lg border border-[#EBEBEB]">
         <table className="w-full min-w-[760px] table-fixed text-left text-xs">
           <colgroup>
             <col className="w-[10%]" />
@@ -141,7 +141,7 @@ export default function SearchResults({
             <col className="w-[7%]" />
           </colgroup>
           <thead>
-            <tr className="border-b border-[#E5E7EB] bg-[#F8FAFC] text-[11px] font-medium text-[#64748B]">
+            <tr className="border-b border-[#EBEBEB] bg-[#F5F5F5] text-xs font-medium text-[#A1A1A1]">
               <th className="px-2 py-2.5"></th>
               <th className="px-2 py-2.5">{t.manufacturerLabel}</th>
               <th className="px-2 py-2.5">{t.codeLabel}</th>
@@ -155,7 +155,7 @@ export default function SearchResults({
             {pageRows.map((row) => (
               <tr
                 key={row.formula.id}
-                className="border-b border-zinc-100 last:border-b-0 transition-colors hover:bg-[#F8FAFC]"
+                className="border-b border-zinc-100 last:border-b-0 transition-colors hover:bg-[#F5F5F5]"
               >
                 {/* 色块 — 2:1 宽高比，Kapci 水平中高光 */}
                 <td className="px-2 py-2.5">

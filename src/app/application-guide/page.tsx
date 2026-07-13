@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useLang } from "@/components/LanguageContext";
 import SiteHeader from "@/components/SiteHeader";
-import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import type { Guide, GuideCategory } from "@/types";
 
@@ -96,7 +95,6 @@ export default function ApplicationGuidePage() {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
       <SiteHeader />
-      <Navigation />
 
       <div className="bg-white px-6 pt-20 pb-4">
         <input

@@ -301,7 +301,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx }: Fo
 
       <div
         className={cn(
-          "fixed left-1/2 top-1/2 flex flex-col overflow-hidden rounded-2xl bg-white shadow-2xl",
+          "fixed left-1/2 top-1/2 flex flex-col overflow-hidden rounded-lg bg-white",
           "w-[95vw] max-w-[85rem] max-h-[90vh]",
           "transition-all duration-200 ease-out",
           visible
@@ -313,6 +313,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx }: Fo
           transform: visible
             ? "translate(-50%, -50%) scale(1)"
             : "translate(-50%, -50%) scale(0.96)",
+          boxShadow: "0 1px 1px rgba(0,0,0,0.02), 0 8px 16px -4px rgba(0,0,0,0.04), 0 24px 32px -8px rgba(0,0,0,0.06)"
         }}
       >
         <div className="flex shrink-0 items-center gap-3 border-b border-[#E2E8F0] px-5 py-5 sm:px-8 sm:py-6">

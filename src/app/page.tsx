@@ -104,28 +104,25 @@ export default function Home() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f7fafc]">
+    <div className="flex min-h-screen flex-col bg-[#FAFAFA]">
       <SiteHeader />
 
       {/* Hero + Search */}
       <section className="relative flex min-h-[50vh] flex-1 items-center overflow-hidden pt-20 pb-8 md:pt-24">
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#f7fafc] via-[#f7fafc] to-[#0D9488]/5" />
-        </div>
 
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-5 lg:px-10">
           <div className="mx-auto w-full space-y-6 text-center">
-            <h1 className="text-balance text-2xl font-semibold leading-snug text-[#181c1e] sm:text-3xl sm:font-bold md:text-4xl lg:text-5xl">
+            <h1 className="text-balance text-2xl font-semibold leading-snug text-[#171717] sm:text-3xl sm:font-bold md:text-4xl lg:text-5xl">
               {t.heroTitlePrefix} <span className="text-[#0D9488]">{t.heroTitleHighlight}</span>
             </h1>
 
-            <div className="rounded-xl border border-[#bdc9c8]/50 bg-white p-4 shadow-sm sm:p-6">
+            <div className="rounded-lg border border-[#EBEBEB] bg-white p-4 sm:p-6" style={{boxShadow:"0 1px 1px rgba(0,0,0,0.02), 0 2px 2px rgba(0,0,0,0.04)"}}>
               <SearchPanel onSearch={handleSearch} isLoading={isLoading} />
             </div>
 
             {/* Search results inline below search box */}
             {hasSearched && (
-              <div className="mt-4 rounded-xl border border-[#bdc9c8]/50 bg-white p-4 text-left shadow-sm sm:p-6">
+              <div className="mt-4 rounded-lg border border-[#EBEBEB] bg-white p-4 text-left sm:p-6" style={{boxShadow:"0 1px 1px rgba(0,0,0,0.02), 0 2px 2px rgba(0,0,0,0.04)"}}>
                 <SearchResults
                   rows={tableRows}
                   isLoading={isLoading}

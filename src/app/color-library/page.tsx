@@ -3,7 +3,6 @@
 import { useState, useMemo } from "react";
 import { useLang } from "@/components/LanguageContext";
 import SiteHeader from "@/components/SiteHeader";
-import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { TONERS, TONER_CATEGORIES } from "@/data/toners";
 import type { TonerCategory } from "@/types";
@@ -53,7 +52,6 @@ export default function TonerPage() {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
       <SiteHeader />
-      <Navigation />
 
       {/* 标题栏 */}
       <div className="bg-white border-b border-gray-200 px-4 pt-20 pb-0 lg:px-6">

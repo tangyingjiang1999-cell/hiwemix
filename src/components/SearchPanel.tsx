@@ -28,7 +28,7 @@ function PillSelect({
 }) {
   return (
     <div className={`relative ${widthClass}`}>
-      <div className="flex h-11 items-center border border-gray-300 bg-white px-4 transition-colors hover:border-[#0D9488]">
+      <div className="flex h-10 items-center border border-[#EBEBEB] bg-white px-4 transition-colors hover:border-[#0D9488] rounded-[6px]">
         <span className="shrink-0 text-xs text-gray-600">
           {label}
         </span>
@@ -67,7 +67,7 @@ function PillInput({
 }) {
   return (
     <div className={`relative ${widthClass}`}>
-      <div className="flex h-11 items-center border border-gray-300 bg-white px-4 transition-colors hover:border-[#0D9488]">
+      <div className="flex h-10 items-center border border-[#EBEBEB] bg-white px-4 transition-colors hover:border-[#0D9488] rounded-[6px]">
         <span className="shrink-0 text-xs text-gray-600">
           {label}
         </span>
@@ -234,10 +234,10 @@ label={t.colorCode}
                 type="button"
                 onClick={() => setColorType(opt.value)}
                 className={[
-                  "rounded border px-3 py-1.5 transition-colors sm:px-4",
+                  "rounded-[6px] border px-3 py-1.5 text-sm transition-colors sm:px-4",
                   isSelected
                     ? "border-[#0D9488] bg-[#0D9488] text-white"
-                    : "border-gray-300 bg-white text-gray-700 hover:border-[#0D9488]",
+                    : "border-[#EBEBEB] bg-white text-[#4D4D4D] hover:border-[#0D9488]",
                 ].join(" ")}
               >
                 {labelMap[opt.value] ?? opt.label}
@@ -250,7 +250,7 @@ label={t.colorCode}
           type="submit"
           disabled={isLoading}
           className={[
-            "flex items-center gap-2 whitespace-nowrap rounded px-4 py-2.5 text-xs font-semibold text-white transition-colors sm:px-6",
+            "flex items-center gap-2 whitespace-nowrap rounded-[100px] px-5 py-2.5 text-sm font-medium text-white transition-colors sm:px-6",
             "bg-[#0D9488] hover:bg-[#0F766E]",
             "disabled:cursor-not-allowed disabled:opacity-60",
           ].join(" ")}
@@ -264,7 +264,7 @@ label={t.colorCode}
           onClick={handleReset}
           disabled={isLoading}
           className={[
-            "flex items-center gap-2 whitespace-nowrap rounded border border-gray-300 bg-white px-4 py-2.5 text-xs font-semibold text-gray-700 transition-colors sm:px-6",
+            "flex items-center gap-2 whitespace-nowrap rounded-[100px] border border-[#EBEBEB] bg-white px-5 py-2.5 text-sm font-medium text-[#4D4D4D] transition-colors sm:px-6",
             "hover:border-[#0D9488] hover:text-[#0D9488]",
             "disabled:cursor-not-allowed disabled:opacity-60",
           ].join(" ")}
