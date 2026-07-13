@@ -125,33 +125,11 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef }: Search
         </Box>
       )}
 
-      {/* === 操作按钮：左侧 Search，右侧 Reset === */}
-      <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Button
-          type="submit"
-          disabled={isLoading}
-          variant="contained"
-          startIcon={<SearchIcon />}
-          sx={{ minWidth: 120, borderRadius: 1.5, textTransform: "none", fontWeight: 600, fontSize: "0.875rem" }}
-        >
-          {isLoading ? t.searching : t.search}
-        </Button>
-        <Button
-          type="button"
-          onClick={handleReset}
-          disabled={isLoading}
-          variant="outlined"
-          startIcon={<RestartAltIcon />}
-          sx={{ minWidth: 120, borderRadius: 1.5, textTransform: "none", fontWeight: 600, fontSize: "0.875rem", color: "text.secondary", borderColor: "grey.300" }}
-        >
-          {t.reset}
-        </Button>
-      </Box>
-
       <Divider sx={{ my: 2.5 }} />
 
-      {/* === 漆面类型 Chips === */}
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2.5 }}>
+      {/* === 漆面类型 + 按钮同行 === */}
+      <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1.5 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, flex: 1 }}>
         {colorTypeOptions.map((opt) => {
           const isSelected = colorType === opt.value;
           return (
@@ -172,6 +150,28 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef }: Search
             />
           );
         })}
+        </Box>
+        <Box sx={{ display: "flex", gap: 1, flexShrink: 0 }}>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            variant="contained"
+            startIcon={<SearchIcon />}
+            sx={{ minWidth: 120, borderRadius: 1.5, textTransform: "none", fontWeight: 600, fontSize: "0.875rem" }}
+          >
+            {isLoading ? t.searching : t.search}
+          </Button>
+          <Button
+            type="button"
+            onClick={handleReset}
+            disabled={isLoading}
+            variant="outlined"
+            startIcon={<RestartAltIcon />}
+            sx={{ minWidth: 120, borderRadius: 1.5, textTransform: "none", fontWeight: 600, fontSize: "0.875rem", color: "text.secondary", borderColor: "grey.300" }}
+          >
+            {t.reset}
+          </Button>
+        </Box>
       </Box>
     </Box>
   );
