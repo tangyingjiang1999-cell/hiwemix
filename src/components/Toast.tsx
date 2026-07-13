@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 
 interface ToastProps {
   message: string;
@@ -13,27 +15,40 @@ export default function Toast({
   onDone,
   duration = 2000,
 }: ToastProps) {
-  const [entering, setEntering] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    requestAnimationFrame(() => setEntering(true));
+    requestAnimationFrame(() => setOpen(true));
   }, []);
 
-  useEffect(() => {
-    const t = setTimeout(onDone, duration);
-    return () => clearTimeout(t);
-  }, [onDone, duration]);
+  function handleClose(_: unknown, reason?: string) {
+    if (reason === "clickaway") return;
+    setOpen(false);
+  }
 
   return (
-    <div
-      className={[
-        "fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-lg px-5 py-2.5 text-xs font-medium text-white transition-all duration-300",
-      "bg-[#0D9488]",
-        entering ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0",
-      ].join(" ")}
+    <Snackbar
+      open={open}
+      onClose={handleClose}
+      autoHideDuration={duration}
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      slotProps={{ transition: { onExited: onDone } }}
     >
-      {message}
-    </div>
+      <Alert
+        severity="success"
+        variant="filled"
+        sx={{
+          bgcolor: "primary.main",
+          color: "#fff",
+          fontSize: "0.8125rem",
+          fontWeight: 500,
+          borderRadius: 1.5,
+          "& .MuiAlert-icon": { color: "#fff" },
+        }}
+      >
+        {message}
+      </Alert>
+    </Snackbar>
   );
 }
 

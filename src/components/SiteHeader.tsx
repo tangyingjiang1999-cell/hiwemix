@@ -4,13 +4,25 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Drawer from "@mui/material/Drawer";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import Divider from "@mui/material/Divider";
+import MenuIcon from "@mui/icons-material/Menu";
+import CloseIcon from "@mui/icons-material/Close";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useAuth } from "@/components/AuthContext";
 import { useLang } from "@/components/LanguageContext";
 
-interface SiteHeaderProps {}
-
-export default function SiteHeader({}: SiteHeaderProps) {
+export default function SiteHeader() {
   const { user: authUser, logout } = useAuth();
   const { t } = useLang();
   const pathname = usePathname();
@@ -23,143 +35,204 @@ export default function SiteHeader({}: SiteHeaderProps) {
     { label: t.navAppGuide, href: "/application-guide" },
   ];
 
+  const isActive = (href: string) =>
+    (href === "/" && pathname === "/") ||
+    (href !== "/" && pathname?.startsWith(href));
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-[#EBEBEB] bg-white/95 backdrop-blur-sm">
-      <div className="flex h-16 items-center justify-between pl-[20px] pr-[20px]">
+    <AppBar
+      position="fixed"
+      color="default"
+      sx={{
+        bgcolor: "rgba(255,255,255,0.95)",
+        backdropFilter: "blur(8px)",
+        borderBottom: 1,
+        borderColor: "divider",
+        zIndex: 1100,
+      }}
+    >
+      <Toolbar
+        disableGutters
+        sx={{
+          pl: "20px",
+          pr: "20px",
+          minHeight: 64,
+          gap: 4,
+        }}
+      >
         {/* 左侧组：Logo + 中间 3 个 nav 链接 */}
-        <div className="flex items-center gap-8">
-          <Link href="/" className="flex shrink-0 items-center">
+        <Stack direction="row" spacing={4} sx={{ flex: 1, alignItems: "center" }}>
+          <Link href="/" style={{ display: "flex", flexShrink: 0 }}>
             <Image
               src="/HIWE_Logo.png"
               alt="HIWE MIX"
               width={1893}
               height={334}
-              className="h-7 w-auto object-contain sm:h-8 md:h-9"
+              style={{
+                height: 32,
+                width: "auto",
+                objectFit: "contain",
+              }}
             />
           </Link>
 
           {/* 中间导航链接 - 桌面端 */}
-          <nav className="hidden items-center gap-8 md:flex">
+          <Stack
+            direction="row"
+            spacing={3}
+            sx={{ display: { xs: "none", md: "flex" } }}
+          >
             {navItems.map((item) => {
-              const isActive =
-                (item.href === "/" && pathname === "/") ||
-                (item.href !== "/" && pathname?.startsWith(item.href));
+              const active = isActive(item.href);
               return (
-                <Link
+                <Button
                   key={item.label}
+                  component={Link}
                   href={item.href}
-                  className={[
-                    "text-sm font-medium transition-colors",
-                    isActive
-                      ? "text-[#0D9488] font-semibold"
-                      : "text-[#6B7280] hover:text-[#0D9488]",
-                  ].join(" ")}
+                  disableElevation
+                  sx={{
+                    color: active ? "primary.main" : "text.secondary",
+                    fontWeight: active ? 600 : 500,
+                    fontSize: "0.875rem",
+                    minWidth: "auto",
+                    px: 1.5,
+                    "&:hover": {
+                      bgcolor: "transparent",
+                      color: "primary.main",
+                    },
+                  }}
                 >
                   {item.label}
-                </Link>
+                </Button>
               );
             })}
-          </nav>
-        </div>
+          </Stack>
+        </Stack>
 
         {/* 右侧 actions */}
-        <div className="flex items-center gap-2 md:gap-3">
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
           {authUser ? (
-            <div className="flex items-center gap-2">
+            <>
               {authUser.role === "admin" && (
-                <Link
+                <Button
+                  component={Link}
                   href="/admin/data"
-                  className="whitespace-nowrap rounded-lg bg-[#171717] px-2 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 md:px-4 md:text-sm"
+                  variant="contained"
+                  color="inherit"
+                  size="small"
+                  sx={{
+                    bgcolor: "#171717",
+                    color: "#fff",
+                    "&:hover": { bgcolor: "#262626" },
+                    textTransform: "none",
+                    fontWeight: 600,
+                  }}
                 >
                   {t.navAdmin}
-                </Link>
+                </Button>
               )}
               {authUser.role === "admin" && (
-                <Link
+                <Button
+                  component={Link}
                   href="/admin/users"
-                  className="max-w-20 truncate rounded-lg bg-[#0D9488] px-2 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 md:max-w-none md:px-4 md:text-sm"
+                  variant="contained"
+                  size="small"
+                  sx={{
+                    textTransform: "none",
+                    fontWeight: 600,
+                    maxWidth: { xs: 80, md: "none" },
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
                 >
                   {authUser.username}
-                </Link>
+                </Button>
               )}
-              <button
+              <Button
                 onClick={logout}
-                className="rounded-lg bg-[#0D9488] px-2 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 md:px-4 md:text-sm"
+                variant="contained"
+                size="small"
+                sx={{ textTransform: "none", fontWeight: 600 }}
               >
                 {t.logout}
-              </button>
-            </div>
+              </Button>
+            </>
           ) : (
-            <Link
+            <Button
+              component={Link}
               href="/login"
-              className="rounded-lg bg-[#0D9488] px-2 py-1.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 md:px-4 md:text-sm"
+              variant="contained"
+              size="small"
+              sx={{ textTransform: "none", fontWeight: 600 }}
             >
               {t.login}
-            </Link>
+            </Button>
           )}
+
           <LanguageSwitcher />
 
           {/* 移动端汉堡菜单按钮 */}
-          <button
-            type="button"
+          <IconButton
             onClick={() => setMobileMenuOpen((o) => !o)}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#0D9488] hover:bg-[#0D9488]/5 md:hidden"
+            sx={{
+              display: { xs: "inline-flex", md: "none" },
+              color: "primary.main",
+            }}
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileMenuOpen}
           >
-            <svg
-              className="h-6 w-6"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              {mobileMenuOpen ? (
-                <>
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </>
-              ) : (
-                <>
-                  <line x1="3" y1="6" x2="21" y2="6" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <line x1="3" y1="18" x2="21" y2="18" />
-                </>
-              )}
-            </svg>
-          </button>
-        </div>
-      </div>
+            {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
+          </IconButton>
+        </Stack>
+      </Toolbar>
 
       {/* 移动端导航菜单 */}
-      {mobileMenuOpen && (
-        <nav className="absolute left-0 right-0 top-full border-b border-[#bdc9c8] bg-white px-4 py-3 shadow-lg md:hidden">
-          <div className="flex flex-col gap-2">
+      <Drawer
+        anchor="top"
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        slotProps={{
+          root: { keepMounted: true },
+          paper: { sx: { mt: 8, borderTop: 1, borderColor: "divider" } },
+        }}
+      >
+        <Box sx={{ width: "auto" }} role="presentation">
+          <List>
             {navItems.map((item) => {
-              const isActive =
-                (item.href === "/" && pathname === "/") ||
-                (item.href !== "/" && pathname?.startsWith(item.href));
+              const active = isActive(item.href);
               return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={[
-                    "rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-[#0D9488]/10 text-[#0D9488] font-semibold"
-                      : "text-[#6B7280] hover:bg-gray-50 hover:text-[#0D9488]",
-                  ].join(" ")}
-                >
-                  {item.label}
-                </Link>
+                <ListItem key={item.label} disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    selected={active}
+                    sx={{
+                      py: 1.5,
+                      "&.Mui-selected": {
+                        bgcolor: "rgba(13,148,136,0.08)",
+                        color: "primary.main",
+                      },
+                    }}
+                  >
+                    <ListItemText
+                      primary={item.label}
+                      slotProps={{
+                        primary: {
+                          sx: {
+                            fontWeight: active ? 600 : 500,
+                            fontSize: "0.875rem",
+                          },
+                        },
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
               );
             })}
-          </div>
-        </nav>
-      )}
-    </header>
+          </List>
+          <Divider />
+        </Box>
+      </Drawer>
+    </AppBar>
   );
 }
