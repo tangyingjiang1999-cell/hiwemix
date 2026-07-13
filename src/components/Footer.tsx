@@ -35,7 +35,7 @@ export default function Footer() {
               width={1206}
               height={334}
               style={{
-                height: 32,
+                height: 16,
                 width: "auto",
                 objectFit: "contain",
                 filter: "brightness(0) invert(1)",
