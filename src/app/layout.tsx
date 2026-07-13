@@ -10,7 +10,7 @@ const notoSansArabic = Noto_Sans_Arabic({ subsets: ["arabic"], variable: "--font
 const notoSansHebrew = Noto_Sans_Hebrew({ subsets: ["hebrew"], variable: "--font-hebrew" });
 
 export const metadata: Metadata = {
-  title: "HAIWEN MIX - Formula Search",
+  title: "HIWE MIX - Formula Search",
   description: "Car refinish paint formula search system",
   icons: {
     icon: "/weblogo.png",
