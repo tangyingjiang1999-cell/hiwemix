@@ -64,7 +64,7 @@ export default function SiteHeader() {
         <Stack direction="row" spacing={4} sx={{ flex: 1, alignItems: "center" }}>
           <Link href="/" style={{ display: "flex", flexShrink: 0 }}>
             <Image
-              src="/HIWE_Logo.png"
+              src="/hiwemix2-01.png"
               alt="HIWE MIX"
               width={1893}
               height={334}
