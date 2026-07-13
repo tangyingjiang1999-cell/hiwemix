@@ -25,42 +25,44 @@ export default function SiteHeader({}: SiteHeaderProps) {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-[#EBEBEB] bg-white/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-10 lg:px-20">
-        {/* Logo - 左侧 */}
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/HIWE_Logo.png"
-            alt="HIWE MIX"
-            width={1893}
-            height={334}
-            className="h-7 w-auto object-contain sm:h-8 md:h-9"
-          />
-        </Link>
+      <div className="flex h-16 items-center justify-between pl-[20px] pr-[20px]">
+        {/* 左侧组：Logo + 中间 3 个 nav 链接 */}
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex shrink-0 items-center">
+            <Image
+              src="/HIWE_Logo.png"
+              alt="HIWE MIX"
+              width={1893}
+              height={334}
+              className="h-7 w-auto object-contain sm:h-8 md:h-9"
+            />
+          </Link>
 
-        {/* 中间导航链接 - 桌面端 */}
-        <nav className="hidden items-center gap-8 md:flex">
-          {navItems.map((item) => {
-            const isActive =
-              (item.href === "/" && pathname === "/") ||
-              (item.href !== "/" && pathname?.startsWith(item.href));
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={[
-                  "text-sm font-medium transition-colors",
-                  isActive
-                    ? "text-[#0D9488] font-semibold"
-                    : "text-[#6B7280] hover:text-[#0D9488]",
-                ].join(" ")}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
+          {/* 中间导航链接 - 桌面端 */}
+          <nav className="hidden items-center gap-8 md:flex">
+            {navItems.map((item) => {
+              const isActive =
+                (item.href === "/" && pathname === "/") ||
+                (item.href !== "/" && pathname?.startsWith(item.href));
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={[
+                    "text-sm font-medium transition-colors",
+                    isActive
+                      ? "text-[#0D9488] font-semibold"
+                      : "text-[#6B7280] hover:text-[#0D9488]",
+                  ].join(" ")}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
-        {/* Right side actions */}
+        {/* 右侧 actions */}
         <div className="flex items-center gap-2 md:gap-3">
           {authUser ? (
             <div className="flex items-center gap-2">
