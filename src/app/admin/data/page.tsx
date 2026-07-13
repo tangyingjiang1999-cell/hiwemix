@@ -141,16 +141,16 @@ export default function DataManagementPage() {
                   <button
                     key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
-                    className={`group relative flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                    className={`group relative flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200 ${
                       isActive
-                        ? "bg-white text-[#0D9488]"
-                        : "text-[#4D4D4D] hover:bg-white/60 hover:text-[#171717]"
+                        ? "bg-gradient-to-r from-[#E0F2FE] to-white text-[#0369A1] shadow-[inset_2px_0_0_#0EA5E9]"
+                        : "text-[#4D4D4D] hover:bg-gradient-to-r hover:from-[#E0F2FE]/70 hover:to-[#E0F2FE]/0 hover:text-[#0369A1]"
                     }`}
                   >
                     {isActive && (
-                      <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r-full bg-[#0D9488]" />
+                      <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r-full bg-[#0EA5E9]" />
                     )}
-                    <span className={isActive ? "text-[#0D9488]" : "text-[#888888] group-hover:text-[#4D4D4D]"}>
+                    <span className={isActive ? "text-[#0EA5E9]" : "text-[#888888] group-hover:text-[#0EA5E9]"}>
                       {tab.icon}
                     </span>
                     <span>{tab.label}</span>
