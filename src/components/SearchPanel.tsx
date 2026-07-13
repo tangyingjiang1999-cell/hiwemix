@@ -9,7 +9,6 @@ import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
-import Stack from "@mui/material/Stack";
 import Divider from "@mui/material/Divider";
 import SearchIcon from "@mui/icons-material/Search";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -84,7 +83,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef }: Search
           onChange={(e) => setMakeId(e.target.value)}
           size="small"
           fullWidth
-          slotProps={{ select: { displayEmpty: true } }}
+          slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }}
         >
           <MenuItem value="">All</MenuItem>
           {carMakes.map((m) => <MenuItem key={m.id} value={m.id}>{m.name}</MenuItem>)}
@@ -126,6 +125,29 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef }: Search
         </Box>
       )}
 
+      {/* === 操作按钮：左侧 Search，右侧 Reset === */}
+      <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Button
+          type="submit"
+          disabled={isLoading}
+          variant="contained"
+          startIcon={<SearchIcon />}
+          sx={{ minWidth: 120, borderRadius: 1.5, textTransform: "none", fontWeight: 600, fontSize: "0.875rem" }}
+        >
+          {isLoading ? t.searching : t.search}
+        </Button>
+        <Button
+          type="button"
+          onClick={handleReset}
+          disabled={isLoading}
+          variant="outlined"
+          startIcon={<RestartAltIcon />}
+          sx={{ minWidth: 120, borderRadius: 1.5, textTransform: "none", fontWeight: 600, fontSize: "0.875rem", color: "text.secondary", borderColor: "grey.300" }}
+        >
+          {t.reset}
+        </Button>
+      </Box>
+
       <Divider sx={{ my: 2.5 }} />
 
       {/* === 漆面类型 Chips === */}
@@ -151,29 +173,6 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef }: Search
           );
         })}
       </Box>
-
-      {/* === 操作按钮 === */}
-      <Stack direction="row" spacing={1.5}>
-        <Button
-          type="submit"
-          disabled={isLoading}
-          variant="contained"
-          startIcon={<SearchIcon />}
-          sx={{ minWidth: 120, borderRadius: 1.5, textTransform: "none", fontWeight: 600, fontSize: "0.875rem" }}
-        >
-          {isLoading ? t.searching : t.search}
-        </Button>
-        <Button
-          type="button"
-          onClick={handleReset}
-          disabled={isLoading}
-          variant="outlined"
-          startIcon={<RestartAltIcon />}
-          sx={{ minWidth: 120, borderRadius: 1.5, textTransform: "none", fontWeight: 600, fontSize: "0.875rem", color: "text.secondary", borderColor: "grey.300" }}
-        >
-          {t.reset}
-        </Button>
-      </Stack>
     </Box>
   );
 }
