@@ -27,9 +27,22 @@ export interface SearchResultsProps {
 }
 
 const FONT = 'var(--font-inter), var(--font-noto), "Helvetica Neue", Arial, sans-serif';
-const HEADER_FONT_SIZE = "0.875rem";
-const CELL_FONT_SIZE = "1rem";
-const CAPTION_FONT_SIZE = "0.9375rem";
+const HEADER_FONT_SIZE = "0.8125rem";
+const CELL_FONT_SIZE = "0.9375rem";
+const CAPTION_FONT_SIZE = "0.875rem";
+
+// 列宽定义，确保间距均匀
+const COLUMN_WIDTHS = {
+  colorType: 80,
+  manufacturer: 150,
+  carModel: 150,
+  formulaVariants: 130,
+  code: 100,
+  colorName: 150,
+  years: 120,
+  version: 100,
+  action: 60,
+};
 
 function colorSwatchStyle(hex: string): React.CSSProperties {
   return {
@@ -120,28 +133,36 @@ export default function SearchResults({
         {t.foundFormulas(rows.length)}
       </Typography>
 
-      <TableContainer component={Paper} variant="outlined">
-        <Table>
+      <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 1, border: "1px solid", borderColor: "grey.200" }}>
+        <Table sx={{ tableLayout: "fixed", width: "100%" }}>
           <TableHead>
-            <TableRow sx={{ bgcolor: "#000000" }}>
-              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.colorType}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.manufacturerLabel}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.carModelLabel}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.formulaVariants}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.codeLabel}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.colorName}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.yearsLabel}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.versionLabel}</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}></TableCell>
+            <TableRow sx={{ bgcolor: "#1a1a1a" }}>
+              <TableCell sx={{ width: COLUMN_WIDTHS.colorType, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5 }}>{t.colorType}</TableCell>
+              <TableCell sx={{ width: COLUMN_WIDTHS.manufacturer, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5 }}>{t.manufacturerLabel}</TableCell>
+              <TableCell sx={{ width: COLUMN_WIDTHS.carModel, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5 }}>{t.carModelLabel}</TableCell>
+              <TableCell sx={{ width: COLUMN_WIDTHS.formulaVariants, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5 }}>{t.formulaVariants}</TableCell>
+              <TableCell sx={{ width: COLUMN_WIDTHS.code, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5 }}>{t.codeLabel}</TableCell>
+              <TableCell sx={{ width: COLUMN_WIDTHS.colorName, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5 }}>{t.colorName}</TableCell>
+              <TableCell sx={{ width: COLUMN_WIDTHS.years, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5 }}>{t.yearsLabel}</TableCell>
+              <TableCell sx={{ width: COLUMN_WIDTHS.version, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5 }}>{t.versionLabel}</TableCell>
+              <TableCell sx={{ width: COLUMN_WIDTHS.action }}></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {pageRows.map((row) => (
-              <TableRow key={row.formula.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                <TableCell sx={{ py: 2 }}>
+            {pageRows.map((row, index) => (
+              <TableRow
+                key={row.formula.id}
+                sx={{
+                  borderBottom: "1px solid #e5e7eb",
+                  bgcolor: index % 2 === 0 ? "#ffffff" : "#fafafa",
+                  "&:last-child td": { borderBottom: "none" },
+                  "&:hover": { bgcolor: "#f5f5f5" },
+                  transition: "background-color 0.15s ease",
+                }}
+              >
+                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
                   <Box
                     sx={{
-                      position: "relative",
                       width: 32,
                       height: 16,
                       borderRadius: 0.5,
@@ -151,45 +172,52 @@ export default function SearchResults({
                     style={colorSwatchStyle(row.color.hex_preview)}
                   />
                 </TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE }}>{row.makeName}</Typography>
+                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, fontWeight: 500, color: "#1a1a1a" }}>{row.makeName}</Typography>
                 </TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.primary" }}>
+                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
                     {row.color.car_model || "—"}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ py: 2 }}>
+                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
                   <Chip
                     label={row.variant?.name ?? row.formula.variant_id}
                     size="small"
                     variant="outlined"
                     color="primary"
                     onClick={() => onOpenFormula(row)}
-                    sx={{ fontFamily: FONT, fontSize: "0.8125rem", fontWeight: 500, cursor: "pointer" }}
+                    sx={{
+                      fontFamily: FONT,
+                      fontSize: "0.75rem",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                      height: 24,
+                      "&:hover": { bgcolor: "primary.main", color: "white" },
+                    }}
                   />
                 </TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CAPTION_FONT_SIZE, color: "text.primary" }}>
+                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151", fontWeight: 500 }}>
                     {row.color.color_code}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE }}>{row.color.color_name}</Typography>
+                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#1a1a1a" }}>{row.color.color_name}</Typography>
                 </TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary" }}>
+                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                  <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#9ca3af" }}>
                     {row.variant?.year_range ?? "-"}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE }}>{row.formula.version}</Typography>
+                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                  <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151", fontWeight: 500 }}>{row.formula.version}</Typography>
                 </TableCell>
-                <TableCell align="center" sx={{ py: 2 }}>
+                <TableCell align="center" sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
                   <IconButton
                     onClick={() => onOpenFormula(row)}
                     size="small"
-                    sx={{ color: "text.secondary", "&:hover": { bgcolor: "rgba(13,148,136,0.08)", color: "primary.main" } }}
+                    sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(13,148,136,0.08)", color: "primary.main" } }}
                   >
                     <ZoomInIcon fontSize="small" />
                   </IconButton>
