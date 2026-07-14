@@ -121,15 +121,15 @@ export default function SearchResults({
       <TableContainer component={Paper} variant="outlined">
         <Table>
           <TableHead>
-            <TableRow sx={{ bgcolor: "grey.100" }}>
-              <TableCell sx={{ fontWeight: 500, color: "text.disabled", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}></TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "text.disabled", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.manufacturerLabel}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "text.disabled", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.carModelLabel}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "text.disabled", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.codeLabel}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "text.disabled", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.colorName}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "text.disabled", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.yearsLabel}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "text.disabled", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.versionLabel}</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 500, color: "text.disabled", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}></TableCell>
+            <TableRow sx={{ bgcolor: "#000000" }}>
+              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.colorType}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.manufacturerLabel}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.carModelLabel}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.codeLabel}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.colorName}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.yearsLabel}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}>{t.versionLabel}</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 500, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE }}></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
