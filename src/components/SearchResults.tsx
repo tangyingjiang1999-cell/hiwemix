@@ -44,6 +44,12 @@ const COLUMN_WIDTHS = {
   action: 60,
 };
 
+// 列背景色 - 偶数列加淡灰背景以区分列边界
+const COLUMN_BG = {
+  odd: "transparent",           // 奇数列：透明（跟随行色）
+  even: "rgba(0, 0, 0, 0.025)", // 偶数列：2.5% 黑色透明度
+};
+
 function colorSwatchStyle(hex: string): React.CSSProperties {
   return {
     backgroundColor: hex,
@@ -160,7 +166,8 @@ export default function SearchResults({
                   transition: "background-color 0.15s ease",
                 }}
               >
-                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                {/* col 0: colorType (odd) */}
+                <TableCell sx={{ py: 2, bgcolor: COLUMN_BG.odd }}>
                   <Box
                     sx={{
                       width: 32,
@@ -172,15 +179,18 @@ export default function SearchResults({
                     style={colorSwatchStyle(row.color.hex_preview)}
                   />
                 </TableCell>
-                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                {/* col 1: manufacturer (even) */}
+                <TableCell sx={{ py: 2, bgcolor: COLUMN_BG.even }}>
                   <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, fontWeight: 500, color: "#1a1a1a" }}>{row.makeName}</Typography>
                 </TableCell>
-                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                {/* col 2: carModel (odd) */}
+                <TableCell sx={{ py: 2, bgcolor: COLUMN_BG.odd }}>
                   <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
                     {row.color.car_model || "—"}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                {/* col 3: formulaVariants (even) */}
+                <TableCell sx={{ py: 2, bgcolor: COLUMN_BG.even }}>
                   <Chip
                     label={row.variant?.name ?? row.formula.variant_id}
                     size="small"
@@ -197,23 +207,28 @@ export default function SearchResults({
                     }}
                   />
                 </TableCell>
-                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                {/* col 4: code (odd) */}
+                <TableCell sx={{ py: 2, bgcolor: COLUMN_BG.odd }}>
                   <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151", fontWeight: 500 }}>
                     {row.color.color_code}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                {/* col 5: colorName (even) */}
+                <TableCell sx={{ py: 2, bgcolor: COLUMN_BG.even }}>
                   <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#1a1a1a" }}>{row.color.color_name}</Typography>
                 </TableCell>
-                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                {/* col 6: years (odd) */}
+                <TableCell sx={{ py: 2, bgcolor: COLUMN_BG.odd }}>
                   <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#9ca3af" }}>
                     {row.variant?.year_range ?? "-"}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                {/* col 7: version (even) */}
+                <TableCell sx={{ py: 2, bgcolor: COLUMN_BG.even }}>
                   <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151", fontWeight: 500 }}>{row.formula.version}</Typography>
                 </TableCell>
-                <TableCell align="center" sx={{ py: 2, borderBottom: "1px solid #e5e7eb" }}>
+                {/* col 8: action (odd) */}
+                <TableCell align="center" sx={{ py: 2, bgcolor: COLUMN_BG.odd }}>
                   <IconButton
                     onClick={() => onOpenFormula(row)}
                     size="small"
