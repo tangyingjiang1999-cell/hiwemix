@@ -98,7 +98,7 @@ export default function Home() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", bgcolor: "background.default" }}>
       <SiteHeader />
-      <Box component="section" sx={{ flex: 1, display: "flex", alignItems: "center", overflow: "hidden", pt: 10, pb: 4 }}>
+      <Box component="section" sx={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden", pt: 10, pb: 4 }}>
         <Container maxWidth="lg">
           <Box sx={{ textAlign: "center", mb: 4 }}>
             <Typography
@@ -116,12 +116,12 @@ export default function Home() {
           <Paper variant="outlined" sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 2 }}>
             <SearchPanel onSearch={handleSearch} isLoading={isLoading} />
           </Paper>
-          {hasSearched && (
-            <Box sx={{ mt: 2.5, px: { xs: 0, md: "60px" } }}>
-              <SearchResults rows={tableRows} isLoading={isLoading} hasSearched={hasSearched} onOpenFormula={handleOpenFormula} />
-            </Box>
-          )}
         </Container>
+        {hasSearched && (
+          <Box sx={{ mx: "60px", mt: 2.5 }}>
+            <SearchResults rows={tableRows} isLoading={isLoading} hasSearched={hasSearched} onOpenFormula={handleOpenFormula} />
+          </Box>
+        )}
       </Box>
       <Footer />
       <FormulaDrawer result={drawerResult} initialFormulaIdx={drawerInitialIdx} onClose={() => setDrawerResult(null)} />
