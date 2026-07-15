@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { Formula, FormulaComponent } from "@/types";
+import type { Formula, FormulaComponent, ComponentGroup } from "@/types";
 import { useLang } from "@/components/LanguageContext";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -16,13 +16,14 @@ import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
 
-// 字体大小常量（+3px）
+// 字体大小常量（+6px）
 const FONT_SIZES = {
-  caption: "0.9375rem",      // 15px
-  body: "1.0625rem",         // 17px
-  small: "0.875rem",         // 14px
-  tiny: "0.8125rem",         // 13px
+  caption: "1.125rem",        // 18px
+  body: "1.25rem",            // 20px
+  small: "1.0625rem",         // 17px
+  tiny: "1rem",               // 16px
 } as const;
 
 const UNIT_OPTIONS = ["g", "kg", "ml", "liter"] as const;
@@ -32,6 +33,9 @@ const UNIT_MULTIPLIER: Record<Unit, number> = { g: 1, kg: 1000, ml: 1, liter: 10
 
 interface KapciFormulaTableProps {
   formula: Formula;
+  activeGroup?: ComponentGroup;
+  onGroupChange?: (group: ComponentGroup) => void;
+  showGroupToggle?: boolean;
 }
 
 function calcWeight(gramsPer100g: number, totalGrams: number): number {
@@ -53,7 +57,7 @@ function massToneColor(comp: FormulaComponent): string {
   return "#E2E8F0";
 }
 
-export default function KapciFormulaTable({ formula }: KapciFormulaTableProps) {
+export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint", onGroupChange, showGroupToggle = false }: KapciFormulaTableProps) {
   const { t } = useLang();
   const [volume, setVolume] = useState(1);
   const [unit, setUnit] = useState<Unit>("kg");
@@ -91,32 +95,50 @@ export default function KapciFormulaTable({ formula }: KapciFormulaTableProps) {
         spacing={1}
         sx={{ mb: 1.5, p: 1.5, borderRadius: 1, bgcolor: "grey.50", flexWrap: "wrap", alignItems: "center" }}
       >
-        <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500 }}>
-          {t.volume}
-        </Typography>
-        <TextField
-          type="number"
-          value={volume}
-          onChange={(e) => handleVolumeChange(e.target.value)}
-          size="small"
-          slotProps={{ htmlInput: { min: 0.1, step: 0.1 } }}
-          sx={{ width: 90, "& input": { textAlign: "center", fontSize: "0.8125rem" } }}
-        />
-        <Typography variant="caption" sx={{ color: "text.disabled" }}>×</Typography>
-        <TextField
-          select
-          value={unit}
-          onChange={(e) => setUnit(e.target.value as Unit)}
-          size="small"
-          sx={{ width: 80, "& .MuiSelect-select": { fontSize: "0.8125rem" } }}
-        >
-          {UNIT_OPTIONS.map((u) => (
-            <MenuItem key={u} value={u}>{u}</MenuItem>
-          ))}
-        </TextField>
-        <Typography variant="caption" sx={{ color: "text.secondary", ml: 1 }}>
-          = {totalGrams.toLocaleString()} g total
-        </Typography>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, flex: 1, alignItems: "center" }}>
+          <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500 }}>
+            {t.volume}
+          </Typography>
+          <TextField
+            type="number"
+            value={volume}
+            onChange={(e) => handleVolumeChange(e.target.value)}
+            size="small"
+            slotProps={{ htmlInput: { min: 0.1, step: 0.1 } }}
+            sx={{ width: 90, "& input": { textAlign: "center", fontSize: FONT_SIZES.tiny } }}
+          />
+          <Typography variant="caption" sx={{ color: "text.disabled" }}>×</Typography>
+          <TextField
+            select
+            value={unit}
+            onChange={(e) => setUnit(e.target.value as Unit)}
+            size="small"
+            sx={{ width: 80, "& .MuiSelect-select": { fontSize: FONT_SIZES.tiny } }}
+          >
+            {UNIT_OPTIONS.map((u) => (
+              <MenuItem key={u} value={u}>{u}</MenuItem>
+            ))}
+          </TextField>
+          <Typography variant="caption" sx={{ color: "text.secondary", ml: 1 }}>
+            = {totalGrams.toLocaleString()} g total
+          </Typography>
+        </Box>
+
+        {/* Pearl Paint/Ground Paint 切换按钮 */}
+        {showGroupToggle && formula.formula_type === "Pearl Paint" && (
+          <Stack direction="row" spacing={0.5} sx={{ flexShrink: 0 }}>
+            {(["Pearl Paint", "Ground Paint"] as ComponentGroup[]).map((g) => (
+              <Chip
+                key={g}
+                label={g === "Pearl Paint" ? t.pearlPaintLabel : t.groundPaintLabel}
+                onClick={() => onGroupChange?.(g)}
+                variant={activeGroup === g ? "filled" : "outlined"}
+                color={activeGroup === g ? "primary" : "default"}
+                size="small"
+              />
+            ))}
+          </Stack>
+        )}
       </Stack>
 
       <TableContainer component={Paper} variant="outlined">

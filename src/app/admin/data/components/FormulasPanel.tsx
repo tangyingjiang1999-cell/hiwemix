@@ -553,8 +553,8 @@ export default function FormulasPanel() {
         p: 2,
         display: "flex",
         flexDirection: "column",
-        maxHeight: "calc(100vh - 120px)",
-        overflow: "hidden",
+        height: "100%",
+        overflow: "auto",
       }}>
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 1.5 }}>
           <TextField label="配方 ID（自动生成）" value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!selectedId} size="small" fullWidth />
@@ -637,7 +637,20 @@ export default function FormulasPanel() {
         {error && <Box sx={{ color: "error.main", fontSize: "0.8125rem", mt: 2 }}>{error}</Box>}
         {message && <Box sx={{ color: "success.main", fontSize: "0.8125rem", mt: 2 }}>{message}</Box>}
 
-        <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5, mt: 2 }}>
+        {/* 底部按钮区域 - 固定在底部 */}
+        <Box sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: 1.5,
+          p: 2,
+          mt: 2,
+          borderTop: 1,
+          borderColor: "divider",
+          position: "sticky",
+          bottom: 0,
+          bgcolor: "background.paper",
+          zIndex: 10,
+        }}>
           {selectedId && (
             <Button onClick={handleDelete} variant="outlined" color="error" size="small">删除配方</Button>
           )}

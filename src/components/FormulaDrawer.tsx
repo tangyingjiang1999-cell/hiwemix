@@ -24,12 +24,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import PrintIcon from "@mui/icons-material/Print";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
-// 字体大小常量（+3px）
+// 字体大小常量（+6px）
 const FONT_SIZES = {
-  caption: "0.9375rem",      // 15px
-  body: "1.0625rem",         // 17px
-  small: "0.875rem",         // 14px
-  tiny: "0.8125rem",         // 13px
+  caption: "1.125rem",        // 18px
+  body: "1.25rem",            // 20px
+  small: "1.0625rem",         // 17px
+  tiny: "1rem",               // 16px
 } as const;
 
 interface FormulaDrawerProps {
@@ -150,7 +150,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
 
   return (
     <>
-      <Dialog open onClose={handleClose} maxWidth="lg" fullWidth slotProps={{ paper: { sx: { height: "90vh", maxWidth: "85rem" } } }}>
+      <Dialog open onClose={handleClose} maxWidth={false} slotProps={{ paper: { sx: { height: "100vh", maxHeight: "100vh", width: "100vw", maxWidth: "100vw", borderRadius: 0, m: 0, p: 0 } } }}>
         <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Toolbar sx={{ gap: 2 }}>
             <Box
@@ -162,42 +162,33 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                 <Typography variant="subtitle1" noWrap sx={{ fontWeight: 600 }}>{color.color_name}</Typography>
                 <Typography variant="caption" sx={{ color: "text.secondary" }}>{color.color_code}</Typography>
               </Box>
-
-              {activeFormula?.formula_type === "Pearl Paint" && (
-                <Stack direction="row" spacing={0.5} sx={{ flexShrink: 0 }}>
-                  {(["Pearl Paint", "Ground Paint"] as ComponentGroup[]).map((g) => (
-                    <Chip
-                      key={g}
-                      label={g === "Pearl Paint" ? t.pearlPaintLabel : t.groundPaintLabel}
-                      onClick={() => setActiveGroup(g)}
-                      variant={activeGroup === g ? "filled" : "outlined"}
-                      color={activeGroup === g ? "primary" : "default"}
-                      size="small"
-                    />
-                  ))}
-                </Stack>
-              )}
             </Box>
+
+            {/* Print + Copy buttons */}
+            <Button onClick={handlePrint} variant="outlined" startIcon={<PrintIcon />}
+              sx={{ color: "text.primary", borderColor: "grey.300", textTransform: "none", flexShrink: 0 }}>
+              {t.print}
+            </Button>
+            <Button onClick={handleCopy} variant="contained" startIcon={<ContentCopyIcon />}
+              sx={{ textTransform: "none", flexShrink: 0 }}>
+              {t.copy}
+            </Button>
 
             <IconButton onClick={handleClose} edge="end"><CloseIcon /></IconButton>
           </Toolbar>
         </AppBar>
 
-        {/* Mobile Pearl Paint toggle */}
-        {activeFormula?.formula_type === "Pearl Paint" && (
-          <Box sx={{ px: 2, py: 1, borderBottom: 1, borderColor: "divider", display: { xs: "flex", sm: "none" }, gap: 0.5 }}>
-            {(["Pearl Paint", "Ground Paint"] as ComponentGroup[]).map((g) => (
-              <Chip key={g} label={g === "Pearl Paint" ? t.pearlPaintLabel : t.groundPaintLabel}
-                onClick={() => setActiveGroup(g)}
-                variant={activeGroup === g ? "filled" : "outlined"}
-                color={activeGroup === g ? "primary" : "default"} size="small" />
-            ))}
-          </Box>
-        )}
+        <Box sx={{ display: "flex", flex: 1, flexDirection: { xs: "column", md: "row" }, overflow: "hidden", width: "100%", height: "100%" }}>
 
-        <Box sx={{ display: "flex", flex: 1, flexDirection: "column", overflow: "auto" }}>
-          {/* 上：配方表 */}
-          <Box sx={{ flex: "none", width: "100%", overflow: "visible", p: { xs: 2, sm: 4 }, borderBottom: 1, borderColor: "divider" }}>
+          {/* 左侧：配方详情 (~62.5% 宽度) */}
+          <Box sx={{
+            flex: { xs: "none", md: "1 1 62.5%" },
+            overflow: "auto",
+            p: { xs: 2, sm: 4 },
+            borderRight: { md: 1 },
+            borderBottom: { xs: 1, md: "none" },
+            borderColor: "divider",
+          }}>
             {activeFormula && displayedFormula && (
               <Box>
                 <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1.5 }}>
@@ -212,7 +203,13 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                     sx={{ fontWeight: 600, fontSize: "0.75rem", bgcolor: "#FEF3C7", color: "#92400E" }} />
                 </Stack>
 
-                <KapciFormulaTable key={`${activeFormula.id}-${activeGroup}`} formula={displayedFormula} />
+                <KapciFormulaTable
+                  key={`${activeFormula.id}-${activeGroup}`}
+                  formula={displayedFormula}
+                  activeGroup={activeGroup}
+                  onGroupChange={setActiveGroup}
+                  showGroupToggle={true}
+                />
 
                 {activeFormula.notes && (
                   <Box sx={{ mt: 2, p: 2, borderRadius: 1, border: 1, borderColor: "#FDE68A", bgcolor: "rgba(254,243,199,0.5)" }}>
@@ -227,8 +224,12 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
             )}
           </Box>
 
-          {/* 下：颜色预览 + 信息 */}
-          <Box sx={{ width: "100%", flexShrink: 0, overflow: "visible", borderTop: 1, borderColor: "divider", mt: 2 }}>
+          {/* 右侧：颜色预览+信息 (~37.5% 宽度) */}
+          <Box sx={{
+            flex: { xs: "none", md: "1 1 37.5%" },
+            overflow: "auto",
+            flexShrink: 0,
+          }}>
             <Box sx={{ p: { xs: 2, sm: 3 } }}>
               <Typography variant="overline" sx={{ color: "#1a1a1a", fontWeight: 600, letterSpacing: 1, fontSize: FONT_SIZES.small }}>
                 {t.colorPreview}
@@ -263,15 +264,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
               )}
             </Box>
           </Box>
-        </Box>
 
-        <Box sx={{ borderTop: 1, borderColor: "divider", p: { xs: 1.5, sm: 2 }, display: "flex", gap: 1.5 }}>
-          <Button onClick={handlePrint} variant="outlined" startIcon={<PrintIcon />} fullWidth sx={{ color: "text.primary", borderColor: "grey.300", textTransform: "none" }}>
-            {t.print}
-          </Button>
-          <Button onClick={handleCopy} variant="contained" startIcon={<ContentCopyIcon />} fullWidth sx={{ textTransform: "none" }}>
-            {t.copy}
-          </Button>
         </Box>
       </Dialog>
 
