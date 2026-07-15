@@ -27,10 +27,28 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
 import Chip from "@mui/material/Chip";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 const COLOR_TYPES = ["solid", "metallic", "pearl", "matte", "candy", "special"] as const;
+
+const CARD_STYLE = {
+  borderRadius: 2,
+  border: "1px solid",
+  borderColor: "grey.200",
+  overflow: "hidden",
+};
+
+const CARD_TITLE_STYLE = {
+  fontSize: "0.875rem",
+  fontWeight: 600,
+  color: "#1a1a1a",
+  mb: 2,
+  pb: 1.5,
+  borderBottom: "1px solid #e5e7eb",
+};
 
 const COLUMN_WIDTHS = {
   preview: 60,
@@ -214,94 +232,198 @@ export default function ColorsPanel() {
         />
       </TableContainer>
 
-      <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>{editing ? "编辑颜色" : "新增颜色"}</DialogTitle>
-        <DialogContent><Stack spacing={2} sx={{ pt: 0.5 }}>
-          <TextField label="ID" value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} size="small" fullWidth />
-          <TextField select label="品牌" value={form.make_id} onChange={(e) => setForm({ ...form, make_id: e.target.value })} size="small" fullWidth>
-            <MenuItem value="">请选择品牌</MenuItem>
-            {brands.map((b) => <MenuItem key={b.id} value={b.id}>{b.name}</MenuItem>)}
-          </TextField>
-          <Stack direction="row" spacing={2}>
-            <TextField label="颜色代码" value={form.color_code} onChange={(e) => setForm({ ...form, color_code: e.target.value })} size="small" fullWidth />
-            <TextField label="颜色名称" value={form.color_name} onChange={(e) => setForm({ ...form, color_name: e.target.value })} size="small" fullWidth />
+      <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ borderBottom: "1px solid #e5e7eb", pb: 2, mb: 0 }}>
+          {editing ? "编辑颜色" : "新增颜色"}
+        </DialogTitle>
+        <DialogContent sx={{ pt: 2.5, pb: 1 }}>
+          <Stack spacing={3}>
+            {/* 卡片1：基本信息 */}
+            <Paper variant="outlined" sx={CARD_STYLE}>
+              <CardContent sx={{ p: 2.5 }}>
+                <Typography sx={CARD_TITLE_STYLE}>基本信息</Typography>
+                <Stack spacing={2}>
+                  <TextField
+                    label="ID"
+                    value={form.id}
+                    onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }}
+                    disabled={!!editing}
+                    size="small"
+                    fullWidth
+                  />
+                  <TextField
+                    select
+                    label="品牌"
+                    value={form.make_id}
+                    onChange={(e) => setForm({ ...form, make_id: e.target.value })}
+                    size="small"
+                    fullWidth
+                  >
+                    <MenuItem value="">请选择品牌</MenuItem>
+                    {brands.map((b) => <MenuItem key={b.id} value={b.id}>{b.name}</MenuItem>)}
+                  </TextField>
+                  <Stack direction="row" spacing={2}>
+                    <TextField
+                      label="颜色代码"
+                      value={form.color_code}
+                      onChange={(e) => setForm({ ...form, color_code: e.target.value })}
+                      size="small"
+                      fullWidth
+                    />
+                    <TextField
+                      label="颜色名称"
+                      value={form.color_name}
+                      onChange={(e) => setForm({ ...form, color_name: e.target.value })}
+                      size="small"
+                      fullWidth
+                    />
+                  </Stack>
+                  <Stack direction="row" spacing={2}>
+                    <TextField
+                      select
+                      label="类型"
+                      value={form.color_type}
+                      onChange={(e) => setForm({ ...form, color_type: e.target.value as Color["color_type"] })}
+                      size="small"
+                      fullWidth
+                    >
+                      {COLOR_TYPES.map((t) => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                    </TextField>
+                    <TextField
+                      label="预览色"
+                      type="color"
+                      value={form.hex_preview}
+                      onChange={(e) => setForm({ ...form, hex_preview: e.target.value })}
+                      size="small"
+                      fullWidth
+                      sx={{ "& input": { height: 32, p: 0.5 } }}
+                    />
+                  </Stack>
+                  <TextField
+                    label="车型"
+                    value={form.car_model}
+                    onChange={(e) => setForm({ ...form, car_model: e.target.value })}
+                    placeholder="例如 Camry / Corolla"
+                    size="small"
+                    fullWidth
+                  />
+                </Stack>
+              </CardContent>
+            </Paper>
+
+            {/* 卡片2：适用年份 */}
+            <Paper variant="outlined" sx={CARD_STYLE}>
+              <CardContent sx={{ p: 2.5 }}>
+                <Typography sx={CARD_TITLE_STYLE}>适用年份</Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
+                  {years.map((year) => (
+                    <Chip
+                      key={year}
+                      label={year}
+                      onDelete={() => setYears(years.filter((y) => y !== year))}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))}
+                  {years.length === 0 && (
+                    <Typography variant="body2" color="text.secondary">
+                      暂无年份
+                    </Typography>
+                  )}
+                </Box>
+                <Stack direction="row" spacing={1} useFlexGap>
+                  <TextField
+                    label="添加年份"
+                    type="number"
+                    size="small"
+                    sx={{ width: 120 }}
+                    slotProps={{ htmlInput: { min: 1900, max: 2100 } }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        const target = e.target as HTMLInputElement;
+                        const val = parseInt(target.value, 10);
+                        if (val >= 1900 && val <= 2100 && !years.includes(val)) {
+                          setYears([...years, val].sort());
+                          target.value = "";
+                        }
+                      }
+                    }}
+                  />
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => {
+                      const input = document.querySelector('input[type="number"]') as HTMLInputElement;
+                      if (input) {
+                        const val = parseInt(input.value, 10);
+                        if (val >= 1900 && val <= 2100 && !years.includes(val)) {
+                          setYears([...years, val].sort());
+                          input.value = "";
+                        }
+                      }
+                    }}
+                  >
+                    添加
+                  </Button>
+                </Stack>
+                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                  按 Enter 或点击「添加」按钮添加年份
+                </Typography>
+              </CardContent>
+            </Paper>
+
+            {/* 卡片3：关联变体 */}
+            <Paper variant="outlined" sx={CARD_STYLE}>
+              <CardContent sx={{ p: 2.5 }}>
+                <Typography sx={CARD_TITLE_STYLE}>关联变体</Typography>
+                <Box
+                  sx={{
+                    maxHeight: 200,
+                    overflow: "auto",
+                    border: 1,
+                    borderColor: "grey.200",
+                    borderRadius: 1,
+                    p: 1.5,
+                  }}
+                >
+                  {allVariants.length === 0 ? (
+                    <Typography variant="body2" color="text.secondary">
+                      暂无变体
+                    </Typography>
+                  ) : (
+                    <Stack spacing={0.5}>
+                      {allVariants.map((v) => (
+                        <FormControlLabel
+                          key={v.id}
+                          control={
+                            <Checkbox
+                              checked={variantIds.includes(v.id)}
+                              onChange={() => toggleVariant(v.id)}
+                              size="small"
+                            />
+                          }
+                          label={
+                            <Typography variant="body2">
+                              {v.name} <Typography variant="caption" color="text.secondary">({v.year_range})</Typography>
+                            </Typography>
+                          }
+                        />
+                      ))}
+                    </Stack>
+                  )}
+                </Box>
+              </CardContent>
+            </Paper>
+
+            {error && (
+              <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{error}</Box>
+            )}
           </Stack>
-          <Stack direction="row" spacing={2}>
-            <TextField select label="类型" value={form.color_type} onChange={(e) => setForm({ ...form, color_type: e.target.value as Color["color_type"] })} size="small" fullWidth>
-              {COLOR_TYPES.map((t) => <MenuItem key={t} value={t}>{t}</MenuItem>)}
-            </TextField>
-            <TextField label="预览色" type="color" value={form.hex_preview} onChange={(e) => setForm({ ...form, hex_preview: e.target.value })} size="small" sx={{ "& input": { height: 32, p: 0.5 } }} fullWidth />
-          </Stack>
-          <TextField label="车型" value={form.car_model} onChange={(e) => setForm({ ...form, car_model: e.target.value })} placeholder="例如 Camry / Corolla" size="small" fullWidth />
-          <Box>
-            <Box sx={{ fontSize: "0.8125rem", fontWeight: 500, mb: 1 }}>适用年份</Box>
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 1 }}>
-              {years.map((year) => (
-                <Chip
-                  key={year}
-                  label={year}
-                  onDelete={() => setYears(years.filter((y) => y !== year))}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
-              ))}
-              {years.length === 0 && <Box sx={{ fontSize: "0.8125rem", color: "text.disabled" }}>暂无年份</Box>}
-            </Box>
-            <Stack direction="row" spacing={1}>
-              <TextField
-                label="添加年份"
-                type="number"
-                size="small"
-                sx={{ width: 120 }}
-                slotProps={{ htmlInput: { min: 1900, max: 2100 } }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    const target = e.target as HTMLInputElement;
-                    const val = parseInt(target.value, 10);
-                    if (val >= 1900 && val <= 2100 && !years.includes(val)) {
-                      setYears([...years, val].sort());
-                      target.value = "";
-                    }
-                  }
-                }}
-              />
-              <Button
-                variant="outlined"
-                size="small"
-                onClick={() => {
-                  const input = document.querySelector('input[type="number"]') as HTMLInputElement;
-                  if (input) {
-                    const val = parseInt(input.value, 10);
-                    if (val >= 1900 && val <= 2100 && !years.includes(val)) {
-                      setYears([...years, val].sort());
-                      input.value = "";
-                    }
-                  }
-                }}
-              >
-                添加
-              </Button>
-            </Stack>
-            <Box sx={{ fontSize: "0.75rem", color: "text.disabled", mt: 0.5 }}>
-              按 Enter 或点击「添加」按钮添加年份
-            </Box>
-          </Box>
-          <Box>
-            <Box sx={{ fontSize: "0.8125rem", fontWeight: 500, mb: 1 }}>关联变体</Box>
-            <Box sx={{ maxHeight: 160, overflow: "auto", border: 1, borderColor: "grey.300", borderRadius: 1, p: 1 }}>
-              {allVariants.length === 0 && <Box sx={{ fontSize: "0.8125rem", color: "text.disabled" }}>暂无变体</Box>}
-              {allVariants.map((v) => (
-                <FormControlLabel key={v.id} control={<Checkbox checked={variantIds.includes(v.id)} onChange={() => toggleVariant(v.id)} size="small" />}
-                  label={`${v.name} (${v.year_range})`} />
-              ))}
-            </Box>
-          </Box>
-          {error && <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{error}</Box>}
-        </Stack></DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setShowModal(false)} variant="outlined">取消</Button>
-          <Button onClick={handleSave} variant="contained">保存</Button>
+        </DialogContent>
+        <DialogActions sx={{ borderTop: "1px solid #e5e7eb", pt: 2, pb: 2.5, px: 3 }}>
+          <Button onClick={() => setShowModal(false)} variant="outlined" sx={{ borderRadius: 2 }}>取消</Button>
+          <Button onClick={handleSave} variant="contained" sx={{ borderRadius: 2 }}>保存</Button>
         </DialogActions>
       </Dialog>
     </Box>

@@ -12,6 +12,7 @@ import type {
 import type { Toner, CarMake } from "@/types";
 import { generateFormulaId } from "@/lib/id-generator";
 import { TONERS } from "@/data/toners";
+import { FONT, HEADER_BG, HEADER_FONT_SIZE, CELL_FONT_SIZE, COLUMN_BG, ROW_BG, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx } from "@/components/admin-table-styles";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -311,6 +312,28 @@ export default function FormulasPanel() {
     }
   }
 
+  // 输入框样式常量
+  const INPUT_STYLE: React.CSSProperties = {
+    width: "100%",
+    border: "1px solid #E5E7EB",
+    borderRadius: 4,
+    padding: "8px 12px",
+    fontSize: CELL_FONT_SIZE,
+    fontFamily: FONT,
+    outline: "none",
+  };
+
+  const INPUT_SMALL_STYLE: React.CSSProperties = {
+    ...INPUT_STYLE,
+    width: 100,
+  };
+
+  const RGB_INPUT_STYLE: React.CSSProperties = {
+    ...INPUT_STYLE,
+    width: 72,
+    padding: "8px 8px",
+  };
+
   function renderComponentTable(group?: ComponentGroup) {
     const title = group ?? "色母组件";
     const filtered = group
@@ -318,79 +341,116 @@ export default function FormulasPanel() {
       : components;
     return (
       <Box key={group ?? "regular"} sx={{ mt: 2 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-          <Box sx={{ fontWeight: 600, fontSize: "0.8125rem", color: "text.secondary" }}>{title}</Box>
-          <Button onClick={() => addComponent(group)} variant="outlined" size="small">+ 添加色母</Button>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5 }}>
+          <Box sx={{ fontWeight: 600, fontSize: CELL_FONT_SIZE, color: "#1a1a1a", fontFamily: FONT }}>{title}</Box>
+          <Button onClick={() => addComponent(group)} variant="outlined" size="small" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE }}>+ 添加色母</Button>
         </Box>
-        <TableContainer component={Paper} variant="outlined" sx={{ minHeight: 320 }}>
-          <Table size="small">
+        <TableContainer component={Paper} variant="outlined" sx={tableContainerSx}>
+          <Table sx={tableSx}>
             <TableHead>
-              <TableRow sx={{ bgcolor: "grey.50" }}>
-                <TableCell sx={{ fontWeight: 500, fontSize: "0.6875rem" }}>色母编号</TableCell>
-                <TableCell sx={{ fontWeight: 500, fontSize: "0.6875rem" }}>名称</TableCell>
-                <TableCell sx={{ fontWeight: 500, fontSize: "0.6875rem" }}>百分比</TableCell>
-                <TableCell sx={{ fontWeight: 500, fontSize: "0.6875rem" }}>RGB</TableCell>
-                <TableCell></TableCell>
+              <TableRow sx={{ bgcolor: HEADER_BG }}>
+                <TableCell sx={{ ...headerCellSx, width: "25%" }}>色母编号</TableCell>
+                <TableCell sx={{ ...headerCellSx, width: "30%" }}>名称</TableCell>
+                <TableCell sx={{ ...headerCellSx, width: "15%" }}>百分比</TableCell>
+                <TableCell sx={{ ...headerCellSx, width: "25%" }}>RGB</TableCell>
+                <TableCell sx={{ ...headerCellSx, width: "5%" }}></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ color: "text.disabled", fontSize: "0.8125rem", py: 4 }}>
+                  <TableCell colSpan={5} align="center" sx={{ color: "#9ca3af", fontSize: CELL_FONT_SIZE, fontFamily: FONT, py: 6 }}>
                     暂无色母，点击「添加色母」
                   </TableCell>
                 </TableRow>
               )}
-              {filtered.map((c) => {
+              {filtered.map((c, rowIndex) => {
                 const globalIndex = components.indexOf(c);
                 return (
-                  <TableRow key={globalIndex}>
-                    <TableCell sx={{ position: "relative", py: 0.5, px: 1 }}>
+                  <TableRow key={globalIndex} sx={getRowSx(rowIndex)}>
+                    <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd, position: "relative" }}>
                       <input
                         type="text"
                         value={c.toner_code}
                         onChange={(e) => { updateComponent(globalIndex, "toner_code", e.target.value); setTonerQuery(e.target.value); }}
                         onFocus={() => openTonerDropdown(globalIndex, c.toner_code)}
                         onBlur={() => scheduleCloseTonerDropdown()}
-                        style={{ width: 80, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }}
+                        style={INPUT_SMALL_STYLE}
                       />
                       {tonerDropdownFor === globalIndex && matchingToners(tonerQuery).length > 0 && (
-                        <Paper sx={{ position: "absolute", left: 8, top: "100%", zIndex: 50, mt: 0.25, maxHeight: 240, width: 224, overflow: "auto" }}>
+                        <Paper sx={{ position: "absolute", left: 8, top: "100%", zIndex: 50, mt: 0.5, maxHeight: 240, width: 280, overflow: "auto", boxShadow: 3 }}>
                           {matchingToners(tonerQuery).map((toner) => (
                             <Button
                               key={toner.code}
                               onMouseDown={() => { selectToner(globalIndex, toner); setTonerDropdownFor(null); }}
                               fullWidth
-                              sx={{ justifyContent: "flex-start", gap: 1, px: 1, py: 0.75, borderRadius: 0, fontSize: "0.6875rem", textTransform: "none", "&:hover": { bgcolor: "rgba(13,148,136,0.06)" } }}
+                              sx={{ justifyContent: "flex-start", gap: 1, px: 1.5, py: 1, borderRadius: 0, fontSize: CELL_FONT_SIZE, fontFamily: FONT, textTransform: "none", "&:hover": { bgcolor: "rgba(13,148,136,0.06)" } }}
                             >
-                              <Box sx={{ width: 24, height: 16, borderRadius: 0.5, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: toner.hex }} />
-                              <Box component="span" sx={{ fontFamily: "monospace", color: "text.primary" }}>{toner.code}</Box>
-                              <Box component="span" sx={{ color: "text.secondary" }}>{toner.tradeName}</Box>
+                              <Box sx={{ width: 32, height: 20, borderRadius: 0.5, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: toner.hex }} />
+                              <Box component="span" sx={{ fontFamily: "monospace", color: "#1a1a1a", fontWeight: 500 }}>{toner.code}</Box>
+                              <Box component="span" sx={{ color: "#374151" }}>{toner.tradeName}</Box>
                             </Button>
                           ))}
                         </Paper>
                       )}
                     </TableCell>
-                    <TableCell sx={{ py: 0.5, px: 1 }}>
-                      <input type="text" value={c.toner_name} onChange={(e) => updateComponent(globalIndex, "toner_name", e.target.value)}
-                        style={{ width: 96, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }} />
+                    <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
+                      <input
+                        type="text"
+                        value={c.toner_name}
+                        onChange={(e) => updateComponent(globalIndex, "toner_name", e.target.value)}
+                        style={INPUT_STYLE}
+                      />
                     </TableCell>
-                    <TableCell sx={{ py: 0.5, px: 1 }}>
-                      <input type="number" value={c.percentage} onChange={(e) => updateComponent(globalIndex, "percentage", Number(e.target.value))}
-                        style={{ width: 64, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }} />
+                    <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
+                      <input
+                        type="number"
+                        value={c.percentage}
+                        onChange={(e) => updateComponent(globalIndex, "percentage", Number(e.target.value))}
+                        style={INPUT_SMALL_STYLE}
+                      />
                     </TableCell>
-                    <TableCell sx={{ py: 0.5, px: 1 }}>
-                      <Box sx={{ display: "flex", gap: 0.25 }}>
-                        <input type="number" value={c.rgb_r ?? ""} onChange={(e) => updateComponent(globalIndex, "rgb_r", e.target.value === "" ? undefined : Number(e.target.value))}
-                          placeholder="R" style={{ width: 48, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }} />
-                        <input type="number" value={c.rgb_g ?? ""} onChange={(e) => updateComponent(globalIndex, "rgb_g", e.target.value === "" ? undefined : Number(e.target.value))}
-                          placeholder="G" style={{ width: 48, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }} />
-                        <input type="number" value={c.rgb_b ?? ""} onChange={(e) => updateComponent(globalIndex, "rgb_b", e.target.value === "" ? undefined : Number(e.target.value))}
-                          placeholder="B" style={{ width: 48, border: "1px solid #E5E7EB", borderRadius: 4, padding: "2px 4px", fontSize: "0.6875rem", outline: "none" }} />
+                    <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
+                      <Box sx={{ display: "flex", gap: 1 }}>
+                        <input
+                          type="number"
+                          value={c.rgb_r ?? ""}
+                          onChange={(e) => updateComponent(globalIndex, "rgb_r", e.target.value === "" ? undefined : Number(e.target.value))}
+                          placeholder="R"
+                          style={RGB_INPUT_STYLE}
+                        />
+                        <input
+                          type="number"
+                          value={c.rgb_g ?? ""}
+                          onChange={(e) => updateComponent(globalIndex, "rgb_g", e.target.value === "" ? undefined : Number(e.target.value))}
+                          placeholder="G"
+                          style={RGB_INPUT_STYLE}
+                        />
+                        <input
+                          type="number"
+                          value={c.rgb_b ?? ""}
+                          onChange={(e) => updateComponent(globalIndex, "rgb_b", e.target.value === "" ? undefined : Number(e.target.value))}
+                          placeholder="B"
+                          style={RGB_INPUT_STYLE}
+                        />
                       </Box>
                     </TableCell>
-                    <TableCell sx={{ py: 0.5, px: 1 }}>
-                      <Button onClick={() => removeComponent(globalIndex)} size="small" color="error" sx={{ fontSize: "0.6875rem" }}>删除</Button>
+                    <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
+                      <Button
+                        onClick={() => removeComponent(globalIndex)}
+                        size="small"
+                        sx={{
+                          color: "#9ca3af",
+                          fontSize: CELL_FONT_SIZE,
+                          fontFamily: FONT,
+                          "&:hover": {
+                            bgcolor: "rgba(239,68,68,0.08)",
+                            color: "error.main",
+                          },
+                        }}
+                      >
+                        删除
+                      </Button>
                     </TableCell>
                   </TableRow>
                 );
