@@ -32,8 +32,8 @@ const CAPTION_FONT_SIZE = "0.875rem";
 
 // 列宽定义，确保间距均匀
 const COLUMN_WIDTHS = {
-  colorType: 150,
-  manufacturer: 80,
+  colorType: 105,
+  manufacturer: 125,
   carModel: 150,
   formulaVariants: 120,
   code: 100,
