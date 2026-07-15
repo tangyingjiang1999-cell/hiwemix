@@ -171,7 +171,7 @@ export default function SearchResults({
                     sx={{
                       width: 83,
                       height: 37,
-                      borderRadius: 2,
+                      borderRadius: 1,
                       border: 1,
                       borderColor: "grey.200",
                     }}
