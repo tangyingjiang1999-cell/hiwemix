@@ -158,7 +158,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
             </Stack>
 
             {activeFormula?.formula_type === "Pearl Paint" && (
-              <Stack direction="row" spacing={0.5} sx={{ display: { xs: "none", sm: "flex" } }}>
+              <Stack direction="row" spacing={0.5} sx={{ ml: 1 }}>
                 {(["Pearl Paint", "Ground Paint"] as ComponentGroup[]).map((g) => (
                   <Chip
                     key={g}
