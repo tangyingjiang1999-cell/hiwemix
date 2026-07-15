@@ -151,13 +151,6 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                 <Typography variant="caption" sx={{ color: "text.secondary" }}>{color.color_code}</Typography>
               </Box>
 
-              <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
-                <Chip label={activeFormula?.paint_system} size="small"
-                  sx={{ fontWeight: 600, fontSize: "0.625rem",
-                    ...(activeFormula?.paint_system === "2K" ? { bgcolor: "#DBEAFE", color: "#1D4ED8" } : { bgcolor: "#D1FAE5", color: "#047857" }) }} />
-                <Chip label={activeFormula?.formula_type} size="small" variant="outlined" sx={{ fontWeight: 600, fontSize: "0.625rem" }} />
-              </Stack>
-
               {activeFormula?.formula_type === "Pearl Paint" && (
                 <Stack direction="row" spacing={0.5} sx={{ flexShrink: 0 }}>
                   {(["Pearl Paint", "Ground Paint"] as ComponentGroup[]).map((g) => (
@@ -199,6 +192,12 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                   <Typography variant="caption" sx={{ color: "text.secondary" }}>
                     {t.version} {activeFormula.version}
                   </Typography>
+
+                  <Chip label={activeFormula?.paint_system} size="small"
+                    sx={{ fontWeight: 600, fontSize: "0.75rem",
+                      ...(activeFormula?.paint_system === "2K" ? { bgcolor: "#DBEAFE", color: "#1D4ED8" } : { bgcolor: "#D1FAE5", color: "#047857" }) }} />
+                  <Chip label={activeFormula?.formula_type} size="small"
+                    sx={{ fontWeight: 600, fontSize: "0.75rem", bgcolor: "#FEF3C7", color: "#92400E" }} />
                 </Stack>
 
                 <KapciFormulaTable key={`${activeFormula.id}-${activeGroup}`} formula={displayedFormula} />
