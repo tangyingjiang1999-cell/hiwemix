@@ -17,6 +17,14 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 
+// 字体大小常量（+3px）
+const FONT_SIZES = {
+  caption: "0.9375rem",      // 15px
+  body: "1.0625rem",         // 17px
+  small: "0.875rem",         // 14px
+  tiny: "0.8125rem",         // 13px
+} as const;
+
 const UNIT_OPTIONS = ["g", "kg", "ml", "liter"] as const;
 type Unit = (typeof UNIT_OPTIONS)[number];
 
@@ -115,11 +123,11 @@ export default function KapciFormulaTable({ formula }: KapciFormulaTableProps) {
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.6875rem" }}>{t.tonerCode}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.6875rem" }}>{t.tonerName}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.6875rem" }}>{t.weight}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.6875rem" }}>{t.accum}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.6875rem" }}>{t.massTone}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.tonerCode}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.tonerName}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.weight}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.accum}</TableCell>
+              <TableCell sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.massTone}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -129,10 +137,10 @@ export default function KapciFormulaTable({ formula }: KapciFormulaTableProps) {
 
               return (
                 <TableRow key={comp.toner_code}>
-                  <TableCell sx={{ py: 1, fontSize: "0.6875rem", fontFamily: "monospace", color: "text.disabled" }}>
+                  <TableCell sx={{ py: 1, fontSize: FONT_SIZES.tiny, fontFamily: "monospace", color: "#1a1a1a" }}>
                     {comp.toner_code}
                   </TableCell>
-                  <TableCell sx={{ py: 1, fontSize: "0.8125rem" }}>{comp.toner_name}</TableCell>
+                  <TableCell sx={{ py: 1, fontSize: FONT_SIZES.small, color: "#1a1a1a" }}>{comp.toner_name}</TableCell>
                   <TableCell sx={{ py: 1 }}>
                     <TextField
                       type="number"
@@ -140,10 +148,10 @@ export default function KapciFormulaTable({ formula }: KapciFormulaTableProps) {
                       onChange={(e) => handleWeightChange(idx, e.target.value)}
                       size="small"
                       slotProps={{ htmlInput: { min: 0, step: 0.1 } }}
-                      sx={{ width: "100%", "& input": { fontSize: "0.8125rem", py: 0.5 } }}
+                      sx={{ width: "100%", "& input": { fontSize: FONT_SIZES.small, py: 0.5, color: "#1a1a1a" } }}
                     />
                   </TableCell>
-                  <TableCell sx={{ py: 1, fontVariantNumeric: "tabular-nums", fontWeight: 500, fontSize: "0.8125rem" }}>
+                  <TableCell sx={{ py: 1, fontVariantNumeric: "tabular-nums", fontWeight: 500, fontSize: FONT_SIZES.small, color: "#1a1a1a" }}>
                     {running.toFixed(1)}
                   </TableCell>
                   <TableCell sx={{ py: 1 }}>
@@ -157,7 +165,7 @@ export default function KapciFormulaTable({ formula }: KapciFormulaTableProps) {
             })}
           </TableBody>
           <TableFooter>
-            <TableRow sx={{ "& td": { fontWeight: 700, fontSize: "0.8125rem", bgcolor: "grey.50" } }}>
+            <TableRow sx={{ "& td": { fontWeight: 700, fontSize: FONT_SIZES.small, bgcolor: "grey.50", color: "#1a1a1a" } }}>
               <TableCell colSpan={5}>
                 <Box component="span">{t.totalWeightLabel}</Box>
                 <Box component="span" sx={{ fontVariantNumeric: "tabular-nums" }}>

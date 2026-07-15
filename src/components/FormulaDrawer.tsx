@@ -23,6 +23,14 @@ import CloseIcon from "@mui/icons-material/Close";
 import PrintIcon from "@mui/icons-material/Print";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
+// 字体大小常量（+3px）
+const FONT_SIZES = {
+  caption: "0.9375rem",      // 15px
+  body: "1.0625rem",         // 17px
+  small: "0.875rem",         // 14px
+  tiny: "0.8125rem",         // 13px
+} as const;
+
 interface FormulaDrawerProps {
   result: SearchResult | null;
   onClose: () => void;
@@ -183,13 +191,13 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
           </Box>
         )}
 
-        <Box sx={{ display: "flex", flex: 1, flexDirection: { xs: "column", lg: "row" }, overflow: "hidden" }}>
-          {/* 左：配方表 */}
-          <Box sx={{ flex: 1, overflow: "auto", p: { xs: 2, sm: 4 }, borderBottom: { xs: 1, lg: 0 }, borderColor: "divider" }}>
+        <Box sx={{ display: "flex", flex: 1, flexDirection: "column", overflow: "auto" }}>
+          {/* 上：配方表 */}
+          <Box sx={{ flex: "none", width: "100%", overflow: "visible", p: { xs: 2, sm: 4 }, borderBottom: 1, borderColor: "divider" }}>
             {activeFormula && displayedFormula && (
               <Box>
                 <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1.5 }}>
-                  <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                  <Typography variant="caption" sx={{ color: "#1a1a1a", fontSize: FONT_SIZES.caption }}>
                     {t.version} {activeFormula.version}
                   </Typography>
 
@@ -215,10 +223,10 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
             )}
           </Box>
 
-          {/* 右：颜色预览 + 信息 */}
-          <Box sx={{ width: { lg: 420 }, flexShrink: 0, overflow: "auto", borderLeft: { lg: 1 }, borderColor: "divider" }}>
+          {/* 下：颜色预览 + 信息 */}
+          <Box sx={{ width: "100%", flexShrink: 0, overflow: "visible", borderTop: 1, borderColor: "divider", mt: 2 }}>
             <Box sx={{ p: { xs: 2, sm: 3 } }}>
-              <Typography variant="overline" sx={{ color: "text.disabled", fontWeight: 600, letterSpacing: 1 }}>
+              <Typography variant="overline" sx={{ color: "#1a1a1a", fontWeight: 600, letterSpacing: 1, fontSize: FONT_SIZES.small }}>
                 {t.colorPreview}
               </Typography>
               <Box sx={{ mt: 1.5, height: { xs: 150, sm: 240 }, borderRadius: 1, border: 1, borderColor: "grey.200", bgcolor: previewColor }} />
