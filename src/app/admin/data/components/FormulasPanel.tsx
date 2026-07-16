@@ -608,7 +608,7 @@ export default function FormulasPanel() {
               <MenuItem key={y} value={y}>{y}</MenuItem>
             ))}
           </TextField>
-          <TextField select label="关联变体（可选）" value={form.variant_id} onChange={(e) => setForm({ ...form, variant_id: e.target.value })} size="small" fullWidth>
+          <TextField select label="施工工艺（可选）" value={form.variant_id} onChange={(e) => setForm({ ...form, variant_id: e.target.value })} size="small" fullWidth>
             <MenuItem value="">无</MenuItem>
             {variants.map((v) => <MenuItem key={v.id} value={v.id}>{v.name} ({v.year_range})</MenuItem>)}
           </TextField>

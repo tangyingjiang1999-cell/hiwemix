@@ -33,7 +33,7 @@ const DRAWER_WIDTH = 224;
 const TABS = [
   { key: "brands", label: "品牌", icon: <BarChartIcon /> },
   { key: "colors", label: "颜色", icon: <PaletteIcon /> },
-  { key: "variants", label: "变体", icon: <GridViewIcon /> },
+  { key: "variants", label: "施工工艺", icon: <GridViewIcon /> },
   { key: "formulas", label: "配方", icon: <ScienceIcon /> },
   { key: "guides", label: "指南", icon: <MenuBookIcon /> },
   { key: "settings", label: "设置", icon: <SettingsIcon /> },
@@ -76,17 +76,13 @@ export default function DataManagementPage() {
               borderRadius: 1,
               mb: 0.25,
               "&.Mui-selected": {
-                bgcolor: "rgba(36,135,202,0.08)",
-                color: "primary.main",
-                "& .MuiListItemIcon-root": { color: "primary.main" },
-                borderLeft: 2,
-                borderColor: "primary.main",
+                bgcolor: "#1a1a1a",
+                color: "#FFFFFF",
+                "& .MuiListItemIcon-root": { color: "#FFFFFF" },
               },
-              borderLeft: 2,
-              borderColor: "transparent",
             }}
           >
-            <ListItemIcon sx={{ minWidth: 36, color: activeTab === tab.key ? "primary.main" : "text.disabled" }}>
+            <ListItemIcon sx={{ minWidth: 36, color: activeTab === tab.key ? "#FFFFFF" : "text.disabled" }}>
               {tab.icon}
             </ListItemIcon>
             <ListItemText

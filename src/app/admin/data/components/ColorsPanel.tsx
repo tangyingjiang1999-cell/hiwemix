@@ -148,7 +148,7 @@ export default function ColorsPanel() {
               <TableCell sx={{ width: COLUMN_WIDTHS.carModel, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>车型</TableCell>
               <TableCell sx={{ width: COLUMN_WIDTHS.brand, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>品牌</TableCell>
               <TableCell sx={{ width: COLUMN_WIDTHS.colorType, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>类型</TableCell>
-              <TableCell sx={{ width: COLUMN_WIDTHS.variantCount, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>变体</TableCell>
+              <TableCell sx={{ width: COLUMN_WIDTHS.variantCount, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>工艺</TableCell>
               <TableCell sx={{ width: COLUMN_WIDTHS.yearCount, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>年份</TableCell>
               <TableCell sx={{ width: COLUMN_WIDTHS.actions, borderBottom: "2px solid #333", py: 1.5 }}></TableCell>
             </TableRow>
