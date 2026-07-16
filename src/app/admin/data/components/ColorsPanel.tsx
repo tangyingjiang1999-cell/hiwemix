@@ -58,14 +58,30 @@ const COLUMN_WIDTHS = {
   brand: 120,
   colorType: 80,
   variantCount: 70,
-  yearCount: 70,
+  yearCount: 80,
   actions: 100,
 };
 
-interface ColorRow extends Color {
+interface ExpandedColorRow {
+  /** 颜色 ID（所有子行共享） */
+  colorId: string;
+  /** 在颜色组中的位置（0-based），0 = 第一行（渲染合并单元格） */
+  groupIndex: number;
+  /** 该颜色组的总行数，用作 rowSpan 值 */
+  groupSize: number;
+  /** 该子行的年份，或 undefined（无年份） */
+  year: number | undefined;
+  // ---- 以下为显示字段（仅 groupIndex === 0 时渲染） ----
+  color_code: string;
+  color_name: string;
+  color_type: Color["color_type"];
+  hex_preview: string;
+  car_model?: string;
   brandName: string;
   variantCount: number;
   yearCount: number;
+  /** 原始 Color 对象引用（用于编辑/删除操作） */
+  originalColor: Color;
 }
 
 export default function ColorsPanel() {
@@ -124,9 +140,55 @@ export default function ColorsPanel() {
   function toggleVariant(id: string) { setVariantIds((prev) => prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]); }
 
   const brandMap = new Map(brands.map((b) => [b.id, b.name]));
-  const rows: ColorRow[] = colors.map((c) => ({ ...c, brandName: brandMap.get(c.make_id) ?? c.make_id, variantCount: c.variants.length, yearCount: c.years?.length || 0 }));
 
-  const pageRows = rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  // 将 colors 转换为展开后的行数组
+  const allExpandedRows: ExpandedColorRow[] = colors.flatMap((c) => {
+    const brandName = brandMap.get(c.make_id) ?? c.make_id;
+    const years = c.years ?? [];
+    const groupSize = Math.max(years.length, 1); // 至少1行，即使没有年份
+
+    if (years.length === 0) {
+      // 没有年份：单行，year = undefined
+      return [{
+        colorId: c.id,
+        groupIndex: 0,
+        groupSize: 1,
+        year: undefined,
+        color_code: c.color_code,
+        color_name: c.color_name,
+        color_type: c.color_type,
+        hex_preview: c.hex_preview,
+        car_model: c.car_model,
+        brandName,
+        variantCount: c.variants.length,
+        yearCount: 0,
+        originalColor: c,
+      }];
+    }
+
+    // 有年份：每个年份一行
+    return years.sort((a, b) => a - b).map((year, i): ExpandedColorRow => ({
+      colorId: c.id,
+      groupIndex: i,
+      groupSize: years.length,
+      year,
+      color_code: c.color_code,
+      color_name: c.color_name,
+      color_type: c.color_type,
+      hex_preview: c.hex_preview,
+      car_model: c.car_model,
+      brandName,
+      variantCount: c.variants.length,
+      yearCount: years.length,
+      originalColor: c,
+    }));
+  });
+
+  // 分页展开后的行
+  const pageRows = allExpandedRows.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   return (
     <Box>
@@ -156,7 +218,7 @@ export default function ColorsPanel() {
           <TableBody>
             {pageRows.map((row, index) => (
               <TableRow
-                key={row.id}
+                key={`${row.colorId}-${row.year ?? 'none'}`}
                 sx={{
                   borderBottom: "1px solid #e5e7eb",
                   "&:last-child td": { borderBottom: "none" },
@@ -200,15 +262,15 @@ export default function ColorsPanel() {
                 </TableCell>
                 <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
                   <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#9ca3af" }}>
-                    {row.yearCount}
+                    {row.year ?? ""}
                   </Typography>
                 </TableCell>
                 <TableCell align="center" sx={{ py: 1.4, bgcolor: COLUMN_BG.odd }}>
                   <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center" }}>
-                    <IconButton onClick={() => openEdit(row)} size="small" sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(36,135,202,0.08)", color: "primary.main" } }}>
+                    <IconButton onClick={() => openEdit(row.originalColor)} size="small" sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(36,135,202,0.08)", color: "primary.main" } }}>
                       <EditIcon fontSize="small" />
                     </IconButton>
-                    <IconButton onClick={() => handleDelete(row)} size="small" sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(239,68,68,0.08)", color: "error.main" } }}>
+                    <IconButton onClick={() => handleDelete(row.originalColor)} size="small" sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(239,68,68,0.08)", color: "error.main" } }}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </Box>
@@ -219,7 +281,7 @@ export default function ColorsPanel() {
         </Table>
         <TablePagination
           component="div"
-          count={rows.length}
+          count={allExpandedRows.length}
           page={page}
           onPageChange={(_, newPage) => setPage(newPage)}
           rowsPerPage={rowsPerPage}

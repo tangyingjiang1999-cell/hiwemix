@@ -17,6 +17,21 @@ function validateFormula(body: Formula): string | null {
   if (body.formula_type === "Pearl Paint") {
     const missingGroup = body.components.some((c) => c.component_group == null);
     if (missingGroup) return "Pearl Paint 配方的每个色母都必须选择分组";
+    const pearlComps = body.components.filter(c => c.component_group === "Pearl Paint");
+    const groundComps = body.components.filter(c => c.component_group === "Ground Paint");
+    const pearlSum = pearlComps.reduce((sum, c) => sum + c.percentage, 0);
+    const groundSum = groundComps.reduce((sum, c) => sum + c.percentage, 0);
+    if (pearlComps.length > 0 && Math.abs(pearlSum - 100) > 1) {
+      return `Pearl Paint 组分百分比总和为 ${pearlSum.toFixed(1)}%，应接近 100%`;
+    }
+    if (groundComps.length > 0 && Math.abs(groundSum - 100) > 1) {
+      return `Ground Paint 组分百分比总和为 ${groundSum.toFixed(1)}%，应接近 100%`;
+    }
+  } else {
+    const totalPct = body.components.reduce((sum, c) => sum + c.percentage, 0);
+    if (body.components.length > 0 && Math.abs(totalPct - 100) > 1) {
+      return `色母百分比总和为 ${totalPct.toFixed(1)}%，应接近 100%`;
+    }
   }
   return null;
 }
@@ -40,6 +55,11 @@ export async function POST(req: NextRequest) {
   if (validationError) {
     return NextResponse.json({ error: validationError }, { status: 400 });
   }
+  // 规范化：确保 grams_per_100g 始终从 percentage 派生
+  body.components = body.components.map((c: Formula['components'][0]) => ({
+    ...c,
+    grams_per_100g: c.percentage,
+  }));
   const saved = await saveFormula(body);
   return NextResponse.json(saved, { status: 201 });
 }
@@ -56,6 +76,11 @@ export async function PUT(req: NextRequest) {
   if (validationError) {
     return NextResponse.json({ error: validationError }, { status: 400 });
   }
+  // 规范化：确保 grams_per_100g 始终从 percentage 派生
+  body.components = body.components.map((c: Formula['components'][0]) => ({
+    ...c,
+    grams_per_100g: c.percentage,
+  }));
   const saved = await saveFormula(body);
   return NextResponse.json(saved);
 }

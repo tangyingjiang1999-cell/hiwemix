@@ -158,7 +158,7 @@ function mapFormulaRow(row: Record<string, unknown>): Formula {
       toner_code: c.toner_code as string,
       toner_name: c.toner_name as string,
       percentage: Number(c.percentage),
-      grams_per_100g: Number(c.grams_per_100g),
+      grams_per_100g: Number(c.percentage),  // 始终从 percentage 派生
     };
     if (c.density != null) comp.density = Number(c.density);
     if (c.rgb_r != null) {
@@ -296,7 +296,7 @@ export async function saveFormula(formula: Formula): Promise<Formula> {
         toner_code: c.toner_code,
         toner_name: c.toner_name,
         percentage: c.percentage,
-        grams_per_100g: c.grams_per_100g,
+        grams_per_100g: c.percentage,  // 始终从 percentage 派生
         density: c.density ?? null,
         rgb_r: c.rgb_r ?? null,
         rgb_g: c.rgb_g ?? null,

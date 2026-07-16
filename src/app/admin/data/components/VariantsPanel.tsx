@@ -67,7 +67,6 @@ export default function VariantsPanel() {
             <TableRow sx={{ bgcolor: HEADER_BG }}>
               <TableCell sx={{ ...headerCellSx, width: 120 }}>ID</TableCell>
               <TableCell sx={{ ...headerCellSx, width: 200 }}>名称</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: 150 }}>年份范围</TableCell>
               <TableCell sx={{ ...headerCellSx, width: 100 }}></TableCell>
             </TableRow>
           </TableHead>
@@ -82,11 +81,6 @@ export default function VariantsPanel() {
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
                   <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#1a1a1a" }}>
                     {variant.name}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#9ca3af" }}>
-                    {variant.year_range || "—"}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
@@ -122,9 +116,6 @@ export default function VariantsPanel() {
         <DialogContent><Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
           <TextField label="ID" value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} size="small" fullWidth />
           <TextField label="名称" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} size="small" fullWidth />
-          <Box sx={{ fontSize: "0.75rem", color: "text.disabled", mt: 1 }}>
-            注意：年份管理已移至颜色级别。此字段已弃用。
-          </Box>
           {error && <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{error}</Box>}
         </Box></DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}><Button onClick={() => setShowModal(false)} variant="outlined">取消</Button><Button onClick={handleSave} variant="contained">保存</Button></DialogActions>

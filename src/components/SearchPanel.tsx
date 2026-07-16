@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { COLOR_TYPE_OPTIONS } from "@/lib/constants";
 import { useLang } from "@/components/LanguageContext";
-import type { CarMake, Region, SearchParams, AppSettings } from "@/types";
+import type { CarMake, SearchParams, AppSettings } from "@/types";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
@@ -22,14 +22,12 @@ export interface SearchPanelProps {
 export default function SearchPanel({ onSearch, isLoading, onSubmitRef }: SearchPanelProps) {
   const { t } = useLang();
 
-  const [region, setRegion] = useState("");
   const [makeId, setMakeId] = useState("");
   const [colorCode, setColorCode] = useState("");
   const [colorName, setColorName] = useState("");
   const [colorType, setColorType] = useState("");
   const [year, setYear] = useState("");
   const [carMakes, setCarMakes] = useState<CarMake[]>([]);
-  const [regions, setRegions] = useState<Region[]>([]);
   const [colorTypeOptions, setColorTypeOptions] = useState<{ value: string; label: string }[]>(
     COLOR_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))
   );
@@ -40,14 +38,6 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef }: Search
       .then((r) => (r.ok ? r.json() : []))
       .then((d: CarMake[]) => setCarMakes(d))
       .catch(() => setCarMakes([]));
-  }, []);
-
-  // Fetch regions
-  useEffect(() => {
-    fetch("/api/regions")
-      .then((r) => (r.ok ? r.json() : []))
-      .then((d: Region[]) => setRegions(d))
-      .catch(() => setRegions([]));
   }, []);
 
   // Fetch settings (color types)
@@ -71,7 +61,6 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef }: Search
     (e?: FormEvent) => {
       if (e) e.preventDefault();
       const params: SearchParams = {};
-      if (region) params.region = region;
       if (makeId) params.make_id = makeId;
       if (colorCode.trim()) params.color_code = colorCode.replace(/\s/g, "");
       if (colorName.trim()) params.color_name = colorName.trim();
@@ -79,7 +68,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef }: Search
       if (year.trim()) params.year = year.trim();
       onSearch(params);
     },
-    [region, makeId, colorCode, colorName, colorType, year, onSearch]
+    [makeId, colorCode, colorName, colorType, year, onSearch]
   );
 
   useEffect(() => {
@@ -92,7 +81,6 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef }: Search
   }, [onSubmitRef, handleSubmit]);
 
   function handleReset() {
-    setRegion("");
     setMakeId("");
     setColorCode("");
     setColorName("");
@@ -113,24 +101,6 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef }: Search
     <Box component="form" onSubmit={(e) => handleSubmit(e)}>
       {/* === 搜索条件：3×2 网格 === */}
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
-        {/* Region select */}
-        <TextField
-          select
-          label="产地"
-          value={region}
-          onChange={(e) => setRegion(e.target.value)}
-          size="small"
-          fullWidth
-          slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }}
-        >
-          <MenuItem value="">全部产地</MenuItem>
-          {regions.map((r) => (
-            <MenuItem key={r.code} value={r.code}>
-              {r.code}
-            </MenuItem>
-          ))}
-        </TextField>
-
         {/* Make select */}
         <TextField
           select

@@ -96,7 +96,7 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
         sx={{ mb: 1.5, p: 1.5, borderRadius: 1, bgcolor: "grey.50", flexWrap: "wrap", alignItems: "center" }}
       >
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, flex: 1, alignItems: "center" }}>
-          <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500 }}>
+          <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500, fontSize: "14px" }}>
             {t.volume}
           </Typography>
           <TextField
@@ -107,7 +107,7 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
             slotProps={{ htmlInput: { min: 0.1, step: 0.1 } }}
             sx={{ width: 90, "& input": { textAlign: "center", fontSize: FONT_SIZES.tiny } }}
           />
-          <Typography variant="caption" sx={{ color: "text.disabled" }}>×</Typography>
+          <Typography variant="caption" sx={{ color: "text.disabled", fontSize: "14px" }}>×</Typography>
           <TextField
             select
             value={unit}
@@ -119,7 +119,7 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
               <MenuItem key={u} value={u}>{u}</MenuItem>
             ))}
           </TextField>
-          <Typography variant="caption" sx={{ color: "text.secondary", ml: 1 }}>
+          <Typography variant="caption" sx={{ color: "text.secondary", ml: 1, fontSize: "14px" }}>
             = {totalGrams.toLocaleString()} g total
           </Typography>
         </Box>

@@ -162,7 +162,10 @@ export default function FormulasPanel() {
       notes: formula.notes,
       year: formula.year,
     });
-    setComponents(formula.components.map((c) => ({ ...c })));
+    setComponents(formula.components.map((c) => ({
+      ...c,
+      grams_per_100g: c.percentage,
+    })));
     setError("");
     setMessage("");
     setColorQuery("");
@@ -266,10 +269,10 @@ export default function FormulasPanel() {
       setError("配方 ID 和关联颜色不能为空");
       return;
     }
-    // 自动补齐 grams_per_100g
+    // 确保 grams_per_100g 始终从 percentage 派生
     const comps = components.map((c) => ({
       ...c,
-      grams_per_100g: c.grams_per_100g || c.percentage,
+      grams_per_100g: c.percentage,
     }));
     const payload: Formula = {
       ...form,
