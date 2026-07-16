@@ -62,17 +62,22 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
   const [volume, setVolume] = useState(1);
   const [unit, setUnit] = useState<Unit>("kg");
   const [weights, setWeights] = useState<number[]>([]);
+  const [isManualEdit, setIsManualEdit] = useState(false);
 
   const totalGrams = volume * UNIT_MULTIPLIER[unit];
 
   useEffect(() => {
-    const next = formula.components.map((c) => calcWeight(c.grams_per_100g, totalGrams));
-    setWeights(next);
-  }, [formula.id, totalGrams]);
+    if (!isManualEdit) {
+      const next = formula.components.map((c) => calcWeight(c.grams_per_100g, totalGrams));
+      setWeights(next);
+    }
+    setIsManualEdit(false);
+  }, [formula.id, totalGrams, isManualEdit]);
 
   function handleVolumeChange(raw: string) {
     const num = parsePositiveNumber(raw);
     if (num === null) return;
+    setIsManualEdit(false);
     setVolume(Math.max(0.1, Math.round(num * 10) / 10));
   }
 
@@ -96,6 +101,8 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
     // 确保被修改的色母使用精确值（避免四舍五入误差）
     next[idx] = num;
 
+    // 标记为手动编辑，防止useEffect覆盖
+    setIsManualEdit(true);
     setWeights(next);
 
     // 更新 Volume 以反映新的总量
