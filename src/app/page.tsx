@@ -43,18 +43,35 @@ export default function Home() {
     setHasSearched(true);
     loadData().then(({ colors, formulas, brands }) => {
       let filtered = colors;
+
+      // 按产地筛选品牌
+      if (params.region) {
+        const regionBrandIds = brands
+          .filter((b) => b.region === params.region)
+          .map((b) => b.id);
+        filtered = filtered.filter((c) => regionBrandIds.includes(c.make_id));
+      }
+
+      // 按品牌筛选
       if (params.make_id) filtered = filtered.filter((c) => c.make_id === params.make_id);
+
+      // 按颜色代码筛选
       if (params.color_code) {
         const code = params.color_code!.toUpperCase();
         filtered = filtered.filter((c) => c.color_code.toUpperCase().includes(code));
       }
+
+      // 按颜色名称筛选
       if (params.color_name) {
         const name = params.color_name!.toLowerCase();
         filtered = filtered.filter((c) => c.color_name.toLowerCase().includes(name));
       }
+
+      // 按颜色类型筛选
       if (params.color_type) filtered = filtered.filter((c) => c.color_type.toLowerCase() === params.color_type);
+
+      // 按年份筛选
       if (params.year) {
-        // 年份匹配：检查颜色的年份列表中是否包含搜索的年份
         const searchYear = parseInt(params.year, 10);
         if (!isNaN(searchYear)) {
           filtered = filtered.filter((c) =>

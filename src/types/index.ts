@@ -1,8 +1,13 @@
-﻿// 车辆品牌
+﻿// 产地/地区
+export interface Region {
+  code: string           // 产地代码，例如 "JPN"、"EUR"
+}
+
+// 车辆品牌
 export interface CarMake {
   id: string
   name: string          // 例如 "Toyota"、"BMW"
-  region: "JPN" | "EUR" | "USA" | "CHN" | "KOR"
+  region: string        // 产地代码，例如 "JPN"、"EUR"
 }
 
 // 颜色变体（同一颜色代码在不同批次/工厂可能有微小差异）
@@ -61,6 +66,7 @@ export interface Formula {
 
 // 搜索参数
 export interface SearchParams {
+  region?: string       // 产地筛选
   make_id?: string
   color_code?: string
   color_name?: string

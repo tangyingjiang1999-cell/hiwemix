@@ -205,7 +205,7 @@ export default function ColorsPanel() {
                 </TableCell>
                 <TableCell align="center" sx={{ py: 1.4, bgcolor: COLUMN_BG.odd }}>
                   <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center" }}>
-                    <IconButton onClick={() => openEdit(row)} size="small" sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(13,148,136,0.08)", color: "primary.main" } }}>
+                    <IconButton onClick={() => openEdit(row)} size="small" sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(36,135,202,0.08)", color: "primary.main" } }}>
                       <EditIcon fontSize="small" />
                     </IconButton>
                     <IconButton onClick={() => handleDelete(row)} size="small" sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(239,68,68,0.08)", color: "error.main" } }}>

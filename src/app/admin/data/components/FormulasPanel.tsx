@@ -437,7 +437,7 @@ export default function FormulasPanel() {
                               key={toner.code}
                               onMouseDown={() => { selectToner(globalIndex, toner); setTonerDropdownFor(null); }}
                               fullWidth
-                              sx={{ justifyContent: "flex-start", gap: 1, px: 1.5, py: 1, borderRadius: 0, fontSize: CELL_FONT_SIZE, fontFamily: FONT, textTransform: "none", "&:hover": { bgcolor: "rgba(13,148,136,0.06)" } }}
+                              sx={{ justifyContent: "flex-start", gap: 1, px: 1.5, py: 1, borderRadius: 0, fontSize: CELL_FONT_SIZE, fontFamily: FONT, textTransform: "none", "&:hover": { bgcolor: "rgba(36,135,202,0.06)" } }}
                             >
                               <Box sx={{ width: 32, height: 20, borderRadius: 0.5, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: toner.hex }} />
                               <Box component="span" sx={{ fontFamily: "monospace", color: "#1a1a1a", fontWeight: 500 }}>{toner.code}</Box>
@@ -532,9 +532,9 @@ export default function FormulasPanel() {
                 sx={{
                   display: "block", textAlign: "left", px: 2, py: 1.5, borderRadius: 0,
                   borderBottom: 1, borderColor: "grey.100", color: isSel ? "primary.main" : "text.primary",
-                  bgcolor: isSel ? "rgba(13,148,136,0.06)" : "transparent",
+                  bgcolor: isSel ? "rgba(36,135,202,0.06)" : "transparent",
                   fontWeight: isSel ? 600 : 400, fontSize: "0.8125rem", textTransform: "none",
-                  "&:hover": { bgcolor: isSel ? "rgba(13,148,136,0.08)" : "grey.50" },
+                  "&:hover": { bgcolor: isSel ? "rgba(36,135,202,0.08)" : "grey.50" },
                 }}
               >
                 <Box component="span" sx={{ display: "block" }}>{f.id}</Box>
@@ -579,8 +579,8 @@ export default function FormulasPanel() {
                       sx={{
                         justifyContent: "flex-start", gap: 1, px: 1, py: 1, borderRadius: 0,
                         fontSize: "0.75rem", textTransform: "none",
-                        bgcolor: c.id === form.color_id ? "rgba(13,148,136,0.08)" : "transparent",
-                        "&:hover": { bgcolor: "rgba(13,148,136,0.06)" },
+                        bgcolor: c.id === form.color_id ? "rgba(36,135,202,0.08)" : "transparent",
+                        "&:hover": { bgcolor: "rgba(36,135,202,0.06)" },
                       }}
                     >
                       <Box sx={{ width: 20, height: 16, borderRadius: 0.5, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: c.hex_preview }} />

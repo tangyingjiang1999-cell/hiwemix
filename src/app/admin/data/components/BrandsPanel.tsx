@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import type { CarMake } from "@/types";
+import type { CarMake, Region } from "@/types";
 import { generateBrandId } from "@/lib/id-generator";
 import { FONT, HEADER_BG, CELL_FONT_SIZE, COLUMN_BG, ROW_BG, HOVER_BG, HOVER_TRANSITION, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx, actionButtonSx, deleteButtonSx } from "@/components/admin-table-styles";
 import Box from "@mui/material/Box";
@@ -24,65 +24,161 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-
-const REGIONS = ["JPN", "EUR", "USA", "CHN", "KOR"] as const;
+import AddIcon from "@mui/icons-material/Add";
 
 export default function BrandsPanel() {
   const [brands, setBrands] = useState<CarMake[]>([]);
+  const [regions, setRegions] = useState<Region[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  const [showBrandModal, setShowBrandModal] = useState(false);
+  const [showRegionModal, setShowRegionModal] = useState(false);
   const [editing, setEditing] = useState<CarMake | null>(null);
-  const [form, setForm] = useState({ id: "", name: "", region: "JPN" as CarMake["region"] });
-  const [error, setError] = useState("");
+  const [brandForm, setBrandForm] = useState({ id: "", name: "", region: "" });
+  const [regionForm, setRegionForm] = useState({ code: "" });
+  const [brandError, setBrandError] = useState("");
+  const [regionError, setRegionError] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const idManuallyEdited = useRef(false);
 
-  useEffect(() => {
-    if (!editing && !idManuallyEdited.current && form.name) {
-      setForm((prev) => ({ ...prev, id: generateBrandId(form.name) }));
-    }
-  }, [form.name, editing]);
-
+  // Fetch brands
   const fetchBrands = useCallback(async () => {
     const res = await fetch("/api/admin/brands");
     if (res.ok) setBrands(await res.json());
     setLoading(false);
   }, []);
-  useEffect(() => { fetchBrands(); }, [fetchBrands]);
+
+  // Fetch regions
+  const fetchRegions = useCallback(async () => {
+    const res = await fetch("/api/admin/regions");
+    if (res.ok) {
+      const data: Region[] = await res.json();
+      setRegions(data);
+      // Set default region if not set
+      if (!brandForm.region && data.length > 0) {
+        setBrandForm((prev) => ({ ...prev, region: data[0].code }));
+      }
+    }
+  }, [brandForm.region]);
+
+  useEffect(() => {
+    fetchBrands();
+    fetchRegions();
+  }, [fetchBrands, fetchRegions]);
 
   useEffect(() => {
     setPage(0);
   }, [brands]);
 
-  function openCreate() {
-    setEditing(null); setForm({ id: "", name: "", region: "JPN" }); setError(""); idManuallyEdited.current = false; setShowModal(true);
+  // Auto-generate brand ID from name
+  useEffect(() => {
+    if (!editing && !idManuallyEdited.current && brandForm.name) {
+      setBrandForm((prev) => ({ ...prev, id: generateBrandId(brandForm.name) }));
+    }
+  }, [brandForm.name, editing]);
+
+  function openCreateBrand() {
+    setEditing(null);
+    setBrandForm({ id: "", name: "", region: regions[0]?.code || "JPN" });
+    setBrandError("");
+    idManuallyEdited.current = false;
+    setShowBrandModal(true);
   }
-  function openEdit(brand: CarMake) {
-    setEditing(brand); setForm({ id: brand.id, name: brand.name, region: brand.region }); setError(""); setShowModal(true);
+
+  function openEditBrand(brand: CarMake) {
+    setEditing(brand);
+    setBrandForm({ id: brand.id, name: brand.name, region: brand.region });
+    setBrandError("");
+    setShowBrandModal(true);
   }
-  async function handleSave() {
-    setError("");
-    if (!form.id || !form.name) { setError("ID 和名称不能为空"); return; }
-    const m = editing ? "PUT" : "POST";
-    const res = await fetch("/api/admin/brands", { method: m, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-    if (res.ok) { setShowModal(false); fetchBrands(); }
-    else { const d = await res.json(); setError(d.error || "保存失败"); }
+
+  function openCreateRegion() {
+    setRegionForm({ code: "" });
+    setRegionError("");
+    setShowRegionModal(true);
   }
-  async function handleDelete(brand: CarMake) {
+
+  async function handleSaveBrand() {
+    setBrandError("");
+    if (!brandForm.id || !brandForm.name) {
+      setBrandError("ID 和名称不能为空");
+      return;
+    }
+    const method = editing ? "PUT" : "POST";
+    const res = await fetch("/api/admin/brands", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(brandForm),
+    });
+    if (res.ok) {
+      setShowBrandModal(false);
+      fetchBrands();
+    } else {
+      const data = await res.json();
+      setBrandError(data.error || "保存失败");
+    }
+  }
+
+  async function handleDeleteBrand(brand: CarMake) {
     if (!confirm(`确定删除品牌「${brand.name}」吗？`)) return;
-    await fetch("/api/admin/brands", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: brand.id }) });
+    await fetch("/api/admin/brands", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: brand.id }),
+    });
     fetchBrands();
+  }
+
+  async function handleSaveRegion() {
+    setRegionError("");
+    if (!regionForm.code.trim()) {
+      setRegionError("产地代码不能为空");
+      return;
+    }
+    const res = await fetch("/api/admin/regions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(regionForm),
+    });
+    if (res.ok) {
+      setShowRegionModal(false);
+      fetchRegions();
+    } else {
+      const data = await res.json();
+      setRegionError(data.error || "保存失败");
+    }
+  }
+
+  async function handleDeleteRegion(code: string) {
+    if (!confirm(`确定删除产地「${code}」吗？`)) return;
+    const res = await fetch("/api/admin/regions", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    });
+    if (res.ok) {
+      fetchRegions();
+    } else {
+      const data = await res.json();
+      alert(data.error || "删除失败");
+    }
   }
 
   const pageRows = brands.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
     <Box>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1.5 }}>
-        <Button onClick={openCreate} variant="contained" size="small">+ 新增品牌</Button>
+      {/* Header with buttons */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mb: 1.5 }}>
+        <Button onClick={openCreateRegion} variant="outlined" size="small" startIcon={<AddIcon />}>
+          + 新增产地
+        </Button>
+        <Button onClick={openCreateBrand} variant="contained" size="small">
+          + 新增品牌
+        </Button>
       </Box>
 
+      {/* Brands table */}
       <TableContainer component={Paper} variant="outlined" sx={tableContainerSx}>
         <Table sx={tableSx}>
           <TableHead>
@@ -113,10 +209,10 @@ export default function BrandsPanel() {
                 </TableCell>
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
                   <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center" }}>
-                    <IconButton onClick={() => openEdit(brand)} size="small" sx={actionButtonSx}>
+                    <IconButton onClick={() => openEditBrand(brand)} size="small" sx={actionButtonSx}>
                       <EditIcon fontSize="small" />
                     </IconButton>
-                    <IconButton onClick={() => handleDelete(brand)} size="small" sx={deleteButtonSx}>
+                    <IconButton onClick={() => handleDeleteBrand(brand)} size="small" sx={deleteButtonSx}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </Box>
@@ -140,19 +236,116 @@ export default function BrandsPanel() {
         />
       </TableContainer>
 
-      <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="xs" fullWidth>
+      {/* Regions list */}
+      <Box sx={{ mt: 2, p: 1.5, border: "1px solid #E5E7EB", borderRadius: 1 }}>
+        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
+          已有产地：
+        </Typography>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+          {regions.map((region) => (
+            <Box
+              key={region.code}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+                px: 1.5,
+                py: 0.5,
+                bgcolor: "#F3F4F6",
+                borderRadius: 1,
+              }}
+            >
+              <Typography variant="body2">{region.code}</Typography>
+              <IconButton
+                size="small"
+                onClick={() => handleDeleteRegion(region.code)}
+                sx={{ ml: 0.5, "&:hover": { bgcolor: "rgba(239,68,68,0.1)" } }}
+              >
+                <DeleteIcon fontSize="small" sx={{ fontSize: 14, color: "#EF4444" }} />
+              </IconButton>
+            </Box>
+          ))}
+        </Box>
+      </Box>
+
+      {/* Brand creation/edit dialog */}
+      <Dialog open={showBrandModal} onClose={() => setShowBrandModal(false)} maxWidth="xs" fullWidth>
         <DialogTitle>{editing ? "编辑品牌" : "新增品牌"}</DialogTitle>
-        <DialogContent><Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
-          <TextField label="ID（自动生成）" value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} size="small" fullWidth />
-          <TextField label="名称" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} size="small" fullWidth />
-          <TextField select label="产地" value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value as CarMake["region"] })} size="small" fullWidth>
-            {REGIONS.map((r) => <MenuItem key={r} value={r}>{r}</MenuItem>)}
-          </TextField>
-          {error && <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{error}</Box>}
-        </Box></DialogContent>
+        <DialogContent>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
+            <TextField
+              label="ID（自动生成）"
+              value={brandForm.id}
+              onChange={(e) => {
+                idManuallyEdited.current = true;
+                setBrandForm({ ...brandForm, id: e.target.value });
+              }}
+              disabled={!!editing}
+              size="small"
+              fullWidth
+            />
+            <TextField
+              label="名称"
+              value={brandForm.name}
+              onChange={(e) => setBrandForm({ ...brandForm, name: e.target.value })}
+              size="small"
+              fullWidth
+            />
+            <TextField
+              select
+              label="产地"
+              value={brandForm.region}
+              onChange={(e) => setBrandForm({ ...brandForm, region: e.target.value })}
+              size="small"
+              fullWidth
+            >
+              {regions.map((r) => (
+                <MenuItem key={r.code} value={r.code}>
+                  {r.code}
+                </MenuItem>
+              ))}
+            </TextField>
+            {brandError && (
+              <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{brandError}</Box>
+            )}
+          </Box>
+        </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setShowModal(false)} variant="outlined">取消</Button>
-          <Button onClick={handleSave} variant="contained">保存</Button>
+          <Button onClick={() => setShowBrandModal(false)} variant="outlined">
+            取消
+          </Button>
+          <Button onClick={handleSaveBrand} variant="contained">
+            保存
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Region creation dialog */}
+      <Dialog open={showRegionModal} onClose={() => setShowRegionModal(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>新增产地</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
+            <TextField
+              label="产地代码"
+              value={regionForm.code}
+              onChange={(e) => setRegionForm({ ...regionForm, code: e.target.value.toUpperCase() })}
+              size="small"
+              fullWidth
+              placeholder="例如：SEA"
+              inputProps={{ maxLength: 10 }}
+            />
+            {regionError && (
+              <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{regionError}</Box>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setShowRegionModal(false)} variant="outlined">
+            取消
+          </Button>
+          <Button onClick={handleSaveRegion} variant="contained">
+            保存
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
