@@ -79,11 +79,28 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
   function handleWeightChange(idx: number, raw: string) {
     const num = parsePositiveNumber(raw);
     if (num === null) return;
-    setWeights((prev) => {
-      const next = [...prev];
-      next[idx] = num;
-      return next;
-    });
+
+    // 获取被修改色母的百分比
+    const changedPercentage = formula.components[idx].grams_per_100g;
+    if (changedPercentage <= 0) return;
+
+    // 根据新的重量和百分比计算新的总量
+    // newTotal = newWeight / (percentage / 100)
+    const newTotalGrams = Math.round((num / changedPercentage) * 100 * 10) / 10;
+
+    // 根据新的总量重新计算所有色母的重量
+    const next = formula.components.map((c) =>
+      calcWeight(c.grams_per_100g, newTotalGrams)
+    );
+
+    // 确保被修改的色母使用精确值（避免四舍五入误差）
+    next[idx] = num;
+
+    setWeights(next);
+
+    // 更新 Volume 以反映新的总量
+    const newVolume = newTotalGrams / UNIT_MULTIPLIER[unit];
+    setVolume(Math.round(newVolume * 10) / 10);
   }
 
   const totalWeight = weights.reduce((a, b) => a + b, 0);
