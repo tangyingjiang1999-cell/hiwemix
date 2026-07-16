@@ -194,9 +194,7 @@ export default function SearchResults({
                 {/* col 5: years (even) — hidden on mobile */}
                 <TableCell className="hide-on-mobile" sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
                   <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#9ca3af" }}>
-                    {row.color.years?.length
-                      ? row.color.years.join(", ")
-                      : "-"}
+                    {row.year ?? "—"}
                   </Typography>
                 </TableCell>
                 {/* col 6: Variants (odd) — hidden on mobile */}

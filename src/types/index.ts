@@ -87,6 +87,7 @@ export interface FormulaTableRow {
   formula: Formula
   variant: ColorVariant | undefined  // 通过 formula.variant_id 在 color.variants 中查找
   makeName: string                    // 通过 brands 解析 make_id -> name
+  year?: number                       // 展平后的单个年份
 }
 
 // 系统设置

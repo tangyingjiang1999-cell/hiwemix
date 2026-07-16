@@ -86,13 +86,17 @@ export default function Home() {
       const brandsMap = new Map(brands.map((b) => [b.id, b.name]));
       const rows: FormulaTableRow[] = [];
       for (const r of results) {
+        const colorYears = r.color.years && r.color.years.length > 0 ? r.color.years : [undefined];
         for (const f of r.formulas) {
-          rows.push({
-            color: r.color,
-            formula: f,
-            variant: r.color.variants.find((v) => v.id === f.variant_id),
-            makeName: brandsMap.get(r.color.make_id) ?? r.color.make_id,
-          });
+          for (const year of colorYears) {
+            rows.push({
+              color: r.color,
+              formula: f,
+              variant: r.color.variants.find((v) => v.id === f.variant_id),
+              makeName: brandsMap.get(r.color.make_id) ?? r.color.make_id,
+              year,
+            });
+          }
         }
       }
       setSearchResults(results);
