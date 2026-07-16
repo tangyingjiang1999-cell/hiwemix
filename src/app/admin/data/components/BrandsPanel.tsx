@@ -332,7 +332,7 @@ export default function BrandsPanel() {
               size="small"
               fullWidth
               placeholder="例如：SEA"
-              inputProps={{ maxLength: 10 }}
+              slotProps={{ htmlInput: { maxLength: 10 } }}
             />
             {regionError && (
               <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{regionError}</Box>
