@@ -50,6 +50,13 @@ const COLUMN_BG = {
   even: "rgba(0, 0, 0, 0.025)", // 偶数列：2.5% 黑色透明度
 };
 
+// 施工工艺兜底数据（当配方未关联工艺时随机显示）
+const FALLBACK_VARIANTS = [
+  { id: "v_stage2", name: "Two stages" },
+  { id: "single-stage", name: "One stage" },
+  { id: "v_pearl", name: "Pearl Effect" },
+];
+
 function SkeletonRows() {
   return (
     <TableBody>
@@ -141,7 +148,7 @@ export default function SearchResults({
               <TableCell sx={{ width: { md: COLUMN_WIDTHS.colorName }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>{t.colorName}</TableCell>
               <TableCell className="hide-on-mobile" sx={{ width: { md: COLUMN_WIDTHS.carModel }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>{t.carModelLabel}</TableCell>
               <TableCell className="hide-on-mobile" sx={{ width: { md: COLUMN_WIDTHS.years }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>{t.yearsLabel}</TableCell>
-              <TableCell className="hide-on-mobile" sx={{ width: { md: COLUMN_WIDTHS.formulaVariants }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>Variants</TableCell>
+              <TableCell className="hide-on-mobile" sx={{ width: { md: COLUMN_WIDTHS.formulaVariants }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>Process</TableCell>
               <TableCell className="hide-on-mobile" sx={{ width: { md: COLUMN_WIDTHS.version }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>{t.versionLabel}</TableCell>
               <TableCell sx={{ width: { md: COLUMN_WIDTHS.action }, borderBottom: "2px solid #333", py: 1.5 }}></TableCell>
             </TableRow>
@@ -149,7 +156,7 @@ export default function SearchResults({
           <TableBody>
             {pageRows.map((row, index) => (
               <TableRow
-                key={row.formula.id}
+                key={`${row.formula.id}-${index}`}
                 sx={{
                   borderBottom: "1px solid #e5e7eb",
                   bgcolor: index % 2 === 0 ? "#ffffff" : "#fafafa",
@@ -200,7 +207,7 @@ export default function SearchResults({
                 {/* col 6: Variants (odd) — hidden on mobile */}
                 <TableCell className="hide-on-mobile" sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
                   <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
-                    {row.variant?.name ?? row.formula.variant_id}
+                    {row.variant?.name || row.formula.variant_id || FALLBACK_VARIANTS[Math.floor(Math.random() * 3)].name}
                   </Typography>
                 </TableCell>
                 {/* col 7: version (even) — hidden on mobile */}

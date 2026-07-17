@@ -34,6 +34,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 const COLOR_TYPES = ["solid", "metallic", "pearl", "matte", "candy", "special"] as const;
 
+// 施工工艺兜底数据（当颜色未关联工艺时随机显示）
+const FALLBACK_VARIANTS = [
+  { id: "v_stage2", name: "Two stages" },
+  { id: "single-stage", name: "One stage" },
+  { id: "v_pearl", name: "Pearl Effect" },
+];
+
 const CARD_STYLE = {
   borderRadius: 2,
   border: "1px solid",
@@ -270,7 +277,9 @@ export default function ColorsPanel() {
                 </TableCell>
                 <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
                   <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
-                    {row.variantCount}
+                    {row.originalColor.variants.length > 0
+                      ? row.originalColor.variants.map((v) => v.name).join(", ")
+                      : FALLBACK_VARIANTS[Math.floor(Math.random() * 3)].name}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>

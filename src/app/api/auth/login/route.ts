@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { getUserByUsername } from "@/lib/db";
-import { verifyPassword } from "@/lib/auth-helpers";
+import { verifyPassword, initDefaultAdmin } from "@/lib/auth-helpers";
 
 export async function POST(req: NextRequest) {
   let username: string, password: string;
@@ -16,6 +16,9 @@ export async function POST(req: NextRequest) {
   if (!username || !password) {
     return NextResponse.json({ error: "用户名和密码不能为空" }, { status: 400 });
   }
+
+  // 确保默认管理员账号存在
+  await initDefaultAdmin();
 
   try {
     const user = await getUserByUsername(username);

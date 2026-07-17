@@ -205,10 +205,17 @@ export default function FormulasPanel() {
     setPctInputs({});
     setError("");
     setMessage("");
-    setColorQuery("");
+
+    // 回显关联颜色的显示文本
+    const color = colors.find((c) => c.id === formula.color_id);
+    if (color) {
+      const bName = brandMap.get(color.make_id) ?? color.make_id;
+      setColorQuery(`${color.color_code} - ${color.color_name} (${bName})`);
+    } else {
+      setColorQuery(formula.color_id);
+    }
 
     // 加载选中颜色的可用年份
-    const color = colors.find((c) => c.id === formula.color_id);
     setAvailableYears(color?.years || []);
   }
 
@@ -534,8 +541,8 @@ export default function FormulasPanel() {
                               sx={{ justifyContent: "flex-start", gap: 1, px: 1.5, py: 1, borderRadius: 0, fontSize: "0.8125rem", fontFamily: FONT, textTransform: "none", transition: "background-color 0.15s ease", "&:hover": { bgcolor: "rgba(59,130,246,0.06)" } }}
                             >
                               <Box sx={{ width: 32, height: 20, borderRadius: 0.5, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: toner.hex }} />
-                              <Box component="span" sx={{ fontFamily: "monospace", color: "#1a1a1a", fontWeight: 500 }}>{toner.code}</Box>
-                              <Box component="span" sx={{ color: "#374151" }}>{toner.tradeName}</Box>
+                              <Box component="span" sx={{ color: "#1a1a1a", fontWeight: 500 }}>{toner.code}</Box>
+                              <Box component="span" sx={{ fontWeight: 500, color: "#374151" }}>{toner.tradeName}</Box>
                             </Button>
                           ))}
                         </Paper>
@@ -720,9 +727,11 @@ export default function FormulasPanel() {
                   "&:hover": { bgcolor: isSel ? "rgba(36,135,202,0.08)" : "grey.50" },
                 }}
               >
-                <Box component="span" sx={{ display: "block" }}>{f.id}</Box>
-                <Box component="span" sx={{ display: "block", color: "text.disabled", fontSize: "0.75rem" }}>
+                <Box component="span" sx={{ display: "block", fontWeight: 700, fontFamily: FONT, color: "#111827" }}>
                   {colors.find((c) => c.id === f.color_id)?.color_code || f.color_id}
+                </Box>
+                <Box component="span" sx={{ display: "block", fontWeight: 500, fontFamily: FONT, color: "text.disabled", fontSize: "0.75rem" }}>
+                  {f.id}
                 </Box>
               </Button>
             );
@@ -760,7 +769,7 @@ export default function FormulasPanel() {
                   return (
                     <Button
                       key={c.id}
-                      onMouseDown={() => { setForm((prev) => ({ ...prev, color_id: c.id, year: undefined })); setColorQuery(""); setColorDropdownOpen(false); setAvailableYears(c.years || []); }}
+                      onMouseDown={() => { setForm((prev) => ({ ...prev, color_id: c.id, year: undefined })); setColorQuery(`${c.color_code} - ${c.color_name} (${brandName})`); setColorDropdownOpen(false); setAvailableYears(c.years || []); }}
                       fullWidth
                       sx={{
                         justifyContent: "flex-start", gap: 1, px: 1, py: 1, borderRadius: 0,
@@ -770,15 +779,14 @@ export default function FormulasPanel() {
                       }}
                     >
                       <Box sx={{ width: 20, height: 16, borderRadius: 0.5, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: c.hex_preview }} />
-                      <Box component="span" sx={{ fontFamily: "monospace", color: "text.primary", fontSize: "0.75rem" }}>{c.color_code}</Box>
-                      <Box component="span" sx={{ color: "text.secondary", fontSize: "0.75rem", overflow: "hidden", textOverflow: "ellipsis" }}>{c.color_name}</Box>
+                      <Box component="span" sx={{ fontWeight: 500, color: "text.primary", fontSize: "0.75rem" }}>{c.color_code}</Box>
+                      <Box component="span" sx={{ fontWeight: 500, color: "text.secondary", fontSize: "0.75rem", overflow: "hidden", textOverflow: "ellipsis" }}>{c.color_name}</Box>
                       <Box component="span" sx={{ ml: "auto", color: "text.disabled", fontSize: "0.6875rem" }}>{brandName}</Box>
                     </Button>
                   );
                 })}
               </Paper>
             )}
-            {selectedColor && <Box sx={{ mt: 0.25, color: "primary.main", fontSize: "0.6875rem", overflow: "hidden", textOverflow: "ellipsis" }}>{colorDisplay}</Box>}
           </Box>
           <TextField
             select
