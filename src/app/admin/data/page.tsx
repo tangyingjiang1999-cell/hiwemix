@@ -31,7 +31,7 @@ const DRAWER_WIDTH = 224;
 const TABS = [
   { key: "brands", label: "品牌", icon: <BarChartIcon /> },
   { key: "colors", label: "颜色", icon: <PaletteIcon /> },
-  { key: "variants", label: "施工工艺", icon: <GridViewIcon /> },
+  { key: "variants", label: "配方类型", icon: <GridViewIcon /> },
   { key: "formulas", label: "配方", icon: <ScienceIcon /> },
   { key: "guides", label: "指南", icon: <MenuBookIcon /> },
 ] as const;

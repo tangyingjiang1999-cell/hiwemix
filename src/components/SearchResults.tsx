@@ -50,13 +50,6 @@ const COLUMN_BG = {
   even: "rgba(0, 0, 0, 0.025)", // 偶数列：2.5% 黑色透明度
 };
 
-// 施工工艺兜底数据（当配方未关联工艺时随机显示）
-const FALLBACK_VARIANTS = [
-  { id: "v_stage2", name: "Two stages" },
-  { id: "single-stage", name: "One stage" },
-  { id: "v_pearl", name: "Pearl Effect" },
-];
-
 function SkeletonRows() {
   return (
     <TableBody>
@@ -204,10 +197,10 @@ export default function SearchResults({
                     {row.year ?? "—"}
                   </Typography>
                 </TableCell>
-                {/* col 6: Variants (odd) — hidden on mobile */}
+                {/* col 6: Process (odd) — 配方类型，隐藏在移动端 */}
                 <TableCell className="hide-on-mobile" sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
                   <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
-                    {row.variant?.name || row.formula.variant_id || FALLBACK_VARIANTS[Math.floor(Math.random() * 3)].name}
+                    {row.formula.formula_type}
                   </Typography>
                 </TableCell>
                 {/* col 7: version (even) — hidden on mobile */}

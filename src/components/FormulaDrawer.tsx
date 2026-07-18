@@ -55,8 +55,7 @@ function formatFormulaAsText(result: SearchResult, activeFormula: Formula, makeN
   lines.push(`Color Code: ${result.color.color_code}`);
   lines.push(`Make: ${makeName}`);
   lines.push(`Type: ${result.color.color_type}`);
-  const v = result.color.variants.find((x) => x.id === activeFormula.variant_id);
-  lines.push(`Variant: ${v?.name ?? activeFormula.variant_id}`);
+  lines.push(`Process: ${activeFormula.formula_type}`);
   lines.push(`Paint System: ${activeFormula.paint_system}`);
   lines.push(`Formula Type: ${activeFormula.formula_type}`);
   lines.push(`Version: ${activeFormula.version}`);
@@ -259,7 +258,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                   <InfoRow label={t.colorName} value={color.color_name} />
                   <InfoRow label={t.carModelLabel} value={color.car_model || "-"} />
                   <InfoRow label={t.yearsLabel} value={currentYear} />
-                  <InfoRow label={t.processLabel} value={color.color_type} />
+                  <InfoRow label={t.processLabel} value={activeFormula?.formula_type || "-"} />
                   <InfoRow label={t.versionLabel} value={activeFormula?.version || "-"} />
                 </Stack>
               )}

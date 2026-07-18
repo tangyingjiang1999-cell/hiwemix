@@ -26,9 +26,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 
 const PAINT_SYSTEMS = ["1K", "2K"] as const;
-const FORMULA_TYPES: FormulaType[] = ["Single Stage", "Two Stages", "Pearl Paint"];
 const AUTO_2K_TYPE: FormulaType = "Single Stage";
-const MANUAL_1K_TYPES: FormulaType[] = ["Two Stages", "Pearl Paint"];
 const PEARL_GROUPS: ComponentGroup[] = ["Pearl Paint", "Ground Paint"];
 
 const EMPTY_COMPONENT: FormulaComponent = {
@@ -81,14 +79,13 @@ function matchingColors(query: string, colors: Color[], brands: CarMake[]): Colo
 export default function FormulasPanel() {
   const [formulas, setFormulas] = useState<Formula[]>([]);
   const [colors, setColors] = useState<Color[]>([]);
-  const [variants, setVariants] = useState<ColorVariant[]>([]);
+  const [formulaTypes, setFormulaTypes] = useState<ColorVariant[]>([]);
   const [brands, setBrands] = useState<CarMake[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [form, setForm] = useState({
     id: "",
     color_id: "",
-    variant_id: "",
     version: "v1",
     paint_system: "2K" as Formula["paint_system"],
     formula_type: AUTO_2K_TYPE,
@@ -160,15 +157,15 @@ export default function FormulasPanel() {
     tonerBlurRef.current = setTimeout(() => setTonerDropdownFor(null), 150);
   }
 
-  // 新建时：颜色 + 变体 + 版本变化自动生成 ID
+  // 新建时：颜色 + 版本变化自动生成 ID
   useEffect(() => {
     if (!selectedId && !idManuallyEdited.current && form.color_id && form.version) {
       setForm((prev) => ({
         ...prev,
-        id: generateFormulaId(form.color_id, form.variant_id, form.version),
+        id: generateFormulaId(form.color_id, "", form.version),
       }));
     }
-  }, [form.color_id, form.variant_id, form.version, selectedId]);
+  }, [form.color_id, form.version, selectedId]);
 
   const fetchFormulas = useCallback(async () => {
     try {
@@ -182,7 +179,7 @@ export default function FormulasPanel() {
     const ctrl = new AbortController();
     fetchFormulas();
     fetch("/api/admin/colors", { signal: ctrl.signal }).then((r) => r.ok ? r.json() : []).then(setColors).catch(() => {});
-    fetch("/api/admin/variants", { signal: ctrl.signal }).then((r) => r.ok ? r.json() : []).then(setVariants).catch(() => {});
+    fetch("/api/admin/variants", { signal: ctrl.signal }).then((r) => r.ok ? r.json() : []).then(setFormulaTypes).catch(() => {});
     fetch("/api/admin/brands", { signal: ctrl.signal }).then((r) => r.ok ? r.json() : []).then(setBrands).catch(() => {});
     return () => ctrl.abort();
   }, [fetchFormulas]);
@@ -192,7 +189,6 @@ export default function FormulasPanel() {
     setForm({
       id: formula.id,
       color_id: formula.color_id,
-      variant_id: formula.variant_id || "",
       version: formula.version,
       paint_system: formula.paint_system,
       formula_type: formula.formula_type,
@@ -225,7 +221,6 @@ export default function FormulasPanel() {
     setForm({
       id: "",
       color_id: "",
-      variant_id: "",
       version: "v1",
       paint_system: "2K",
       formula_type: AUTO_2K_TYPE,
@@ -243,7 +238,14 @@ export default function FormulasPanel() {
 
   function handlePaintSystemChange(next: "1K" | "2K") {
     setForm((prev) => {
-      const nextType = next === "2K" ? AUTO_2K_TYPE : prev.formula_type;
+      if (next === "2K") {
+        return { ...prev, paint_system: next, formula_type: AUTO_2K_TYPE };
+      }
+      // 1K：如果当前类型是 Single Stage，切换到动态类型列表的第一个非 Single Stage 项
+      const availableTypes = formulaTypes.map((v) => v.name).filter((n) => n !== "Single Stage") as FormulaType[];
+      const nextType = availableTypes.includes(prev.formula_type as FormulaType)
+        ? prev.formula_type
+        : (availableTypes[0] || AUTO_2K_TYPE);
       return { ...prev, paint_system: next, formula_type: nextType };
     });
     // 切换体系时清空所有已选色母，避免数据不一致
@@ -345,7 +347,7 @@ export default function FormulasPanel() {
     }));
     const payload: Formula = {
       ...form,
-      variant_id: form.variant_id || "",
+      variant_id: "",
       components: comps,
       updated_at: "",
       year: form.year,
@@ -847,10 +849,6 @@ export default function FormulasPanel() {
               <MenuItem key={y} value={y}>{y}</MenuItem>
             ))}
           </TextField>
-          <TextField select label="施工工艺（可选）" value={form.variant_id} onChange={(e) => setForm({ ...form, variant_id: e.target.value })} size="small" fullWidth>
-            <MenuItem value="">无</MenuItem>
-            {variants.map((v) => <MenuItem key={v.id} value={v.id}>{v.name} ({v.year_range})</MenuItem>)}
-          </TextField>
           <TextField label="版本" value={form.version} onChange={(e) => setForm({ ...form, version: e.target.value })} size="small" fullWidth />
           <TextField select label="体系" value={form.paint_system} onChange={(e) => handlePaintSystemChange(e.target.value as Formula["paint_system"])} size="small" fullWidth>
             {PAINT_SYSTEMS.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
@@ -859,7 +857,10 @@ export default function FormulasPanel() {
             onChange={(e) => handleFormulaTypeChange(e.target.value as FormulaType)}
             disabled={form.paint_system === "2K"} size="small" fullWidth
           >
-            {(form.paint_system === "2K" ? [AUTO_2K_TYPE] : MANUAL_1K_TYPES).map((t) => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+            {(form.paint_system === "2K"
+              ? [AUTO_2K_TYPE]
+              : formulaTypes.map((v) => v.name).filter((n) => n !== "Single Stage")
+            ).map((t) => <MenuItem key={t} value={t}>{t}</MenuItem>)}
           </TextField>
         </Box>
         <TextField label="施工备注" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} size="small" multiline rows={2} fullWidth sx={{ mt: 2 }} />

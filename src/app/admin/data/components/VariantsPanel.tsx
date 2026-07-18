@@ -52,14 +52,14 @@ export default function VariantsPanel() {
       if (r.ok) { setShowModal(false); fetchVariants(); } else { const d = await r.json(); setError(d.error || "保存失败"); }
     } catch { setError("网络错误，请重试"); }
   }
-  async function handleDelete(v: ColorVariant) { if (!confirm(`确定删除变体「${v.name}」吗？`)) return; try { await fetch("/api/admin/variants", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: v.id }) }); fetchVariants(); } catch { /* network error */ } }
+  async function handleDelete(v: ColorVariant) { if (!confirm(`确定删除配方类型「${v.name}」吗？`)) return; try { await fetch("/api/admin/variants", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: v.id }) }); fetchVariants(); } catch { /* network error */ } }
 
   const pageRows = variants.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
     <Box>
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1.5 }}>
-        <Button onClick={openCreate} variant="contained" size="small">+ 新增工艺</Button>
+        <Button onClick={openCreate} variant="contained" size="small">+ 新增配方类型</Button>
       </Box>
 
       <TableContainer component={Paper} variant="outlined" sx={tableContainerSx}>
@@ -113,7 +113,7 @@ export default function VariantsPanel() {
         />
       </TableContainer>
       <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>{editing ? "编辑工艺" : "新增工艺"}</DialogTitle>
+        <DialogTitle>{editing ? "编辑配方类型" : "新增配方类型"}</DialogTitle>
         <DialogContent><Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
           <TextField label="ID" value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} size="small" fullWidth />
           <TextField label="名称" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} size="small" fullWidth />

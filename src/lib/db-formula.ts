@@ -27,11 +27,11 @@ export async function getBrands(): Promise<CarMake[]> {
   return (data ?? []) as CarMake[];
 }
 
-// ====== Color Variants ======
+// ====== Formula Types ======
 
-export async function getVariants(): Promise<ColorVariant[]> {
+export async function getFormulaTypes(): Promise<ColorVariant[]> {
   const { data, error } = await supabase
-    .from("color_variants")
+    .from("formula_types")
     .select("*")
     .order("name", { ascending: true });
   if (error) throw error;
@@ -204,11 +204,11 @@ export async function deleteBrand(id: string): Promise<void> {
   if (error) throw error;
 }
 
-// --- Color Variants ---
+// --- Formula Types ---
 
-export async function saveVariant(variant: ColorVariant): Promise<ColorVariant> {
+export async function saveFormulaType(variant: ColorVariant): Promise<ColorVariant> {
   const { data, error } = await supabaseAdmin
-    .from("color_variants")
+    .from("formula_types")
     .upsert({ id: variant.id, name: variant.name, year_range: variant.year_range })
     .select()
     .single();
@@ -216,8 +216,8 @@ export async function saveVariant(variant: ColorVariant): Promise<ColorVariant> 
   return data as ColorVariant;
 }
 
-export async function deleteVariant(id: string): Promise<void> {
-  const { error } = await supabaseAdmin.from("color_variants").delete().eq("id", id);
+export async function deleteFormulaType(id: string): Promise<void> {
+  const { error } = await supabaseAdmin.from("formula_types").delete().eq("id", id);
   if (error) throw error;
 }
 
