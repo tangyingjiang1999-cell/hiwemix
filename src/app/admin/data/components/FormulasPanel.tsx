@@ -104,7 +104,7 @@ export default function FormulasPanel() {
 
   // 计算百分比总和（按组件组或全部）
   const percentageSums = useMemo(() => {
-    if (form.formula_type === "Pearl Paint") {
+    if (form.formula_type === "Three Stages") {
       return {
         "Pearl Paint": components
           .filter((c) => c.component_group === "Pearl Paint")
@@ -120,7 +120,7 @@ export default function FormulasPanel() {
   // 百分比是否全部合法（总和=100%）
   const percentageValid = useMemo(() => {
     if (components.length === 0) return false;
-    if (form.formula_type === "Pearl Paint") {
+    if (form.formula_type === "Three Stages") {
       const sums = percentageSums as Record<ComponentGroup, number>;
       return Math.abs((sums["Pearl Paint"] ?? 0) - 100) < 0.01
         && Math.abs((sums["Ground Paint"] ?? 0) - 100) < 0.01;
@@ -184,6 +184,11 @@ export default function FormulasPanel() {
     return () => ctrl.abort();
   }, [fetchFormulas]);
 
+  // 旧数据兼容：将已更名的配方类型映射到新名称
+  const LEGACY_FORMULA_TYPE_MAP: Record<string, FormulaType> = {
+    "Pearl Paint": "Three Stages",
+  };
+
   function selectFormula(formula: Formula) {
     setSelectedId(formula.id);
     setForm({
@@ -191,7 +196,7 @@ export default function FormulasPanel() {
       color_id: formula.color_id,
       version: formula.version,
       paint_system: formula.paint_system,
-      formula_type: formula.formula_type,
+      formula_type: LEGACY_FORMULA_TYPE_MAP[formula.formula_type] ?? formula.formula_type,
       notes: formula.notes,
       year: formula.year,
     });
@@ -273,7 +278,7 @@ export default function FormulasPanel() {
 
   function handleFormulaTypeChange(next: FormulaType) {
     setForm((prev) => ({ ...prev, formula_type: next }));
-    if (next !== "Pearl Paint") {
+    if (next !== "Three Stages") {
       setComponents((prev) =>
         prev.map((c) => {
           const { component_group: _, ...rest } = c;
@@ -866,7 +871,7 @@ export default function FormulasPanel() {
         <TextField label="施工备注" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} size="small" multiline rows={2} fullWidth sx={{ mt: 2 }} />
 
         {/* 色母组件表 */}
-        {form.formula_type === "Pearl Paint" ? (
+        {form.formula_type === "Three Stages" ? (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
             {PEARL_GROUPS.map((g) => renderComponentTable(g))}
           </Box>

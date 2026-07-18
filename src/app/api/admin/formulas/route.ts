@@ -7,16 +7,16 @@ function validateFormula(body: Formula): string | null {
   if (body.paint_system === "2K" && body.formula_type !== "Single Stage") {
     return "2K 体系只能使用 Single Stage";
   }
-  if (body.paint_system === "1K" && !["Two Stages", "Pearl Paint"].includes(body.formula_type)) {
-    return "1K 体系只能选择 Two Stages 或 Pearl Paint";
+  if (body.paint_system === "1K" && !["Two Stages", "Three Stages"].includes(body.formula_type)) {
+    return "1K 体系只能选择 Two Stages 或 Three Stages";
   }
-  if (body.formula_type !== "Pearl Paint") {
+  if (body.formula_type !== "Three Stages") {
     const hasGroup = body.components.some((c) => c.component_group != null);
-    if (hasGroup) return "非 Pearl Paint 配方不能设置 component_group";
+    if (hasGroup) return "非 Three Stages 配方不能设置 component_group";
   }
-  if (body.formula_type === "Pearl Paint") {
+  if (body.formula_type === "Three Stages") {
     const missingGroup = body.components.some((c) => c.component_group == null);
-    if (missingGroup) return "Pearl Paint 配方的每个色母都必须选择分组";
+    if (missingGroup) return "Three Stages 配方的每个色母都必须选择分组";
     const pearlComps = body.components.filter(c => c.component_group === "Pearl Paint");
     const groundComps = body.components.filter(c => c.component_group === "Ground Paint");
     const pearlSum = pearlComps.reduce((sum, c) => sum + c.percentage, 0);

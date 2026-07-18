@@ -31,7 +31,7 @@ export interface Color {
 }
 
 // 配方类型
-export type FormulaType = "Single Stage" | "Two Stages" | "Pearl Paint";
+export type FormulaType = "Single Stage" | "Two Stages" | "Three Stages";
 
 // Pearl Paint 分组
 export type ComponentGroup = "Pearl Paint" | "Ground Paint";

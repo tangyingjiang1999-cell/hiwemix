@@ -55,13 +55,13 @@ function formatFormulaAsText(result: SearchResult, activeFormula: Formula, makeN
   lines.push(`Color Code: ${result.color.color_code}`);
   lines.push(`Make: ${makeName}`);
   lines.push(`Type: ${result.color.color_type}`);
-  lines.push(`Process: ${activeFormula.formula_type}`);
+  lines.push(`Process: ${displayFormulaType(activeFormula.formula_type)}`);
   lines.push(`Paint System: ${activeFormula.paint_system}`);
   lines.push(`Formula Type: ${activeFormula.formula_type}`);
   lines.push(`Version: ${activeFormula.version}`);
   lines.push("-".repeat(50));
 
-  if (activeFormula.formula_type === "Pearl Paint") {
+  if (activeFormula.formula_type === "Three Stages" || (activeFormula.formula_type as string) === "Pearl Paint") {
     lines.push("[Pearl Paint]");
     lines.push(...formatComponents(activeFormula.components.filter((c) => c.component_group === "Pearl Paint")));
     lines.push("");
@@ -78,6 +78,15 @@ function formatFormulaAsText(result: SearchResult, activeFormula: Formula, makeN
 }
 
 const HEX_RE = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+
+// 配方类型显示名称映射（兼容旧数据）
+const FORMULA_TYPE_DISPLAY: Record<string, string> = {
+  "Pearl Paint": "Three Stages",
+};
+
+function displayFormulaType(type: string): string {
+  return FORMULA_TYPE_DISPLAY[type] ?? type;
+}
 function parseHexInput(raw: string, fallback: string): string {
   const t = raw.trim();
   if (!HEX_RE.test(t)) return fallback;
@@ -131,7 +140,9 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
   const previewColor = parseHexInput(hexInput, color.hex_preview);
 
   let displayedFormula: Formula | null = activeFormula ?? null;
-  if (activeFormula && activeFormula.formula_type === "Pearl Paint") {
+  // 兼容旧数据："Pearl Paint" 已更名为 "Three Stages"
+  const isGroupedType = activeFormula?.formula_type === "Three Stages" || (activeFormula?.formula_type as string) === "Pearl Paint";
+  if (activeFormula && isGroupedType) {
     displayedFormula = {
       ...activeFormula,
       components: activeFormula.components.filter((c) => c.component_group === activeGroup),
@@ -200,7 +211,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                   <Chip label={activeFormula?.paint_system} size="small"
                     sx={{ fontWeight: 600, fontSize: "0.75rem",
                       ...(activeFormula?.paint_system === "2K" ? { bgcolor: "#DBEAFE", color: "#1D4ED8" } : { bgcolor: "#D1FAE5", color: "#047857" }) }} />
-                  <Chip label={activeFormula?.formula_type} size="small"
+                  <Chip label={displayFormulaType(activeFormula?.formula_type ?? "")} size="small"
                     sx={{ fontWeight: 600, fontSize: "0.75rem", bgcolor: "#FEF3C7", color: "#92400E" }} />
                 </Stack>
 
@@ -258,7 +269,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                   <InfoRow label={t.colorName} value={color.color_name} />
                   <InfoRow label={t.carModelLabel} value={color.car_model || "-"} />
                   <InfoRow label={t.yearsLabel} value={currentYear} />
-                  <InfoRow label={t.processLabel} value={activeFormula?.formula_type || "-"} />
+                  <InfoRow label={t.processLabel} value={displayFormulaType(activeFormula?.formula_type || "-")} />
                   <InfoRow label={t.versionLabel} value={activeFormula?.version || "-"} />
                 </Stack>
               )}

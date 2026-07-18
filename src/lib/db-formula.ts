@@ -11,7 +11,7 @@ import type {
 
 const DEFAULT_SETTINGS: AppSettings = {
   finishes: ["Solid", "Metallic", "Pearl", "Matte", "Candy"],
-  types: ["Single Stage", "Two Stages", "Pearl Paint"],
+  types: ["Single Stage", "Two Stages", "Three Stages"],
   yearMin: 1990,
   yearMax: 2026,
 };

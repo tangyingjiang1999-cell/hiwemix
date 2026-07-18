@@ -149,8 +149,8 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
           </Typography>
         </Box>
 
-        {/* Pearl Paint/Ground Paint 切换按钮 */}
-        {showGroupToggle && formula.formula_type === "Pearl Paint" && (
+        {/* Pearl Paint/Ground Paint 切换按钮（兼容旧数据 "Pearl Paint"） */}
+        {showGroupToggle && (formula.formula_type === "Three Stages" || (formula.formula_type as string) === "Pearl Paint") && (
           <Stack direction="row" spacing={0.5} sx={{ flexShrink: 0 }}>
             {(["Pearl Paint", "Ground Paint"] as ComponentGroup[]).map((g) => (
               <Chip
