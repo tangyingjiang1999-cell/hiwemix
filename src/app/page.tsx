@@ -125,9 +125,13 @@ export default function Home() {
         formulas: formulas.filter((f) => f.color_id === color.id),
       }));
       const brandsMap = new Map(brands.map((b) => [b.id, b.name]));
+      const searchYear = params.year ? parseInt(params.year, 10) : undefined;
       const rows: FormulaTableRow[] = [];
       for (const r of results) {
-        const colorYears = r.color.years && r.color.years.length > 0 ? r.color.years : [undefined];
+        // 精确年份搜索时只展开展示匹配的年份，否则展示全部年份
+        const colorYears = searchYear && !isNaN(searchYear)
+          ? [searchYear]
+          : r.color.years && r.color.years.length > 0 ? r.color.years : [undefined];
         for (const f of r.formulas) {
           for (const year of colorYears) {
             rows.push({
