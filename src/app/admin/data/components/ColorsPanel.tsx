@@ -34,13 +34,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 
 const COLOR_TYPES = ["solid", "metallic", "pearl", "matte", "candy", "special"] as const;
 
-// 施工工艺兜底数据（当颜色未关联工艺时随机显示）
-const FALLBACK_VARIANTS = [
-  { id: "v_stage2", name: "Two stages" },
-  { id: "single-stage", name: "One stage" },
-  { id: "v_pearl", name: "Pearl Effect" },
-];
-
 const CARD_STYLE = {
   borderRadius: 2,
   border: "1px solid",
@@ -64,7 +57,6 @@ const COLUMN_WIDTHS = {
   carModel: 120,
   brand: 120,
   colorType: 80,
-  variantCount: 70,
   yearCount: 80,
   actions: 100,
 };
@@ -85,7 +77,6 @@ interface ExpandedColorRow {
   hex_preview: string;
   car_model?: string;
   brandName: string;
-  variantCount: number;
   yearCount: number;
   /** 原始 Color 对象引用（用于编辑/删除操作） */
   originalColor: Color;
@@ -181,7 +172,6 @@ export default function ColorsPanel() {
         hex_preview: c.hex_preview,
         car_model: c.car_model,
         brandName,
-        variantCount: c.variants.length,
         yearCount: 0,
         originalColor: c,
       }];
@@ -199,7 +189,6 @@ export default function ColorsPanel() {
       hex_preview: c.hex_preview,
       car_model: c.car_model,
       brandName,
-      variantCount: c.variants.length,
       yearCount: sortedYears.length,
       originalColor: c,
     }));
@@ -215,8 +204,6 @@ export default function ColorsPanel() {
       if (row.car_model?.toLowerCase().includes(q)) return true;
       if (row.brandName.toLowerCase().includes(q)) return true;
       if (row.color_type.toLowerCase().includes(q)) return true;
-      const variantNames = row.originalColor.variants.map((v) => v.name).join(" ").toLowerCase();
-      if (variantNames.includes(q)) return true;
       if (row.year !== undefined && String(row.year).includes(q)) return true;
       return false;
     });
@@ -280,7 +267,6 @@ export default function ColorsPanel() {
               <TableCell sx={{ width: COLUMN_WIDTHS.carModel, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>车型</TableCell>
               <TableCell sx={{ width: COLUMN_WIDTHS.brand, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>品牌</TableCell>
               <TableCell sx={{ width: COLUMN_WIDTHS.colorType, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>类型</TableCell>
-              <TableCell sx={{ width: COLUMN_WIDTHS.variantCount, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>工艺</TableCell>
               <TableCell sx={{ width: COLUMN_WIDTHS.yearCount, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "2px solid #333", py: 1.5, textAlign: "center" }}>年份</TableCell>
               <TableCell sx={{ width: COLUMN_WIDTHS.actions, borderBottom: "2px solid #333", py: 1.5 }}></TableCell>
             </TableRow>
@@ -323,13 +309,6 @@ export default function ColorsPanel() {
                 <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
                   <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
                     {row.color_type}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
-                  <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
-                    {row.originalColor.variants.length > 0
-                      ? row.originalColor.variants.map((v) => v.name).join(", ")
-                      : FALLBACK_VARIANTS[Math.floor(Math.random() * 3)].name}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
