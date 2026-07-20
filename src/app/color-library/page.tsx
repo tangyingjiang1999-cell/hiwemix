@@ -631,13 +631,15 @@ function ManagementModal({
         </DialogTitle>
         <DialogContent sx={{ pt: 4, pb: 1 }}>
           <Stack spacing={2}>
-            <TextField
-              label="色母代码"
-              value={editingItem?.code}
-              disabled
-              size="small"
-              fullWidth
-/>
+            {/* 色母代码仅做标识，不可编辑 */}
+            <Box sx={{ mt: 1 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: "block", fontWeight: 500 }}>
+                色母代码
+              </Typography>
+              <Typography variant="body1" sx={{ fontWeight: 700, fontSize: "1rem", color: "#1a1a1a" }}>
+                {editingItem?.code}
+              </Typography>
+            </Box>
             <TextField
               label="英文商品名"
               value={form.tradeName}
