@@ -261,7 +261,7 @@ export async function saveColor(
       const { error: syncErr } = await supabaseAdmin
         .from("color_variants")
         .upsert({ id: vid, name: vid, year_range: "" });
-      if (syncErr) throw new Error(syncErr.message || JSON.stringify(syncErr));
+      if (syncErr) throw new Error("sync color_variants failed: " + syncErr.message);
     }
   }
 
