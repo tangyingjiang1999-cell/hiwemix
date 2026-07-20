@@ -107,7 +107,7 @@ export interface GuideCategory {
 }
 
 // 色母分类
-export type TonerCategory = "2K_BASECOAT" | "1K_BASECOAT" | "1K_SILVER_BASECOAT" | "1K_PEARL_BASECOAT";
+export type TonerCategory = "2K_BASECOAT" | "1K_BASECOAT" | "1K_SILVER_BASECOAT" | "1K_PEARL_BASECOAT" | "SUPPLEMENTARY";
 
 // 色母
 export interface Toner {

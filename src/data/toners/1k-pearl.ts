@@ -1,0 +1,43 @@
+// 1K Pearl Basecoat 色母 — 36 条
+import type { Toner } from '@/types';
+
+const toners1kPearl: Toner[] = [
+  { code: '1K-5001', tradeName: 'Fine White pearl', nameZh: '细白珍珠', category: '1K_PEARL_BASECOAT', hex: '#FFF5EE' },
+  { code: '1K-5002', tradeName: 'super white pearl', nameZh: '超白珍珠', category: '1K_PEARL_BASECOAT', hex: '#FFF8F0' },
+  { code: '1K-5003', tradeName: 'Yellow and white resistant  pearl', nameZh: '耐黄变超白珍珠', category: '1K_PEARL_BASECOAT', hex: '#FFFFF0' },
+  { code: '1K-5004', tradeName: 'Coarse white pearl', nameZh: '粗白珍珠', category: '1K_PEARL_BASECOAT', hex: '#F5F0E8' },
+  { code: '1K-5005', tradeName: 'Red Pearl', nameZh: '红珍珠', category: '1K_PEARL_BASECOAT', hex: '#FF69B4' },
+  { code: '1K-5006', tradeName: 'Transparent Red Pearl', nameZh: '干涉红珍珠', category: '1K_PEARL_BASECOAT', hex: '#FF4080' },
+  { code: '1K-5007', tradeName: 'Crystal Purple Pearl', nameZh: '水晶紫珍珠', category: '1K_PEARL_BASECOAT', hex: '#DDA0DD' },
+  { code: '1K-5008', tradeName: 'Bright Red Pearl', nameZh: '艳光红珍珠', category: '1K_PEARL_BASECOAT', hex: '#FF3366' },
+  { code: '1K-5009', tradeName: 'Orange Red Pearl', nameZh: '橙红珍珠', category: '1K_PEARL_BASECOAT', hex: '#FF6B6B' },
+  { code: '1K-5010', tradeName: 'Golden Yellow Pearl', nameZh: '黄金珍珠', category: '1K_PEARL_BASECOAT', hex: '#FFD700' },
+  { code: '1K-5011', tradeName: 'Golden Yellow Pearl (green phase)', nameZh: '黄金珍珠（绿相）', category: '1K_PEARL_BASECOAT', hex: '#9ACD32' },
+  { code: '1K-5012', tradeName: 'Gold pearl', nameZh: '干涉金黄珍珠', category: '1K_PEARL_BASECOAT', hex: '#FFC125' },
+  { code: '1K-5013', tradeName: 'Green Pearl', nameZh: '绿珍珠', category: '1K_PEARL_BASECOAT', hex: '#98FF98' },
+  { code: '1K-5014', tradeName: 'Fine Green Pearl', nameZh: '细绿珍珠', category: '1K_PEARL_BASECOAT', hex: '#98FF98' },
+  { code: '1K-5015', tradeName: 'Blue Pearl', nameZh: '蓝珍珠', category: '1K_PEARL_BASECOAT', hex: '#87CEEB' },
+  { code: '1K-5016', tradeName: 'Fine Blue Pearl', nameZh: '细蓝珍珠', category: '1K_PEARL_BASECOAT', hex: '#87CEEB' },
+  { code: '1K-5017', tradeName: 'Blue Bright Silver', nameZh: '蓝闪银', category: '1K_PEARL_BASECOAT', hex: '#B0C4DE' },
+  { code: '1K-5018', tradeName: 'Purple pearl', nameZh: '紫珍珠', category: '1K_PEARL_BASECOAT', hex: '#D8BFD8' },
+  { code: '1K-5019', tradeName: 'Copper pearl', nameZh: '铜珍珠', category: '1K_PEARL_BASECOAT', hex: '#CD7F32' },
+  { code: '1K-5020', tradeName: 'Fine copper pearl', nameZh: '细铜珍珠', category: '1K_PEARL_BASECOAT', hex: '#CD7F32' },
+  { code: '1K-5021', tradeName: 'Middle Red Silver', nameZh: '红中银', category: '1K_PEARL_BASECOAT', hex: '#FF9999' },
+  { code: '1K-5022', tradeName: 'Gold Bright Silver', nameZh: '金棕银', category: '1K_PEARL_BASECOAT', hex: '#C5A35A' },
+  { code: '1K-5023', tradeName: 'Orange Red Silver', nameZh: '橙红银', category: '1K_PEARL_BASECOAT', hex: '#FF8855' },
+  { code: '1K-5024', tradeName: 'Crystal Green pearl', nameZh: '水晶绿珍珠', category: '1K_PEARL_BASECOAT', hex: '#7CCD7C' },
+  { code: '1K-5025', tradeName: 'Crystal Blue pearl', nameZh: '水晶蓝珍珠（进口）', category: '1K_PEARL_BASECOAT', hex: '#5B9BD5' },
+  { code: '1K-5026', tradeName: 'Crystal Red pearl', nameZh: '水晶红珍珠', category: '1K_PEARL_BASECOAT', hex: '#E06666' },
+  { code: '1K-5027', tradeName: 'Crystal white pearl', nameZh: '水晶白珍珠', category: '1K_PEARL_BASECOAT', hex: '#FFFFF5' },
+  { code: '1K-5028', tradeName: 'Super Crystal White Pearl', nameZh: '水晶白珍珠（进口）', category: '1K_PEARL_BASECOAT', hex: '#FFFFF5' },
+  { code: '1K-5029', tradeName: 'Crystal Gold Pearl', nameZh: '水晶干涉金珍珠（进口）', category: '1K_PEARL_BASECOAT', hex: '#EEC900' },
+  { code: '1K-5030', tradeName: 'Crystal Copper Pearl', nameZh: '水晶铜珍珠（进口）', category: '1K_PEARL_BASECOAT', hex: '#DA8A67' },
+  { code: '1K-5031', tradeName: 'HQ Crystal Blue Pearl', nameZh: '电光蓝珍珠（进口）', category: '1K_PEARL_BASECOAT', hex: '#4169E1' },
+  { code: '1K-5032', tradeName: 'Bright Blue Pearl', nameZh: '艳蓝珍珠', category: '1K_PEARL_BASECOAT', hex: '#4A90D9' },
+  { code: '1K-5041', tradeName: 'Glass Crystal White Pearl', nameZh: '玻璃水晶白珍珠', category: '1K_PEARL_BASECOAT', hex: '#FFFFF5' },
+  { code: '1K-5042', tradeName: 'White Pearl', nameZh: '白珍珠', category: '1K_PEARL_BASECOAT', hex: '#FFF5EE' },
+  { code: '1K-5043', tradeName: 'Small Grain White Pearl', nameZh: '精细白珍珠', category: '1K_PEARL_BASECOAT', hex: '#FFFAF0' },
+  { code: '1K-5044', tradeName: 'Fine Red Pearl', nameZh: '细红珍珠', category: '1K_PEARL_BASECOAT', hex: '#FF69B4' },
+];
+
+export default toners1kPearl;
