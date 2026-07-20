@@ -251,41 +251,17 @@ export async function saveColor(
     .single();
   if (error) throw new Error(error.message || JSON.stringify(error));
 
-  // 2. 同步 color_variant_map：仅当 variantIds 非空时才写入
+  // 2. 同步 color_variant_map：先清理旧映射再插入新映射
+  const { error: delErr } = await supabaseAdmin
+    .from("color_variant_map")
+    .delete()
+    .eq("color_id", color.id);
+  if (delErr) throw new Error(delErr.message || JSON.stringify(delErr));
+
   if (variantIds.length > 0) {
-    // 检查该颜色是否已有 color_variant_map 记录，先清理旧的
-    const { error: delErr } = await supabaseAdmin
-      .from("color_variant_map")
-      .delete()
-      .eq("color_id", color.id);
-    if (delErr) throw new Error(delErr.message || JSON.stringify(delErr));
-
-    // 查询 color_variants，找出哪些 ID 对应的是 formula_types 表的数据
-    // 因为该数据库同时命中 "color_variants" 表和 "formula_types" 表
-    const { data: existingVariants, error: fetchErr } = await supabaseAdmin
-      .from("formula_types")
-      .select("id")
-      .in("id", variantIds);
-    if (fetchErr) throw new Error(fetchErr.message || JSON.stringify(fetchErr));
-    const validIds = (existingVariants ?? []).map((v: { id: string }) => v.id);
-    const validVariantIds = variantIds.filter((vid) => validIds.includes(vid));
-
-    // 同时也在 color_variants 中查找
-    const { data: cvData, error: cvErr } = await supabaseAdmin
-      .from("color_variants")
-      .select("id")
-      .in("id", variantIds);
-    if (cvErr) throw new Error(cvErr.message || JSON.stringify(cvErr));
-    const cvValidIds = (cvData ?? []).map((v: { id: string }) => v.id);
-    // 合并两个表的有效 ID 并去重
-    const allValidIds = [...new Set([...validIds, ...cvValidIds])];
-    const finalVariantIds = variantIds.filter((vid) => allValidIds.includes(vid));
-
-    if (finalVariantIds.length > 0) {
-      const rows = finalVariantIds.map((variant_id) => ({ color_id: color.id, variant_id }));
-      const { error: insErr } = await supabaseAdmin.from("color_variant_map").insert(rows);
-      if (insErr) throw new Error(insErr.message || JSON.stringify(insErr));
-    }
+    const rows = variantIds.map((variant_id) => ({ color_id: color.id, variant_id }));
+    const { error: insErr } = await supabaseAdmin.from("color_variant_map").insert(rows);
+    if (insErr) throw new Error(insErr.message || JSON.stringify(insErr));
   }
 
   return data as Color;
