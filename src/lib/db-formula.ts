@@ -251,13 +251,28 @@ export async function saveColor(
     .single();
   if (error) throw new Error(error.message || JSON.stringify(error));
 
-  // 2. 同步 color_variant_map：先清理旧映射再插入新映射
+  // 2. 同步 color_variant_map：始终保持双向同步
+  //    color_variant_map 的外键指向 color_variants，但
+  //    saveFormulaType 写入 formula_types 表（同一个变体概念）
+  //    所以要先确保 formula_types 中的 ID 也存在于 color_variants 中
+  if (variantIds.length > 0) {
+    // 将 formula_types 中新增的 ID 同步到 color_variants（幂等 upsert）
+    for (const vid of variantIds) {
+      const { error: syncErr } = await supabaseAdmin
+        .from("color_variants")
+        .upsert({ id: vid, name: vid, year_range: "" });
+      if (syncErr) throw new Error(syncErr.message || JSON.stringify(syncErr));
+    }
+  }
+
+  // 清理旧映射
   const { error: delErr } = await supabaseAdmin
     .from("color_variant_map")
     .delete()
     .eq("color_id", color.id);
   if (delErr) throw new Error(delErr.message || JSON.stringify(delErr));
 
+  // 写入新映射
   if (variantIds.length > 0) {
     const rows = variantIds.map((variant_id) => ({ color_id: color.id, variant_id }));
     const { error: insErr } = await supabaseAdmin.from("color_variant_map").insert(rows);

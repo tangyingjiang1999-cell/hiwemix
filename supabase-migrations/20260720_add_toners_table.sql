@@ -185,3 +185,14 @@ ON CONFLICT (code) DO NOTHING;
 -- 5. 刷新 PostgREST schema cache
 -- ---------------------------------------------------------------------
 NOTIFY pgrst, 'reload schema';
+
+-- =====================================================================
+-- 追加修复: 将 formula_types 中的 ID 同步到 color_variants
+-- color_variant_map.variant_id FOREIGN KEY → color_variants(id)
+-- 但管理后台通过 formula_types 表管理变体，导致 ID 不匹配
+-- =====================================================================
+INSERT INTO public.color_variants (id, name, year_range)
+SELECT id, name, year_range FROM public.formula_types
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name;
+
+NOTIFY pgrst, 'reload schema';
