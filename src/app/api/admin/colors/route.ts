@@ -28,14 +28,20 @@ export async function POST(req: NextRequest) {
   if (!color.id || !color.make_id || !color.color_code) {
     return NextResponse.json({ error: "缺少必填字段（id/make_id/color_code）" }, { status: 400 });
   }
-  const saved = await saveColor(color, (variantIds as string[]) ?? []);
+  try {
+    const saved = await saveColor(color, (variantIds as string[]) ?? []);
 
-  // 保存年份
-  if (years && Array.isArray(years)) {
-    await saveColorYears(color.id, years as number[]);
+    // 保存年份
+    if (years && Array.isArray(years)) {
+      await saveColorYears(color.id, years as number[]);
+    }
+
+    return NextResponse.json(saved, { status: 201 });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "未知错误";
+    console.error("保存颜色失败:", msg);
+    return NextResponse.json({ error: "保存失败: " + msg }, { status: 500 });
   }
-
-  return NextResponse.json(saved, { status: 201 });
 }
 
 export async function PUT(req: NextRequest) {
@@ -52,14 +58,20 @@ export async function PUT(req: NextRequest) {
   if (!color.id) {
     return NextResponse.json({ error: "缺少 ID" }, { status: 400 });
   }
-  const saved = await saveColor(color, (variantIds as string[]) ?? []);
+  try {
+    const saved = await saveColor(color, (variantIds as string[]) ?? []);
 
-  // 保存年份
-  if (years && Array.isArray(years)) {
-    await saveColorYears(color.id, years as number[]);
+    // 保存年份
+    if (years && Array.isArray(years)) {
+      await saveColorYears(color.id, years as number[]);
+    }
+
+    return NextResponse.json(saved);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "未知错误";
+    console.error("保存颜色失败:", msg);
+    return NextResponse.json({ error: "保存失败: " + msg }, { status: 500 });
   }
-
-  return NextResponse.json(saved);
 }
 
 export async function DELETE(req: NextRequest) {
