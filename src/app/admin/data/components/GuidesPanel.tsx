@@ -61,12 +61,27 @@ export default function GuidesPanel() {
       if (r.ok) { setShowModal(false); fetchGuides(); } else { const d = await r.json(); setError(d.error || "保存失败"); }
     } catch { setError("网络错误，请重试"); }
   }
-  async function handleDelete(g: Guide) { if (!confirm(`确定删除指南「${g.titleZh}」吗？`)) return; try { await fetch("/api/admin/guides", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: g.id }) }); fetchGuides(); } catch { /* network error */ } }
+  async function handleDelete(g: Guide) {
+    if (!confirm(`确定删除指南「${g.titleZh}」吗？`)) return;
+    try {
+      const res = await fetch("/api/admin/guides", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: g.id }) });
+      if (res.ok) { fetchGuides(); } else { const d = await res.json(); alert(d.error || "删除失败"); }
+    } catch { alert("网络错误，请重试"); }
+  }
   async function handleSaveCategory() {
     if (!catForm.id || !catForm.name || !catForm.nameZh) return;
-    try { await fetch("/api/admin/guide-categories", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...catForm, sortOrder: 0 }) }); setCatForm({ id: "", name: "", nameZh: "" }); catIdEdited.current = false; fetchCategories(); } catch { /* network error */ }
+    try {
+      const res = await fetch("/api/admin/guide-categories", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...catForm, sortOrder: 0 }) });
+      if (res.ok) { setCatForm({ id: "", name: "", nameZh: "" }); catIdEdited.current = false; fetchCategories(); } else { const d = await res.json(); alert(d.error || "保存失败"); }
+    } catch { alert("网络错误，请重试"); }
   }
-  async function handleDeleteCategory(cat: GuideCategory) { if (!confirm(`确定删除「${cat.nameZh}」吗？`)) return; try { await fetch("/api/admin/guide-categories", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: cat.id }) }); fetchCategories(); fetchGuides(); } catch { /* network error */ } }
+  async function handleDeleteCategory(cat: GuideCategory) {
+    if (!confirm(`确定删除「${cat.nameZh}」吗？`)) return;
+    try {
+      const res = await fetch("/api/admin/guide-categories", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: cat.id }) });
+      if (res.ok) { fetchCategories(); fetchGuides(); } else { const d = await res.json(); alert(d.error || "删除失败"); }
+    } catch { alert("网络错误，请重试"); }
+  }
 
   const catMap = new Map(categories.map((c) => [c.id, c.nameZh]));
   const filtered: GuideRow[] = (filterCat ? guides.filter((g) => g.categoryId === filterCat) : guides).map((g) => ({ ...g, categoryName: catMap.get(g.categoryId) ?? g.categoryId }));

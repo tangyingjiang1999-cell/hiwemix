@@ -161,9 +161,9 @@ export default function ColorsPanel() {
   async function handleDelete(c: Color) {
     if (!confirm(`确定删除颜色「${c.color_name}」吗？`)) return;
     try {
-      await fetch("/api/admin/colors", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: c.id }) });
-      fetchColors();
-    } catch { /* network error */ }
+      const res = await fetch("/api/admin/colors", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: c.id }) });
+      if (res.ok) { fetchColors(); } else { const d = await res.json(); alert(d.error || "删除失败"); }
+    } catch { alert("网络错误，请重试"); }
   }
   function toggleVariant(id: string) { setVariantIds((prev) => prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]); }
 

@@ -56,7 +56,13 @@ export default function VariantsPanel() {
       if (r.ok) { setShowModal(false); fetchVariants(); } else { const d = await r.json(); setError(d.error || "保存失败"); }
     } catch { setError("网络错误，请重试"); }
   }
-  async function handleDelete(v: ColorVariant) { if (!confirm(`确定删除配方类型「${v.name}」吗？`)) return; try { await fetch("/api/admin/variants", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: v.id }) }); fetchVariants(); } catch { /* network error */ } }
+  async function handleDelete(v: ColorVariant) {
+    if (!confirm(`确定删除配方类型「${v.name}」吗？`)) return;
+    try {
+      const res = await fetch("/api/admin/variants", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: v.id }) });
+      if (res.ok) { fetchVariants(); } else { const d = await res.json(); alert(d.error || "删除失败"); }
+    } catch { alert("网络错误，请重试"); }
+  }
 
   const pageRows = variants.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 

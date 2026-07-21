@@ -115,9 +115,9 @@ export default function BrandsPanel() {
   async function handleDeleteBrand(brand: CarMake) {
     if (!confirm(`确定删除品牌「${brand.name}」吗？`)) return;
     try {
-      await fetch("/api/admin/brands", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: brand.id }) });
-      fetchBrands();
-    } catch { /* network error */ }
+      const res = await fetch("/api/admin/brands", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: brand.id }) });
+      if (res.ok) { fetchBrands(); } else { const d = await res.json(); alert(d.error || "删除失败"); }
+    } catch { alert("网络错误，请重试"); }
   }
 
   async function handleSaveRegion() {

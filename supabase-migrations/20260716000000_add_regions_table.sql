@@ -7,6 +7,14 @@ CREATE TABLE IF NOT EXISTS public.regions (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Enable RLS
+ALTER TABLE public.regions ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access
+CREATE POLICY regions_select_all ON public.regions
+  FOR SELECT TO public
+  USING (true);
+
 -- 2. Insert default regions
 INSERT INTO public.regions (code) VALUES
   ('JPN'), ('EUR'), ('USA'), ('CHN'), ('KOR')

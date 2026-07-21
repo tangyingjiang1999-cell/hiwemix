@@ -441,7 +441,7 @@ function ManagementModal({
     setError("");
   }
 
-  function handleEditSave() {
+  async function handleEditSave() {
     setError("");
     if (!form.code || !form.tradeName || !form.nameZh || !form.category) {
       setError("所有字段不能为空");
@@ -454,7 +454,13 @@ function ManagementModal({
       category: form.category as TonerCategory,
       hex: form.hex,
     };
-    onUpdateItem(updated);
+    // 等待 API 调用完成后再关闭编辑对话框
+    try {
+      await onUpdateItem(updated);
+    } catch {
+      setError("保存失败，请重试");
+      return;
+    }
     setEditingItem(null);
   }
 
@@ -743,17 +749,18 @@ export default function TonerPage() {
 
   // 管理弹窗回调 — 调用 Supabase API
   const handleUpdateItem = useCallback(async (updated: Toner) => {
-    try {
-      const res = await fetch("/api/admin/toners", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updated),
-      });
-      if (res.ok) {
-        const saved = await res.json();
-        setToners((prev) => prev.map((t) => t.code === updated.code ? saved as Toner : t));
-      }
-    } catch { /* 静默处理 */ }
+    const res = await fetch("/api/admin/toners", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updated),
+    });
+    if (res.ok) {
+      const saved = await res.json();
+      setToners((prev) => prev.map((t) => t.code === updated.code ? saved as Toner : t));
+    } else {
+      const d = await res.json();
+      throw new Error(d.error || "更新失败");
+    }
   }, []);
 
   const handleDeleteItem = useCallback(async (code: string) => {
@@ -765,8 +772,11 @@ export default function TonerPage() {
       });
       if (res.ok) {
         setToners((prev) => prev.filter((t) => t.code !== code));
+      } else {
+        const d = await res.json();
+        alert(d.error || "删除失败");
       }
-    } catch { /* 静默处理 */ }
+    } catch { alert("网络错误，请重试"); }
   }, []);
 
   const handleAddItem = useCallback(async (newToner: Toner) => {
@@ -779,8 +789,11 @@ export default function TonerPage() {
       if (res.ok) {
         const saved = await res.json();
         setToners((prev) => [...prev, saved as Toner]);
+      } else {
+        const d = await res.json();
+        alert(d.error || "新增失败");
       }
-    } catch { /* 静默处理 */ }
+    } catch { alert("网络错误，请重试"); }
   }, []);
 
   return (
