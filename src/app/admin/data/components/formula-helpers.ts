@@ -1,7 +1,6 @@
 // FormulasPanel 工具函数 — 纯函数，无状态依赖
 
 import type { Toner, Color, CarMake, FormulaType } from "@/types";
-import { TONERS } from "@/data/toners";
 
 /** hex → RGB 转换 */
 export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
@@ -10,10 +9,10 @@ export function hexToRgb(hex: string): { r: number; g: number; b: number } | nul
   return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
 }
 
-/** 按涂料体系过滤色母 */
-export function filterTonersBySystem(system: "1K" | "2K"): Toner[] {
-  if (system === "2K") return TONERS.filter((t) => t.category === "2K_BASECOAT");
-  return TONERS.filter((t) => t.category !== "2K_BASECOAT");
+/** 按涂料体系过滤色母（接收动态 toners 而非静态数据） */
+export function filterTonersBySystem(system: "1K" | "2K", toners: Toner[]): Toner[] {
+  if (system === "2K") return toners.filter((t) => t.category === "2K_BASECOAT");
+  return toners.filter((t) => t.category !== "2K_BASECOAT");
 }
 
 /** 模糊匹配色母（空查询返回全部） */

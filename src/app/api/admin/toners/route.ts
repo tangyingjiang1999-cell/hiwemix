@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getUserFromRequest, requireAdmin } from "@/lib/auth";
 import { applyRateLimit, ADMIN_LIMIT } from "@/lib/rate-limit";
 import { getToners, saveToner, deleteToner } from "@/lib/db-toner";
@@ -32,6 +33,7 @@ export async function POST(req: NextRequest) {
   }
 
   const saved = await saveToner(body);
+  revalidatePath("/api/toners");
   return NextResponse.json(saved, { status: 201 });
 }
 
@@ -54,6 +56,7 @@ export async function PUT(req: NextRequest) {
   }
 
   const saved = await saveToner(body);
+  revalidatePath("/api/toners");
   return NextResponse.json(saved);
 }
 
@@ -75,5 +78,6 @@ export async function DELETE(req: NextRequest) {
   if (!code) return NextResponse.json({ error: "缺少 code" }, { status: 400 });
 
   await deleteToner(code);
+  revalidatePath("/api/toners");
   return NextResponse.json({ success: true });
 }

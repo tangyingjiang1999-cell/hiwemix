@@ -40,6 +40,7 @@ export default function FormulasPanel() {
   const [formulas, setFormulas] = useState<Formula[]>([]);
   const [colors, setColors] = useState<Color[]>([]);
   const [formulaTypes, setFormulaTypes] = useState<ColorVariant[]>([]);
+  const [toners, setToners] = useState<Toner[]>([]);
   const [brands, setBrands] = useState<CarMake[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -100,7 +101,7 @@ export default function FormulasPanel() {
 
   // 选中颜色后的预览文本
   // 根据体系过滤色母列表
-  const tonerPool = useMemo(() => filterTonersBySystem(form.paint_system), [form.paint_system]);
+  const tonerPool = useMemo(() => filterTonersBySystem(form.paint_system, toners), [form.paint_system, toners]);
 
   const selectedColor = colors.find((c) => c.id === form.color_id);
   const brandMap = new Map(brands.map((b) => [b.id, b.name]));
@@ -138,6 +139,7 @@ export default function FormulasPanel() {
   useEffect(() => {
     const ctrl = new AbortController();
     fetchFormulas();
+    fetch("/api/toners", { signal: ctrl.signal }).then((r) => r.ok ? r.json() : []).then(setToners).catch(() => {});
     fetch("/api/admin/colors", { signal: ctrl.signal }).then((r) => r.ok ? r.json() : []).then(setColors).catch(() => {});
     fetch("/api/admin/variants", { signal: ctrl.signal }).then((r) => r.ok ? r.json() : []).then(setFormulaTypes).catch(() => {});
     fetch("/api/admin/brands", { signal: ctrl.signal }).then((r) => r.ok ? r.json() : []).then(setBrands).catch(() => {});
