@@ -73,12 +73,17 @@
 
 body {
   color: var(--color-ink);
-  background: var(--color-canvas);
+  background: transparent;
   font-family: var(--font-inter), var(--font-noto), "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
   font-size: 17px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 1.5s ease;
+}
+
+body[data-bg-state="white"] {
+  background: #ffffff !important;
 }
 
 /* ===== RTL support for Arabic / Hebrew ===== */

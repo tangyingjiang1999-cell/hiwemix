@@ -8,7 +8,6 @@ import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import { useLang } from "@/components/LanguageContext";
 import type { CarMake, Color, Formula, SearchParams, SearchResult, FormulaTableRow } from "@/types";
-import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
@@ -26,14 +25,11 @@ export default function Home() {
   // === 玻璃拟态状态管理 ===
   const [isHovered, setIsHovered] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const blurLayerRef = useRef<HTMLDivElement>(null);
   const glassRef = useRef<HTMLDivElement>(null);
   const transitionDurationRef = useRef("1.5s");
 
   const applyTransitionDuration = useCallback((dur: string) => {
     transitionDurationRef.current = dur;
-    const el = blurLayerRef.current;
-    if (el) el.style.transitionDuration = dur;
     const gl = glassRef.current;
     if (gl) gl.style.transitionDuration = dur;
   }, []);
@@ -78,6 +74,13 @@ export default function Home() {
   }
 
   useEffect(() => { loadData().catch(() => {}); }, []);
+
+  // 切换 body 背景：鼠标移到搜索组件时整个页面变白
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.body.dataset.bgState = shouldBeBlurred ? "white" : "default";
+    return () => { delete document.body.dataset.bgState; };
+  }, [shouldBeBlurred]);
 
   function handleSearch(params: SearchParams) {
     setIsLoading(true);
@@ -157,58 +160,59 @@ export default function Home() {
     setDrawerYear(row.year);
   }
 
-  // 背景模糊层样式（will-change 硬件加速，opacity 过渡避免 filter 动画掉帧）
-  // 使用负 inset（比容器大 40px）代替 scale，彻底消除缩放抖动
-  const BLUR_LAYER_SX = {
-    position: "absolute",
-    top: -20,
-    right: -20,
-    bottom: -20,
-    left: -20,
-    backgroundImage: "url(/bg-home.png)",
-    backgroundSize: "cover",
-    backgroundPosition: "center top",
-    backgroundRepeat: "no-repeat",
-    backgroundAttachment: "fixed",
-    filter: "blur(12px) saturate(1.2)",
-    willChange: "opacity",
-    transitionProperty: "opacity",
-    transitionDuration: "1.5s",
-    transitionTimingFunction: "ease",
-    opacity: shouldBeBlurred ? 1 : 0,
-    zIndex: 0,
-  } as const;
-
   return (
     <Box sx={{ position: "relative", display: "flex", flexDirection: "column", minHeight: "100vh", overflow: "hidden" }}>
 
-      {/* 双层背景：清晰层 + 模糊层（通过 opacity 过渡实现丝滑模糊切换） */}
+      {/* 背景图片层（默认显示，鼠标移到搜索组件时隐藏，让 body 白色透出） */}
       <Box
         sx={{
-          position: "absolute", inset: 0,
-          backgroundImage: "url(/bg-home.png)", backgroundSize: "cover",
-          backgroundPosition: "center top", backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed", zIndex: 0,
+          position: "absolute", inset: 0, overflow: "hidden", zIndex: 0,
+          willChange: "opacity",
+          transitionProperty: "opacity",
+          transitionDuration: "1.5s",
+          transitionTimingFunction: "ease",
+          opacity: shouldBeBlurred ? 0 : 1,
         }}
-      />
-      <Box ref={blurLayerRef} sx={BLUR_LAYER_SX} />
-
-      {/* 遮罩（保留结构便于后续调整） */}
-      <Box sx={{ position: "absolute", inset: 0, bgcolor: "rgba(255,255,255,0)", zIndex: 1 }} />
+      >
+        <Box
+          component="img"
+          src="/bg-home.jpg"
+          alt=""
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "100%",
+            height: "auto",
+            maxWidth: "none",
+            display: "block",
+          }}
+        />
+      </Box>
 
       {/* 页面内容 */}
       <Box sx={{ position: "relative", zIndex: 10, display: "flex", flexDirection: "column", flex: 1 }}>
         <SiteHeader />
         <Box component="section" sx={{ flex: 1, display: "flex", flexDirection: "column", pt: 10, pb: 4 }}>
-          <Container maxWidth="lg">
-            <Box sx={{ textAlign: "center", mb: 4 }}>
+          <Box sx={{ mx: { xs: 1, sm: 3, md: "60px" } }}>
+            <Box
+              sx={{ mb: 4 }}
+              onMouseEnter={handleGlassEnter}
+              onMouseLeave={handleGlassLeave}
+            >
               <Typography
                 sx={{
                   fontWeight: 700,
-                  fontSize: { xs: "1.75rem", sm: "2.25rem", md: "2.75rem", lg: "3.25rem" },
+                  fontSize: { xs: "0.875rem", sm: "1.375rem", md: "1.875rem", lg: "2.375rem" },
                   lineHeight: 1.2,
                   color: "primary.main",
                   letterSpacing: "-0.02em",
+                  opacity: shouldBeBlurred ? 0.2 : 0.8,
+                  willChange: "opacity",
+                  transitionProperty: "opacity",
+                  transitionDuration: "1.5s",
+                  transitionTimingFunction: "ease",
                 }}
               >
                 {t.heroTitlePrefix} {t.heroTitleHighlight}
@@ -244,7 +248,7 @@ export default function Home() {
                 onBlurCapture={handleGlassBlur}
               />
             </Box>
-          </Container>
+          </Box>
           {hasSearched && (
             <Box sx={{ mx: { xs: 1, sm: 3, md: "60px" }, mt: 2.5 }}>
               <SearchResults rows={tableRows} isLoading={isLoading} hasSearched={hasSearched} onOpenFormula={handleOpenFormula} />

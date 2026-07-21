@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
 import LanguageIcon from "@mui/icons-material/Language";
@@ -16,17 +15,16 @@ export default function Footer() {
     <Box
       component="footer"
       sx={{
-        bgcolor: "#2487ca",
-        color: "#A1A1A1",
+        bgcolor: "#ffffff",
+        color: "#2487ca",
         py: 1.5,
       }}
     >
-      <Container maxWidth="lg">
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          spacing={3}
-          sx={{ alignItems: "center", justifyContent: "space-between" }}
-        >
+      <Stack
+        direction={{ xs: "column", md: "row" }}
+        spacing={3}
+        sx={{ alignItems: "center", justifyContent: "space-between", mx: { xs: 1, sm: 3, md: "60px" } }}
+      >
           {/* 品牌 Logo + 社交图标 */}
           <Stack direction="row" spacing={3} sx={{ alignItems: "center" }}>
             <Image
@@ -38,7 +36,6 @@ export default function Footer() {
                 height: 16,
                 width: "auto",
                 objectFit: "contain",
-                filter: "brightness(0) invert(1)",
               }}
             />
             {/* 社交媒体链接 */}
@@ -50,7 +47,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 aria-label="Website"
                 size="small"
-                sx={{ color: "#A1A1A1", "&:hover": { color: "#fff" } }}
+                sx={{ color: "#2487ca", "&:hover": { color: "#1d6ea8" } }}
               >
                 <LanguageIcon fontSize="small" />
               </IconButton>
@@ -61,7 +58,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 aria-label="WhatsApp"
                 size="small"
-                sx={{ color: "#A1A1A1", "&:hover": { color: "#fff" } }}
+                sx={{ color: "#2487ca", "&:hover": { color: "#1d6ea8" } }}
               >
                 <WhatsAppIcon fontSize="small" />
               </IconButton>
@@ -72,7 +69,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 aria-label="Facebook"
                 size="small"
-                sx={{ color: "#A1A1A1", "&:hover": { color: "#fff" } }}
+                sx={{ color: "#2487ca", "&:hover": { color: "#1d6ea8" } }}
               >
                 <FacebookIcon fontSize="small" />
               </IconButton>
@@ -83,14 +80,13 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 aria-label="Instagram"
                 size="small"
-                sx={{ color: "#A1A1A1", "&:hover": { color: "#fff" } }}
+                sx={{ color: "#2487ca", "&:hover": { color: "#1d6ea8" } }}
               >
                 <InstagramIcon fontSize="small" />
               </IconButton>
             </Stack>
           </Stack>
         </Stack>
-      </Container>
     </Box>
   );
 }

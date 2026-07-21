@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import AppBar from "@mui/material/AppBar";
@@ -46,15 +45,14 @@ export default function SiteHeader() {
       elevation={0}
       sx={{
         bgcolor: "#ffffff",
-        backdropFilter: "blur(8px)",
         zIndex: 1100,
       }}
     >
       <Toolbar
         disableGutters
         sx={{
-          pl: "20px",
-          pr: "20px",
+          pl: { xs: 1, sm: 3, md: "60px" },
+          pr: { xs: 1, sm: 3, md: "60px" },
           minHeight: 64,
           gap: 4,
         }}
@@ -62,15 +60,15 @@ export default function SiteHeader() {
         {/* 左侧组：Logo + 中间 3 个 nav 链接 */}
         <Stack direction="row" spacing={4} sx={{ flex: 1, alignItems: "center" }}>
           <Link href="/" style={{ display: "flex", flexShrink: 0 }}>
-            <Image
+            <Box
+              component="img"
               src="/hiwemix2-01.png"
               alt="HIWE MIX"
-              width={1893}
-              height={334}
-              style={{
+              sx={{
                 height: 32,
                 width: "auto",
                 objectFit: "contain",
+                display: "block",
               }}
             />
           </Link>

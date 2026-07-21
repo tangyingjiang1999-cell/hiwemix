@@ -135,11 +135,7 @@ export default function SearchResults({
   const pageRows = rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="body2" sx={{ color: "text.secondary", fontFamily: FONT, fontSize: "1.0625rem", fontWeight: 600, mb: 1 }}>
-        {t.foundFormulas(rows.length)}
-      </Typography>
-
+    <Box>
       <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 0, border: "1px solid", borderColor: "grey.200", borderTop: "2px solid #2487ca", overflowX: "auto" }}>
         <Table sx={{ tableLayout: { xs: "auto", md: "fixed" }, width: "100%", minWidth: { xs: 500, md: "100%" } }}>
           <TableHead>
@@ -243,6 +239,11 @@ export default function SearchResults({
           rowsPerPageOptions={[10, 20, 50]}
           labelRowsPerPage={t.pageSizeLabel}
         />
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, py: 1, borderTop: "1px solid", borderColor: "grey.200" }}>
+          <Typography sx={{ fontFamily: FONT, fontSize: CAPTION_FONT_SIZE, fontWeight: 600, color: "#2487ca" }}>
+            {t.foundFormulas(rows.length)}
+          </Typography>
+        </Box>
       </TableContainer>
     </Box>
   );
