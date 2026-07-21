@@ -242,6 +242,14 @@ export default function FormulasPanel() {
           return rest;
         })
       );
+    } else {
+      // 切换到 Three Stages 时，为缺失分组的色母设为默认分组，避免孤儿行
+      setComponents((prev) =>
+        prev.map((c) => {
+          if (!c.component_group) return { ...c, component_group: "Pearl Paint" as ComponentGroup };
+          return c;
+        })
+      );
     }
   }
 
@@ -302,11 +310,13 @@ export default function FormulasPanel() {
       setError("配方 ID 和关联颜色不能为空");
       return;
     }
-    // 确保 grams_per_100g 始终从 percentage 派生
-    const comps = components.map((c) => ({
-      ...c,
-      grams_per_100g: c.percentage,
-    }));
+    // 过滤空色母行 + 确保 grams_per_100g 始终从 percentage 派生
+    const comps = components
+      .filter((c) => c.toner_code.trim())
+      .map((c) => ({
+        ...c,
+        grams_per_100g: c.percentage,
+      }));
     const payload: Formula = {
       ...form,
       variant_id: "",

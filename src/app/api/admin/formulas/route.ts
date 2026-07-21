@@ -16,8 +16,8 @@ function validateFormula(body: Formula): string | null {
     if (hasGroup) return "非 Three Stages 配方不能设置 component_group";
   }
   if (body.formula_type === "Three Stages") {
-    const missingGroup = body.components.some((c) => c.component_group == null);
-    if (missingGroup) return "Three Stages 配方的每个色母都必须选择分组";
+    const missing = body.components.filter((c) => c.component_group == null).map(c => c.toner_code || "(空)");
+    if (missing.length > 0) return `Three Stages 配方的每个色母都必须选择分组（缺失分组：${missing.join(", ")}）`;
     const pearlComps = body.components.filter(c => c.component_group === "Pearl Paint");
     const groundComps = body.components.filter(c => c.component_group === "Ground Paint");
     const pearlSum = pearlComps.reduce((sum, c) => sum + c.percentage, 0);
