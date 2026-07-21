@@ -233,12 +233,17 @@ export async function deleteFormulaType(id: string): Promise<void> {
 
 export async function saveColor(
   color: Omit<Color, "variants">,
-  variantIds: string[]
+  variantIds: string[],
+  isNew = false
 ): Promise<Color> {
-  // 1. upsert 颜色主行
-  const { data, error } = await supabaseAdmin
-    .from("colors")
-    .upsert({
+  // 1. 写入颜色主行
+  //    - 新增（isNew）：走 insert；若主键冲突（同 ID 已存在）直接报错，
+  //      绝不静默覆盖已有记录 —— 这是"任意字段不同必须独立保存"的最终防线。
+  //    - 编辑：按 id update 现有行。
+  let data: unknown;
+  let error: { code?: string; message?: string; details?: string } | null;
+  if (isNew) {
+    const row = {
       id: color.id,
       make_id: color.make_id,
       color_code: color.color_code,
@@ -246,9 +251,29 @@ export async function saveColor(
       color_type: color.color_type,
       hex_preview: color.hex_preview,
       car_model: color.car_model || null,
-    })
-    .select()
-    .single();
+    };
+    const res = await supabaseAdmin.from("colors").insert(row).select().single();
+    data = res.data; error = res.error;
+    // 23505 = unique_violation（主键冲突）：给出可读的重复提示
+    if (error?.code === "23505") {
+      throw new Error(`颜色 ID「${color.id}」已存在，无法重复新增。请修改颜色代码/类型，或使用编辑功能。`);
+    }
+  } else {
+    const res = await supabaseAdmin
+      .from("colors")
+      .update({
+        make_id: color.make_id,
+        color_code: color.color_code,
+        color_name: color.color_name,
+        color_type: color.color_type,
+        hex_preview: color.hex_preview,
+        car_model: color.car_model || null,
+      })
+      .eq("id", color.id)
+      .select()
+      .single();
+    data = res.data; error = res.error;
+  }
   if (error) throw new Error(error.message || JSON.stringify(error));
 
   // 2. 同步 color_variant_map：始终保持双向同步

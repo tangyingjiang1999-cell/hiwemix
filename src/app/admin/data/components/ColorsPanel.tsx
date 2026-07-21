@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { CarMake, Color, ColorVariant } from "@/types";
 import { colorSwatchStyle } from "@/lib/utils";
-import { generateColorId } from "@/lib/id-generator";
+import { generateUniqueColorId } from "@/lib/id-generator";
 import { FONT, HEADER_BG, HEADER_FONT_SIZE, CELL_FONT_SIZE, COLUMN_BG, ROW_BG, HOVER_BG, HOVER_TRANSITION, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx, actionButtonSx, deleteButtonSx } from "@/components/admin-table-styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -101,9 +101,11 @@ export default function ColorsPanel() {
 
   useEffect(() => {
     if (!editing && !idManuallyEdited.current && form.make_id && form.color_code) {
-      setForm((prev) => ({ ...prev, id: generateColorId(form.make_id, form.color_code) }));
+      // 纳入 color_type 并避开已有 ID，保证任意字段不同都能生成独立记录
+      const existingIds = colors.map((c) => c.id);
+      setForm((prev) => ({ ...prev, id: generateUniqueColorId(form.make_id, form.color_code, form.color_type, existingIds) }));
     }
-  }, [form.make_id, form.color_code, editing]);
+  }, [form.make_id, form.color_code, form.color_type, editing, colors]);
 
   const fetchColors = useCallback(async () => {
     try {
@@ -135,6 +137,20 @@ export default function ColorsPanel() {
   async function handleSave() {
     setError("");
     if (!form.id || !form.make_id || !form.color_code || !form.color_name) { setError("所有字段不能为空"); return; }
+    // 新增时：若已存在相同 品牌+颜色代码 的记录，二次确认是否作为独立记录新增
+    if (!editing) {
+      const code = form.color_code.trim().toUpperCase();
+      const dup = colors.filter((c) => c.make_id === form.make_id && c.color_code.trim().toUpperCase() === code);
+      if (dup.length > 0) {
+        const brandName = brandMap.get(form.make_id) ?? form.make_id;
+        const existing = dup.map((c) => `· ${c.color_name}（${c.color_type}）`).join("\n");
+        const ok = confirm(
+          `已存在 ${dup.length} 条相同代码「${form.color_code}」的颜色（${brandName}）：\n${existing}\n\n` +
+          `是否将当前录入作为独立记录新增？`
+        );
+        if (!ok) return;
+      }
+    }
     try {
       const m = editing ? "PUT" : "POST";
       const res = await fetch("/api/admin/colors", { method: m, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...form, variantIds, years }) });

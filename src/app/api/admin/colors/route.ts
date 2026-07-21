@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
   try {
     // 打印收到的 variantIds 供调试
     console.error("DEBUG variantIds:", JSON.stringify(variantIds));
-    const saved = await saveColor(color, (variantIds as string[]) ?? []);
+    const saved = await saveColor(color, (variantIds as string[]) ?? [], true);
 
     // 保存年份
     if (years && Array.isArray(years)) {

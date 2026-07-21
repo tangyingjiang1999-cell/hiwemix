@@ -28,12 +28,37 @@ export function generateVariantId(name: string): string {
   return slugify(name);
 }
 
-/** 颜色 ID：{品牌ID}_{颜色代码} */
-export function generateColorId(makeId: string, colorCode: string): string {
+/**
+ * 颜色 ID 基名：{品牌ID}_{颜色代码}[_{类型}]
+ * 注意：品牌+代码不足以唯一标识一条颜色（同代码可有 solid/pearl 等多条），
+ * 因此把 color_type 纳入基名，最终唯一性由 generateUniqueColorId 保证。
+ */
+export function generateColorId(makeId: string, colorCode: string, colorType?: string): string {
   const a = slugify(makeId);
   const b = slugify(colorCode);
   if (!a || !b) return "";
-  return `${a}_${b}`;
+  const t = colorType ? slugify(colorType) : "";
+  return t ? `${a}_${b}_${t}` : `${a}_${b}`;
+}
+
+/**
+ * 生成不与现有记录碰撞的颜色 ID。
+ * 基名已存在时追加 -2 / -3 ... 后缀，保证"任意字段不同 → 独立记录"。
+ * 这样 品牌/代码/类型 都相同但 名称/车型/年份 不同的两条数据也能各自独立保存。
+ */
+export function generateUniqueColorId(
+  makeId: string,
+  colorCode: string,
+  colorType: string | undefined,
+  existingIds: Iterable<string>
+): string {
+  const base = generateColorId(makeId, colorCode, colorType);
+  if (!base) return "";
+  const taken = existingIds instanceof Set ? existingIds : new Set(existingIds);
+  if (!taken.has(base)) return base;
+  let n = 2;
+  while (taken.has(`${base}-${n}`)) n++;
+  return `${base}-${n}`;
 }
 
 /** 配方 ID：{颜色ID}_{变体ID}_{版本}，无变体时省略变体部分 */
