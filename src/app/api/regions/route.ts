@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { applyRateLimit, PUBLIC_LIMIT } from "@/lib/rate-limit";
-import { supabase } from "@/lib/supabase-client";
+import { getSupabase } from "@/lib/supabase-client";
 import { jsonError } from "@/lib/api-error";
 import type { Region } from "@/types";
 
@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   const limitRes_GET = applyRateLimit(req, PUBLIC_LIMIT);
   if (limitRes_GET) return limitRes_GET;
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from("regions")
       .select("code")
       .order("code", { ascending: true });

@@ -1,4 +1,4 @@
-import { supabase } from "./supabase-client";
+import { getSupabase } from "./supabase-client";
 import { getSupabaseAdmin } from "./supabase-server";
 import type {
   CarMake,
@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 // ====== Brands ======
 
 export async function getBrands(): Promise<CarMake[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("brands")
     .select("*")
     .order("name", { ascending: true });
@@ -30,7 +30,7 @@ export async function getBrands(): Promise<CarMake[]> {
 // ====== Formula Types ======
 
 export async function getFormulaTypes(): Promise<ColorVariant[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("formula_types")
     .select("*")
     .order("name", { ascending: true });
@@ -41,7 +41,7 @@ export async function getFormulaTypes(): Promise<ColorVariant[]> {
 // ====== Color Years ======
 
 export async function getColorYears(colorId: string): Promise<number[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("color_years")
     .select("year")
     .eq("color_id", colorId)
@@ -51,7 +51,7 @@ export async function getColorYears(colorId: string): Promise<number[]> {
 }
 
 export async function getAllColorYears(): Promise<Record<string, number[]>> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("color_years")
     .select("color_id, year")
     .order("year", { ascending: true });
@@ -85,7 +85,7 @@ export async function saveColorYears(colorId: string, years: number[]): Promise<
 // ====== Colors ======
 
 export async function getColors(): Promise<Color[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("colors")
     .select("*, color_variant_map(color_variants(*))")
     .order("color_code", { ascending: true });
@@ -104,7 +104,7 @@ export async function getColors(): Promise<Color[]> {
 // ====== Formulas ======
 
 export async function getFormulas(): Promise<Formula[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("formulas")
     .select("*, formula_components(*)")
     .order("updated_at", { ascending: false });
@@ -115,7 +115,7 @@ export async function getFormulas(): Promise<Formula[]> {
 // ====== Settings ======
 
 export async function getSettings(): Promise<AppSettings> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("settings")
     .select("*")
     .eq("id", 1)

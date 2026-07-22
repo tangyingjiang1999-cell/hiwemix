@@ -1,11 +1,11 @@
-import { supabase } from "./supabase-client";
+import { getSupabase } from "./supabase-client";
 import { getSupabaseAdmin } from "./supabase-server";
 import type { GuideCategory, Guide } from "@/types";
 
 // ====== 读（anon，受 RLS，仅公开数据）======
 
 export async function getGuideCategories(): Promise<GuideCategory[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("guide_categories")
     .select("*")
     .order("sort_order", { ascending: true });
@@ -14,7 +14,7 @@ export async function getGuideCategories(): Promise<GuideCategory[]> {
 }
 
 export async function getGuides(): Promise<Guide[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("guides")
     .select("*")
     .order("sort_order", { ascending: true });

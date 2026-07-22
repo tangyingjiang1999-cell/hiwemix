@@ -1,14 +1,14 @@
 // ============================================================
 // 色母数据访问层 — 读操作用 anon client，写操作用 getSupabaseAdmin()
 // ============================================================
-import { supabase } from "./supabase-client";
+import { getSupabase } from "./supabase-client";
 import { getSupabaseAdmin } from "./supabase-server";
 import type { Toner } from "@/types";
 
 // ====== 读（anon，受 RLS SELECT 策略保护） ======
 
 export async function getToners(): Promise<Toner[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("toners")
     .select("*")
     .order("code", { ascending: true });
