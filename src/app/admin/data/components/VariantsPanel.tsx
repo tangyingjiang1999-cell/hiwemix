@@ -85,12 +85,12 @@ export default function VariantsPanel() {
             {pageRows.map((variant, rowIndex) => (
               <TableRow key={variant.id} sx={getRowSx(rowIndex)}>
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151", fontWeight: 500 }}>
+                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary", fontWeight: 500 }}>
                     {variant.id}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#1a1a1a" }}>
+                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.primary" }}>
                     {variant.name}
                   </Typography>
                 </TableCell>

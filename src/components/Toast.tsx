@@ -37,14 +37,15 @@ export default function Toast({
     >
       <Alert
         severity="success"
+        role="status"
         variant="filled"
         sx={{
           bgcolor: "primary.main",
-          color: "#fff",
+          color: "primary.contrastText",
           fontSize: "0.8125rem",
           fontWeight: 500,
           borderRadius: 0,
-          "& .MuiAlert-icon": { color: "#fff" },
+          "& .MuiAlert-icon": { color: "primary.contrastText" },
         }}
       >
         {message}

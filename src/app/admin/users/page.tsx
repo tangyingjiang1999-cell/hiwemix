@@ -95,10 +95,10 @@ export default function AdminUsersPage() {
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default", overflowX: "clip" }}>
       <SiteHeader />
-      <Container maxWidth="lg" sx={{ pt: { xs: 9, md: 10 }, pb: 4, px: { xs: 1.5, sm: 2, md: 3 } }}>
+      <Container maxWidth={false} disableGutters sx={{ pt: { xs: 9, md: 10 }, pb: 4, px: { xs: 1.5, sm: 3, md: "60px" } }}>
         <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", alignItems: { sm: "center" }, mb: 3, gap: 1.5 }}>
           <Typography variant="h6" sx={{ fontWeight: 600, fontSize: { xs: "1.05rem", md: "1.25rem" } }}>{t.adminTitle}</Typography>
-          <Button onClick={openCreate} variant="contained" sx={{ borderRadius: { xs: "12px", md: 0 }, textTransform: "none", minHeight: { xs: 36, md: "auto" }, alignSelf: { xs: "flex-start", sm: "auto" } }}>
+          <Button onClick={openCreate} variant="contained" sx={{ borderRadius: { xs: "12px", md: 2 }, textTransform: "none", minHeight: { xs: 36, md: "auto" }, alignSelf: { xs: "flex-start", sm: "auto" } }}>
             + {t.adminNewUser}
           </Button>
         </Box>
@@ -110,7 +110,7 @@ export default function AdminUsersPage() {
                 <TableCell sx={{ fontWeight: 500, color: "text.secondary", whiteSpace: "nowrap" }}>{t.adminColId}</TableCell>
                 <TableCell sx={{ fontWeight: 500, color: "text.secondary" }}>{t.adminColUsername}</TableCell>
                 <TableCell sx={{ fontWeight: 500, color: "text.secondary" }}>{t.adminColRole}</TableCell>
-                <TableCell className="hide-on-mobile" sx={{ fontWeight: 500, color: "text.secondary", whiteSpace: "nowrap" }}>{t.adminColCreatedAt}</TableCell>
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, fontWeight: 500, color: "text.secondary", whiteSpace: "nowrap" }}>{t.adminColCreatedAt}</TableCell>
                 <TableCell align="right" sx={{ fontWeight: 500, color: "text.secondary" }}>{t.adminColActions}</TableCell>
               </TableRow>
             </TableHead>
@@ -128,7 +128,7 @@ export default function AdminUsersPage() {
                       sx={{ fontWeight: 500 }}
                     />
                   </TableCell>
-                  <TableCell className="hide-on-mobile" sx={{ fontSize: "0.8125rem", color: "text.secondary", whiteSpace: "nowrap" }}>{user.created_at}</TableCell>
+                  <TableCell sx={{ display: { xs: "none", md: "table-cell" }, fontSize: "0.8125rem", color: "text.secondary", whiteSpace: "nowrap" }}>{user.created_at}</TableCell>
                   <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
                     <Button onClick={() => openEdit(user)} size="small" sx={{ textTransform: "none", mr: { xs: 0, sm: 1 } }}>{t.adminEdit}</Button>
                     <Button onClick={() => handleDelete(user)} size="small" color="error" disabled={user.username === "admin"} sx={{ textTransform: "none" }}>{t.adminDelete}</Button>

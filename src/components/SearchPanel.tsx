@@ -100,7 +100,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
   };
 
   return (
-    <Box component="form" onSubmit={(e) => handleSubmit(e)} onFocus={onFocusCapture} onBlur={onBlurCapture}>
+    <Box component="form" role="search" aria-label={t.search} onSubmit={(e) => handleSubmit(e)} onFocus={onFocusCapture} onBlur={onBlurCapture}>
       {/* === 外层：输入框 + 右侧列（chips + Search/Reset） === */}
       <Box
         sx={{
@@ -179,7 +179,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
           }}
         >
           {/* chips 行：桌面端在右 / 移动端在按钮上方 */}
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: { xs: 0.75, md: 0.75 }, justifyContent: { md: "flex-end" } }}>
+          <Box role="radiogroup" aria-label={t.colorType} sx={{ display: "flex", flexWrap: "wrap", gap: { xs: 0.75, md: 0.75 }, justifyContent: { md: "flex-end" } }}>
             {colorTypeOptions.map((opt) => {
               const isSelected = colorType === opt.value;
               return (
@@ -187,6 +187,8 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
                   key={opt.value}
                   label={labelMap[opt.value] ?? opt.label}
                   onClick={() => setColorType(opt.value)}
+                  role="radio"
+                  aria-checked={isSelected}
                   variant={isSelected ? "filled" : "outlined"}
                   color={isSelected ? "primary" : "default"}
                   size="small"
@@ -257,7 +259,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
       </Box>
 
       {isCodeTooLong && (
-        <Box sx={{ mt: 1, fontSize: "0.75rem", fontWeight: 500, color: "warning.main" }}>
+        <Box role="alert" sx={{ mt: 1, fontSize: "0.75rem", fontWeight: 500, color: "warning.main" }}>
           {t.codeTooLong}
         </Box>
       )}

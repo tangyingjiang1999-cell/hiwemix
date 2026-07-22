@@ -4,7 +4,12 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { CarMake, Color, ColorVariant } from "@/types";
 import { colorSwatchStyle } from "@/lib/utils";
 import { generateUniqueColorId } from "@/lib/id-generator";
-import { FONT, CELL_FONT_SIZE, COLUMN_BG } from "@/components/admin-table-styles";
+import {
+  FONT, CELL_FONT_SIZE, COLUMN_BG, HEADER_BG,
+  tableContainerSx, tableSx, cellSx, headerCellSx,
+  getRowSx, actionButtonSx, deleteButtonSx, SEARCH_INPUT_SX,
+  CELL_TEXT_PRIMARY_SX, CELL_TEXT_SECONDARY_SX,
+} from "@/components/admin-table-styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -34,19 +39,20 @@ import DeleteIcon from "@mui/icons-material/Delete";
 const COLOR_TYPES = ["solid", "metallic", "pearl", "matte", "candy", "special"] as const;
 
 const CARD_STYLE = {
-  borderRadius: 0,
+  borderRadius: 2,
   border: "1px solid",
-  borderColor: "grey.200",
+  borderColor: "divider",
   overflow: "hidden",
 };
 
 const CARD_TITLE_STYLE = {
   fontSize: "0.875rem",
   fontWeight: 600,
-  color: "#1a1a1a",
+  color: "text.primary",
   mb: 2,
   pb: 1.5,
-  borderBottom: "1px solid #e5e7eb",
+  borderBottom: "1px solid",
+  borderBottomColor: "divider",
 };
 
 const COLUMN_WIDTHS = {
@@ -252,17 +258,7 @@ export default function ColorsPanel() {
               ),
             },
           }}
-          sx={{
-            width: 260,
-            "& .MuiOutlinedInput-root": {
-              borderRadius: "0",
-              fontSize: "0.8125rem",
-              bgcolor: "#fff",
-              "& fieldset": { borderColor: "#3b82f6", borderWidth: 2 },
-              "&:hover fieldset": { borderColor: "#2563eb" },
-              "&.Mui-focused fieldset": { borderColor: "#2563eb", borderWidth: 2 },
-            },
-          }}
+          sx={SEARCH_INPUT_SX}
         />
         <Button onClick={openCreate} variant="contained" size="small">+ 新增颜色</Button>
       </Box>
@@ -270,72 +266,69 @@ export default function ColorsPanel() {
       <TableContainer
         component={Paper}
         variant="outlined"
-        sx={{ borderRadius: 0, border: "1px solid", borderColor: "grey.200", borderTop: "2px solid #2487ca" }}
+        sx={tableContainerSx}
       >
-        <Table sx={{ tableLayout: "fixed", width: "100%" }}>
+        <Table sx={tableSx}>
           <TableHead>
-            <TableRow sx={{ bgcolor: "#2487ca" }}>
-              <TableCell sx={{ width: COLUMN_WIDTHS.preview, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: "0.8125rem", borderBottom: "none", py: 1, textAlign: "center" }}>预览</TableCell>
-              <TableCell sx={{ width: COLUMN_WIDTHS.brand, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: "0.8125rem", borderBottom: "none", py: 1, textAlign: "center" }}>品牌</TableCell>
-              <TableCell sx={{ width: COLUMN_WIDTHS.colorCode, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: "0.8125rem", borderBottom: "none", py: 1, textAlign: "center" }}>颜色代码</TableCell>
-              <TableCell sx={{ width: COLUMN_WIDTHS.colorName, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: "0.8125rem", borderBottom: "none", py: 1, textAlign: "center" }}>颜色名称</TableCell>
-              <TableCell sx={{ width: COLUMN_WIDTHS.carModel, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: "0.8125rem", borderBottom: "none", py: 1, textAlign: "center" }}>车型</TableCell>
-              <TableCell sx={{ width: COLUMN_WIDTHS.colorType, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: "0.8125rem", borderBottom: "none", py: 1, textAlign: "center" }}>类型</TableCell>
-              <TableCell sx={{ width: COLUMN_WIDTHS.yearCount, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: "0.8125rem", borderBottom: "none", py: 1, textAlign: "center" }}>年份</TableCell>
-              <TableCell sx={{ width: COLUMN_WIDTHS.actions, borderBottom: "none", py: 1 }}></TableCell>
+            <TableRow sx={{ bgcolor: HEADER_BG }}>
+              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.preview }}>预览</TableCell>
+              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.brand }}>品牌</TableCell>
+              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.colorCode }}>颜色代码</TableCell>
+              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.colorName }}>颜色名称</TableCell>
+              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.carModel }}>车型</TableCell>
+              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.colorType }}>类型</TableCell>
+              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.yearCount }}>年份</TableCell>
+              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.actions }}>操作</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {pageRows.map((row, _index) => (
               <TableRow
                 key={`${row.colorId}-${row.year ?? 'none'}`}
-                sx={{
-                  borderBottom: "1px solid #e5e7eb",
-                  "&:last-child td": { borderBottom: "none" },
-                }}
+                sx={getRowSx(_index)}
               >
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd, display: "flex", justifyContent: "center", alignItems: "center" }}>
                   <Box
-                    sx={{ width: 40, height: 24, borderRadius: 0, border: 1, borderColor: "grey.200" }}
+                    sx={{ width: 40, height: 24, borderRadius: 2, border: 1, borderColor: "grey.200" }}
                     style={colorSwatchStyle(row.hex_preview)}
                   />
                 </TableCell>
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
-                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, fontWeight: 500, color: "#1a1a1a" }}>
+                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
+                  <Typography variant="body2" noWrap sx={{ ...CELL_TEXT_PRIMARY_SX, fontWeight: 500 }}>
                     {row.brandName}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151", fontWeight: 500 }}>
+                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
+                  <Typography sx={{ ...CELL_TEXT_SECONDARY_SX, fontWeight: 500 }}>
                     {row.color_code}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
-                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#1a1a1a" }}>
+                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
+                  <Typography variant="body2" noWrap sx={CELL_TEXT_PRIMARY_SX}>
                     {row.color_name}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
-                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
+                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
+                  <Typography variant="body2" noWrap sx={CELL_TEXT_SECONDARY_SX}>
                     {row.car_model || "—"}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
-                  <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
+                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
+                  <Typography variant="body2" sx={CELL_TEXT_SECONDARY_SX}>
                     {row.color_type}
                   </Typography>
                 </TableCell>
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
-                  <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#9ca3af" }}>
+                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
+                  <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.disabled" }}>
                     {row.year ?? ""}
                   </Typography>
                 </TableCell>
-                <TableCell align="center" sx={{ py: 1.4, bgcolor: COLUMN_BG.odd }}>
+                <TableCell align="center" sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
                   <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center" }}>
-                    <IconButton onClick={() => openEdit(row.originalColor)} size="small" sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(36,135,202,0.08)", color: "primary.main" } }}>
+                    <IconButton onClick={() => openEdit(row.originalColor)} size="small" sx={actionButtonSx}>
                       <EditIcon fontSize="small" />
                     </IconButton>
-                    <IconButton onClick={() => handleDelete(row.originalColor)} size="small" sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(239,68,68,0.08)", color: "error.main" } }}>
+                    <IconButton onClick={() => handleDelete(row.originalColor)} size="small" sx={deleteButtonSx}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>
                   </Box>
@@ -360,7 +353,7 @@ export default function ColorsPanel() {
       </TableContainer>
 
       <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="md" fullWidth>
-        <DialogTitle sx={{ borderBottom: "1px solid #e5e7eb", pb: 2, mb: 0 }}>
+        <DialogTitle sx={{ borderBottom: "1px solid", borderColor: "divider", pb: 2, mb: 0 }}>
           {editing ? "编辑颜色" : "新增颜色"}
         </DialogTitle>
         <DialogContent sx={{ pt: 2.5, pb: 1 }}>
@@ -509,8 +502,8 @@ export default function ColorsPanel() {
                     maxHeight: 200,
                     overflow: "auto",
                     border: 1,
-                    borderColor: "grey.200",
-                    borderRadius: 0,
+                    borderColor: "divider",
+                    borderRadius: 2,
                     p: 1.5,
                   }}
                 >
@@ -548,9 +541,9 @@ export default function ColorsPanel() {
             )}
           </Stack>
         </DialogContent>
-        <DialogActions sx={{ borderTop: "1px solid #e5e7eb", pt: 2, pb: 2.5, px: 3 }}>
-          <Button onClick={() => setShowModal(false)} variant="outlined" sx={{ borderRadius: 0 }}>取消</Button>
-          <Button onClick={handleSave} variant="contained" sx={{ borderRadius: 0 }}>保存</Button>
+        <DialogActions sx={{ borderTop: "1px solid", borderColor: "divider", pt: 2, pb: 2.5, px: 3 }}>
+          <Button onClick={() => setShowModal(false)} variant="outlined">取消</Button>
+          <Button onClick={handleSave} variant="contained">保存</Button>
         </DialogActions>
       </Dialog>
     </Box>

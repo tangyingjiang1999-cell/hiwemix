@@ -535,9 +535,9 @@ function ManagementModal({
                 fontWeight: 600,
                 fontSize: "0.8125rem",
                 whiteSpace: "nowrap",
-                bgcolor: "#2487ca",
+                bgcolor: "primary.main",
                 minHeight: { xs: 36, md: "auto" },
-                "&:hover": { bgcolor: "#1a6da8" },
+                "&:hover": { bgcolor: "primary.dark" },
               }}
             >
               添加材料
@@ -550,7 +550,7 @@ function ManagementModal({
           component={Paper}
           variant="outlined"
           className="table-responsive-scroll"
-          sx={{ mt: 1, borderRadius: 0, border: "1px solid", borderColor: "grey.200", borderTop: "2px solid #2487ca", maxHeight: 480 }}
+          sx={{ mt: 1, borderRadius: 0, border: "1px solid", borderColor: "grey.200", borderTop: "2px solid", borderTopColor: "primary.main", maxHeight: 480 }}
         >
           <Table stickyHeader sx={{ tableLayout: "fixed", width: "100%", minWidth: 640 }}>
             <TableHead>
@@ -816,7 +816,7 @@ export default function TonerPage() {
       <Box
         sx={{
           position: "sticky", top: 64, zIndex: 30, bgcolor: "#fff", borderBottom: 1, borderColor: "divider",
-          px: { xs: 1.5, sm: 2, lg: 3 }, py: 1.5,
+          px: { xs: 1.5, sm: 3, md: "60px" }, py: 1.5,
         }}
       >
         <Stack direction={{ xs: "column", md: "row" }} spacing={1.5} sx={{ justifyContent: "space-between", alignItems: { md: "center" } }}>
@@ -875,7 +875,7 @@ export default function TonerPage() {
         </Stack>
       </Box>
 
-      <Box sx={{ flex: 1, px: { xs: 1.5, sm: 2, lg: 3 }, py: { xs: 2, md: 3 } }}>
+      <Box sx={{ flex: 1, px: { xs: 1.5, sm: 3, md: "60px" }, py: { xs: 2, md: 3 } }}>
         {dbLoading ? (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", py: 10, color: "text.disabled" }}>
             <Typography variant="body2">加载中...</Typography>

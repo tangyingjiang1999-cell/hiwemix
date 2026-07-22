@@ -25,7 +25,7 @@ const FLAG_MAP: Record<string, React.FC<{ className?: string }>> = {
   GB, CN, FR, DE, ES, PT, IT, RU, SI, TR, IL, SA,
 };
 
-function FlagIcon({ code, className }: { code: string; className?: string }) {
+function FlagIcon({ code, small }: { code: string; small?: boolean }) {
   const Flag = FLAG_MAP[code];
   if (!Flag) return null;
   return (
@@ -35,11 +35,16 @@ function FlagIcon({ code, className }: { code: string; className?: string }) {
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        height: { xs: 12, md: 14 },
+        height: small ? 14 : 16,
         lineHeight: 0,
+        "& > svg": {
+          height: small ? 14 : 16,
+          width: "auto",
+          borderRadius: 0,
+        },
       }}
     >
-      <Flag className={className} />
+      <Flag />
     </Box>
   );
 }
@@ -61,43 +66,44 @@ export default function LanguageSwitcher() {
             sx={{
               display: "inline-flex",
               alignItems: "center",
-              gap: { xs: 0.75, md: 1 },
               fontWeight: 600,
-              fontSize: { xs: "0.75rem", md: "0.8125rem" },
-              color: "primary.main",
+              fontSize: "0.8125rem",
+              color: "text.secondary",
               lineHeight: 1,
-              height: "100%",
             }}
           >
-            <FlagIcon code={l.flag} className="h-3.5 w-auto rounded-none" />
-            <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
-              {l.code.toUpperCase()}
-            </Box>
+            {l.code.toUpperCase()}
           </Box>
         );
       }}
       sx={{
         bgcolor: "transparent",
-        color: "primary.main",
+        color: "text.secondary",
         border: 1,
-        borderColor: "primary.main",
-        borderRadius: 0,
-        minHeight: { xs: 28, md: "auto" },
+        borderColor: "grey.300",
+        borderRadius: 2,
+        height: 36,
         "& .MuiSelect-select": {
           display: "flex",
           alignItems: "center",
-          py: { xs: 0.4, md: 0.5 },
+          py: 0,
           pr: "32px !important",
-          pl: { xs: 1, md: 1.5 },
+          pl: 1.5,
         },
         "& .MuiSelect-icon": {
           right: 6,
           fontSize: "1.1rem",
           top: "50%",
           transform: "translateY(-50%)",
+          color: "text.secondary",
         },
-        "& fieldset": { border: "none" },
-        "&:hover": { bgcolor: "rgba(36,135,202,0.05)" },
+        "& fieldset": { borderColor: "grey.300" },
+        "&:hover": {
+          bgcolor: "rgba(36,135,202,0.04)",
+          borderColor: "primary.main",
+          "& .MuiSelect-icon": { color: "primary.main" },
+        },
+        "&.Mui-focused fieldset": { borderColor: "primary.main", borderWidth: 1 },
       }}
       MenuProps={{
         slotProps: {
@@ -119,7 +125,7 @@ export default function LanguageSwitcher() {
             },
           }}
         >
-          <FlagIcon code={l.flag} className="h-4 w-auto rounded-none" />
+          <FlagIcon code={l.flag} />
           <Box component="span" sx={{ flex: 1 }}>
             {l.name}
           </Box>

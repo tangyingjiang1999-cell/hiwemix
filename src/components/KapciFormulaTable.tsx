@@ -168,13 +168,14 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
 
       <TableContainer component={Paper} variant="outlined" className="table-responsive-scroll">
         <Table size="small" sx={{ minWidth: 520 }}>
+          <caption className="sr-only">Formula components and weights</caption>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.tonerCode}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.tonerName}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.weight}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.accum}</TableCell>
-              <TableCell sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.massTone}</TableCell>
+              <TableCell scope="col" sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.tonerCode}</TableCell>
+              <TableCell scope="col" sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.tonerName}</TableCell>
+              <TableCell scope="col" sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.weight}</TableCell>
+              <TableCell scope="col" sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.accum}</TableCell>
+              <TableCell scope="col" sx={{ fontWeight: 500, color: "#1a1a1a", fontSize: FONT_SIZES.tiny }}>{t.massTone}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -203,6 +204,8 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
                   </TableCell>
                   <TableCell sx={{ py: 1 }}>
                     <Box
+                      role="img"
+                      aria-label={`${comp.toner_name} ${t.massTone}`}
                       sx={{ height: { xs: 24, md: 28 }, width: "100%", minWidth: 60, borderRadius: 0, border: 1, borderColor: "grey.200" }}
                       style={{ backgroundColor: massToneColor(comp) }}
                     />

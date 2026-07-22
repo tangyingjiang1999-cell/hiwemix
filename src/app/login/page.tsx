@@ -93,7 +93,7 @@ export default function LoginPage() {
     }
   }
 
-  const primaryColor = isRegister ? "#7C3AED" : "#2487ca";
+  const primaryColor = isRegister ? "#7C3AED" : "primary.main";
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh", flexDirection: { xs: "column", lg: "row" }, alignItems: { xs: "center", lg: "stretch" }, overflowX: "clip" }}>
@@ -254,7 +254,7 @@ export default function LoginPage() {
           </Box>
 
           {/* 表单 */}
-          <Box component="form" onSubmit={handleSubmit} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <Box component="form" onSubmit={handleSubmit} aria-label={isRegister ? t.registerButton : t.loginButton} sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
             <TextField
               type="text"
               label={t.loginEmail}
@@ -290,6 +290,7 @@ export default function LoginPage() {
                         edge="end"
                         size="small"
                         tabIndex={-1}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
@@ -324,6 +325,7 @@ export default function LoginPage() {
                           edge="end"
                           size="small"
                           tabIndex={-1}
+                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                         >
                           {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
@@ -342,7 +344,7 @@ export default function LoginPage() {
             )}
 
             {error && (
-              <Alert severity="error" variant="outlined" sx={{ fontSize: "0.8125rem" }}>
+              <Alert severity="error" role="alert" variant="outlined" sx={{ fontSize: "0.8125rem" }}>
                 {error}
               </Alert>
             )}
@@ -350,13 +352,14 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
+              aria-busy={loading}
               variant="contained"
               fullWidth
               sx={{
                 py: { xs: 1, md: 1.25 },
                 borderRadius: { xs: "12px", md: 0 },
                 bgcolor: primaryColor,
-                "&:hover": { bgcolor: isRegister ? "#6D28D9" : "#1d6fb0" },
+                "&:hover": { bgcolor: isRegister ? "#6D28D9" : "primary.dark" },
                 fontSize: "0.8125rem",
                 fontWeight: 600,
                 textTransform: "none",
@@ -384,7 +387,7 @@ export default function LoginPage() {
                     fontWeight: 500,
                     textTransform: "none",
                     fontSize: "0.8125rem",
-                    "&:hover": { color: isRegister ? "#6D28D9" : "#1d6fb0" },
+                    "&:hover": { color: isRegister ? "#6D28D9" : "primary.dark" },
                   }}
                 >
                   {t.registerLoginLink}
@@ -400,7 +403,7 @@ export default function LoginPage() {
                     fontWeight: 500,
                     textTransform: "none",
                     fontSize: "0.8125rem",
-                    "&:hover": { color: isRegister ? "#6D28D9" : "#1d6fb0" },
+                    "&:hover": { color: isRegister ? "#6D28D9" : "primary.dark" },
                   }}
                 >
                   {t.loginRegisterLink}

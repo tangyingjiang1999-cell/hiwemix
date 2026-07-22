@@ -59,33 +59,54 @@ export default function DataManagementPage() {
   const activeLabel = TABS.find((t) => t.key === activeTab)?.label ?? "";
 
   const navContent = (
-    <Box sx={{ p: 2 }}>
-      <Typography variant="overline" sx={{ px: 1, pb: 1, color: "text.disabled", fontWeight: 500, letterSpacing: 1 }}>
-        Data Management
-      </Typography>
-      <List dense>
+    <Box component="nav" aria-label="Data management" sx={{ p: 0 }}>
+      <List dense aria-label="Data management navigation" sx={{ p: 0 }}>
         {TABS.map((tab) => (
           <ListItemButton
             key={tab.key}
             selected={activeTab === tab.key}
+            aria-current={activeTab === tab.key ? "page" : undefined}
             onClick={() => setActiveTab(tab.key)}
             sx={{
-              borderRadius: { xs: "10px", md: 0 },
+              borderRadius: "4px",
               mb: 0.25,
-              mx: { xs: 1, md: 0 },
+              mx: 0,
+              pl: 1,
+              pr: 1.5,
+              py: 0.75,
+              position: "relative",
+              // 选中态：左侧指示线 + 浅蓝背景微圆角
               "&.Mui-selected": {
-                bgcolor: "#2487ca",
-                color: "#FFFFFF",
-                "& .MuiListItemIcon-root": { color: "#FFFFFF" },
+                bgcolor: "rgba(36,135,202,0.08)",
+                color: "primary.main",
+                "& .MuiListItemIcon-root": { color: "primary.main" },
+                // 左侧 3px 指示线
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  left: 0,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: 3,
+                  height: "60%",
+                  borderRadius: "0 2px 2px 0",
+                  bgcolor: "primary.main",
+                },
+              },
+              // 未选中 hover
+              "&:hover": {
+                bgcolor: "rgba(0,0,0,0.03)",
+                color: "text.primary",
+                "& .MuiListItemIcon-root": { color: "text.secondary" },
               },
             }}
           >
-            <ListItemIcon sx={{ minWidth: 36, color: activeTab === tab.key ? "#FFFFFF" : "text.disabled" }}>
+            <ListItemIcon sx={{ minWidth: 32, color: "text.disabled" }}>
               {tab.icon}
             </ListItemIcon>
             <ListItemText
               primary={tab.label}
-              slotProps={{ primary: { sx: { fontSize: "0.875rem", fontWeight: 500 } } }}
+              slotProps={{ primary: { sx: { fontSize: "0.8125rem", fontWeight: activeTab === tab.key ? 600 : 400 } } }}
             />
           </ListItemButton>
         ))}
@@ -100,6 +121,7 @@ export default function DataManagementPage() {
       {/* 移动端汉堡按钮（Drawer 打开时隐藏；放在左下角避开顶部 Navbar） */}
       <IconButton
         onClick={() => setMobileNavOpen((v) => !v)}
+        aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
         sx={{
           position: "fixed", right: { xs: 16, sm: 24 }, top: { xs: 72, sm: 76 }, zIndex: 1250,
           bgcolor: "#fff", border: 1, borderColor: "divider", boxShadow: 1,
@@ -126,7 +148,13 @@ export default function DataManagementPage() {
               height: "calc(100vh - 64px)",
               borderRight: 1,
               borderColor: "divider",
-              bgcolor: "grey.50",
+              bgcolor: "transparent",
+              // SideNav 左侧 padding 与 Header Logo 严格对齐：px 与 Toolbar 一致
+              pl: { xs: 1.5, sm: 3, md: "60px" },
+              pr: 2,
+              // 与右侧内容区 py 完全一致（md: 3 = 24px），确保首个菜单项与面包屑水平对齐
+              pt: { xs: 2, md: 3 },
+              pb: 0,
             },
           }}
           open
@@ -145,18 +173,18 @@ export default function DataManagementPage() {
           {navContent}
         </Drawer>
 
-        {/* 右侧主区 */}
+        {/* 右侧主区 —— px 与 Header 严格一致，确保内容边缘对齐 */}
         <Box
           component="main"
           sx={{
             flex: 1,
             minHeight: "calc(100vh - 64px)",
             overflow: "auto",
-            px: { xs: 1.5, sm: 2, md: 3 },
+            px: { xs: 1.5, sm: 3, md: "60px" },
             py: { xs: 2, md: 3 },
           }}
         >
-          <Breadcrumbs separator="/" sx={{ mb: { xs: 2, md: 3 }, fontSize: "0.8125rem" }}>
+          <Breadcrumbs separator="/" aria-label="Breadcrumb" sx={{ mb: { xs: 2, md: 3 }, fontSize: "0.8125rem" }}>
             <Link underline="hover" color="text.disabled">Data Management</Link>
             <Typography variant="body2" sx={{ color: "text.primary", fontWeight: 500 }}>{activeLabel}</Typography>
           </Breadcrumbs>

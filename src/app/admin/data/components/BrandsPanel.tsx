@@ -22,6 +22,7 @@ import TableCell from "@mui/material/TableCell";
 import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
@@ -36,6 +37,7 @@ export default function BrandsPanel() {
   const [regionForm, setRegionForm] = useState({ code: "" });
   const [brandError, setBrandError] = useState("");
   const [regionError, setRegionError] = useState("");
+  const [regionToDelete, setRegionToDelete] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const idManuallyEdited = useRef(false);
@@ -131,7 +133,6 @@ export default function BrandsPanel() {
   }
 
   async function handleDeleteRegion(code: string) {
-    if (!confirm(`确定删除产地「${code}」吗？`)) return;
     try {
       const res = await fetch("/api/admin/regions", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }) });
       if (res.ok) fetchRegions();
@@ -168,17 +169,17 @@ export default function BrandsPanel() {
             {pageRows.map((brand, rowIndex) => (
               <TableRow key={brand.id} sx={getRowSx(rowIndex)}>
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151", fontWeight: 500 }}>
+                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary", fontWeight: 500 }}>
                     {brand.id}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#1a1a1a" }}>
+                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.primary" }}>
                     {brand.name}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
+                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary" }}>
                     {brand.region}
                   </Typography>
                 </TableCell>
@@ -212,36 +213,58 @@ export default function BrandsPanel() {
       </TableContainer>
 
       {/* Regions list */}
-      <Box sx={{ mt: 2, p: 1.5, border: "1px solid #E5E7EB", borderRadius: 0 }}>
+      <Box sx={{ mt: 2, p: 1.5, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
         <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
           已有产地：
         </Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
           {regions.map((region) => (
-            <Box
+            <Chip
               key={region.code}
+              label={region.code}
+              onDelete={() => setRegionToDelete(region.code)}
+              size="small"
+              variant="outlined"
               sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 0.5,
-                px: 1.5,
-                py: 0.5,
-                bgcolor: "#F3F4F6",
-                borderRadius: 0,
+                borderRadius: 2,
+                fontSize: "0.8125rem",
+                borderColor: "divider",
+                bgcolor: "grey.50",
+                "& .MuiChip-deleteIcon": {
+                  color: "text.disabled",
+                  fontSize: 16,
+                  "&:hover": { color: "error.main" },
+                },
               }}
-            >
-              <Typography variant="body2">{region.code}</Typography>
-              <IconButton
-                size="small"
-                onClick={() => handleDeleteRegion(region.code)}
-                sx={{ ml: 0.5, "&:hover": { bgcolor: "rgba(239,68,68,0.1)" } }}
-              >
-                <DeleteIcon fontSize="small" sx={{ fontSize: 14, color: "#EF4444" }} />
-              </IconButton>
-            </Box>
+            />
           ))}
         </Box>
       </Box>
+
+      {/* Region delete confirmation dialog */}
+      <Dialog open={!!regionToDelete} onClose={() => setRegionToDelete(null)} maxWidth="xs" fullWidth>
+        <DialogTitle>确认删除</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2">
+            确定删除产地「{regionToDelete}」吗？此操作不可撤销。
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={() => setRegionToDelete(null)} variant="outlined">取消</Button>
+          <Button
+            onClick={() => {
+              if (regionToDelete) {
+                handleDeleteRegion(regionToDelete);
+                setRegionToDelete(null);
+              }
+            }}
+            variant="contained"
+            color="error"
+          >
+            删除
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Brand creation/edit dialog */}
       <Dialog open={showBrandModal} onClose={() => setShowBrandModal(false)} maxWidth="xs" fullWidth>

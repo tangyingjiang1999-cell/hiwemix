@@ -119,22 +119,22 @@ export default function GuidesPanel() {
             {pageRows.map((guide, rowIndex) => (
               <TableRow key={guide.id} sx={getRowSx(rowIndex)}>
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151", fontWeight: 500 }}>
+                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary", fontWeight: 500 }}>
                     {guide.id}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#1a1a1a" }}>
+                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.primary" }}>
                     {guide.titleZh}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
+                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary" }}>
                     {guide.title}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
+                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary" }}>
                     {guide.categoryName}
                   </Typography>
                 </TableCell>
@@ -191,7 +191,7 @@ export default function GuidesPanel() {
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1, maxHeight: 200, overflow: "auto", mb: 2 }}>
             {categories.map((cat) => (
-              <Stack key={cat.id} direction="row" sx={{ justifyContent: "space-between", alignItems: "center", p: 1, border: 1, borderColor: "grey.200", borderRadius: 0 }}>
+              <Stack key={cat.id} direction="row" sx={{ justifyContent: "space-between", alignItems: "center", p: 1, border: 1, borderColor: "grey.200", borderRadius: 2 }}>
                 <Box sx={{ fontSize: "0.8125rem" }}><Box component="span" sx={{ fontWeight: 500 }}>{cat.nameZh}</Box> <Box component="span" sx={{ color: "text.disabled" }}>({cat.name})</Box></Box>
                 <Button onClick={() => handleDeleteCategory(cat)} size="small" color="error">删除</Button>
               </Stack>

@@ -15,8 +15,8 @@ export default function Footer() {
     <Box
       component="footer"
       sx={{
-        bgcolor: "#ffffff",
-        color: "#2487ca",
+        bgcolor: "background.paper",
+        color: "primary.main",
         py: { xs: 2, md: 1.5 },
         borderTop: 1,
         borderColor: "divider",
@@ -48,7 +48,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               aria-label="Website"
               size="small"
-              sx={{ color: "#2487ca", minWidth: 36, minHeight: 36, "&:hover": { color: "#1d6ea8" } }}
+              sx={{ color: "primary.main", minWidth: 36, minHeight: 36, "&:hover": { color: "primary.dark" } }}
             >
               <LanguageIcon fontSize="small" />
             </IconButton>
@@ -59,7 +59,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               aria-label="WhatsApp"
               size="small"
-              sx={{ color: "#2487ca", minWidth: 36, minHeight: 36, "&:hover": { color: "#1d6ea8" } }}
+              sx={{ color: "primary.main", minWidth: 36, minHeight: 36, "&:hover": { color: "primary.dark" } }}
             >
               <WhatsAppIcon fontSize="small" />
             </IconButton>
@@ -70,7 +70,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               aria-label="Facebook"
               size="small"
-              sx={{ color: "#2487ca", minWidth: 36, minHeight: 36, "&:hover": { color: "#1d6ea8" } }}
+              sx={{ color: "primary.main", minWidth: 36, minHeight: 36, "&:hover": { color: "primary.dark" } }}
             >
               <FacebookIcon fontSize="small" />
             </IconButton>
@@ -81,7 +81,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               aria-label="Instagram"
               size="small"
-              sx={{ color: "#2487ca", minWidth: 36, minHeight: 36, "&:hover": { color: "#1d6ea8" } }}
+              sx={{ color: "primary.main", minWidth: 36, minHeight: 36, "&:hover": { color: "primary.dark" } }}
             >
               <InstagramIcon fontSize="small" />
             </IconButton>

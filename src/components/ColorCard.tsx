@@ -4,6 +4,8 @@ import { memo } from "react";
 import type { SearchResult } from "@/types";
 import { COLOR_TYPE_MAP } from "@/lib/constants";
 import { useLang } from "@/components/LanguageContext";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 interface ColorCardProps {
   result: SearchResult;
@@ -36,53 +38,132 @@ const ColorCard = memo(function ColorCard({
   }
 
   return (
-    <div
+    <Box
       role="button"
       tabIndex={0}
       onClick={() => onOpenDetail(result)}
       onKeyDown={handleKeyDown}
-      className="mb-3 cursor-pointer rounded-none border border-[#E5E7EB] bg-white transition-shadow duration-200 ease-out hover:shadow-[0_4px_16px_rgba(0,0,0,0.06)] last:mb-0"
+      aria-label={`${color.color_name} — ${color.color_code}`}
+      sx={{
+        mb: 1.5,
+        cursor: "pointer",
+        borderRadius: 0,
+        border: "1px solid",
+        borderColor: "grey.300",
+        bgcolor: "background.paper",
+        transition: "box-shadow 0.2s ease-out",
+        "&:hover": {
+          boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+        },
+        "&:focus-visible": {
+          outline: "2px solid",
+          outlineColor: "primary.main",
+          outlineOffset: 2,
+        },
+        "&:last-of-type": {
+          mb: 0,
+        },
+      }}
     >
-      <div className="flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-5 sm:py-4">
-        <div className="flex min-w-0 flex-1 items-center gap-4 text-left">
-          <div
-            className="h-10 w-10 shrink-0 rounded-none border border-[#E5E7EB]"
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: { xs: 1.5, sm: 2 },
+          px: { xs: 2, sm: 2.5 },
+          py: { xs: 1.5, sm: 2 },
+        }}
+      >
+        {/* 左侧：色块 + 颜色信息 */}
+        <Box
+          sx={{
+            display: "flex",
+            minWidth: 0,
+            flex: 1,
+            alignItems: "center",
+            gap: 2,
+            textAlign: "left",
+          }}
+        >
+          <Box
+            sx={{
+              height: 40,
+              width: 40,
+              flexShrink: 0,
+              borderRadius: 0,
+              border: "1px solid",
+              borderColor: "grey.300",
+            }}
             style={{ backgroundColor: color.hex_preview }}
           />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-[#111827]">
+          <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Typography
+              noWrap
+              sx={{
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                color: "#111827",
+              }}
+            >
               {color.color_name}
-            </p>
-            <p className="text-[11px] text-gray-500">{color.color_code}</p>
-          </div>
-        </div>
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: "0.6875rem",
+                color: "text.disabled",
+              }}
+            >
+              {color.color_code}
+            </Typography>
+          </Box>
+        </Box>
 
-        <div className="flex items-center gap-2">
-          <span
-            className={[
-              "shrink-0 rounded-none px-2 py-0.5 text-[10px] font-medium",
-              typeInfo.badge,
-            ].join(" ")}
+        {/* 右侧：类型标记 + 配方数 + 箭头 */}
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box
+            component="span"
+            sx={{
+              flexShrink: 0,
+              borderRadius: 0,
+              px: 1,
+              py: 0.25,
+              fontSize: "0.625rem",
+              fontWeight: 500,
+              bgcolor: "grey.100",
+              color: "text.secondary",
+            }}
           >
             {typeLabel}
-          </span>
+          </Box>
 
-          <span className="shrink-0 text-xs text-[#6B7280]">
+          <Typography
+            sx={{
+              flexShrink: 0,
+              fontSize: "0.75rem",
+              color: "text.secondary",
+            }}
+          >
             {t.formulasCount(formulas.length)}
-          </span>
+          </Typography>
 
-          <svg
-            className="h-4 w-4 text-[#9CA3AF]"
+          <Box
+            component="svg"
+            sx={{
+              height: 16,
+              width: 16,
+              color: "grey.400",
+              flexShrink: 0,
+            }}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
             strokeWidth={2}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </div>
-      </div>
-    </div>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
   );
 });
 

@@ -149,7 +149,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
 
   return (
     <>
-      <Dialog open onClose={handleClose} maxWidth={false} fullScreen slotProps={{ paper: { sx: { borderRadius: 0, m: 0, p: 0 } } }}>
+      <Dialog open onClose={handleClose} maxWidth={false} fullScreen aria-labelledby="formula-drawer-title" slotProps={{ paper: { sx: { borderRadius: 0, m: 0, p: 0 } } }}>
         <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Toolbar sx={{ gap: { xs: 1, md: 2 }, minHeight: { xs: 56, md: 64 }, px: { xs: 1, sm: 2 } }}>
             <Box
@@ -158,7 +158,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
             />
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0, flex: 1 }}>
               <Box sx={{ minWidth: 0 }}>
-                <Typography variant="subtitle1" noWrap sx={{ fontWeight: 600, fontSize: { xs: "0.9rem", md: "1rem" } }}>{color.color_name}</Typography>
+                <Typography id="formula-drawer-title" variant="subtitle1" noWrap sx={{ fontWeight: 600, fontSize: { xs: "0.9rem", md: "1rem" } }}>{color.color_name}</Typography>
                 <Typography variant="caption" sx={{ color: "text.secondary" }}>{color.color_code}</Typography>
               </Box>
             </Box>
@@ -175,7 +175,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
               sx={{ textTransform: "none", flexShrink: 0, display: { xs: "none", sm: "inline-flex" }, minWidth: 64, px: 1.5 }}>
               {t.copy}
             </Button>
-            <IconButton onClick={handleCopy} sx={{ display: { xs: "inline-flex", sm: "none" }, bgcolor: "primary.main", color: "#fff", "&:hover": { bgcolor: "primary.dark" } }} aria-label={t.copy}>
+            <IconButton onClick={handleCopy} sx={{ display: { xs: "inline-flex", sm: "none" }, bgcolor: "primary.main", color: "primary.contrastText", "&:hover": { bgcolor: "primary.dark" } }} aria-label={t.copy}>
               <ContentCopyIcon fontSize="small" />
             </IconButton>
 
@@ -246,7 +246,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
             </Box>
 
             <Box sx={{ borderTop: 1, borderColor: "divider" }}>
-              <Tabs value={infoTab} onChange={(_, v) => setInfoTab(v)} variant="fullWidth"
+              <Tabs value={infoTab} onChange={(_, v) => setInfoTab(v)} variant="fullWidth" aria-label={t.tabColorInfo}
                 sx={{ minHeight: { xs: 36, md: 48 }, "& .MuiTab-root": { minHeight: { xs: 36, md: 48 }, fontSize: { xs: "0.75rem", md: "0.875rem" }, py: 0 } }}>
                 <Tab label={t.tabColorInfo} />
                 <Tab label={t.tabColorDocs} />
@@ -254,7 +254,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
               </Tabs>
             </Box>
 
-            <Box sx={{ p: { xs: 2, sm: 3 } }}>
+            <Box role="tabpanel" id="formula-tabpanel-info" aria-labelledby="formula-tab-info" sx={{ p: { xs: 2, sm: 3 } }}>
               {infoTab === 0 && (
                 <Stack spacing={{ xs: 1.25, md: 2 }}>
                   <InfoRow label={t.manufacturerLabel} value={make} />
@@ -268,7 +268,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                 </Stack>
               )}
               {(infoTab === 1 || infoTab === 2) && (
-                <Box sx={{ py: 3, textAlign: "center" }}>
+                <Box role="tabpanel" id={infoTab === 1 ? "formula-tabpanel-docs" : "formula-tabpanel-plastic"} aria-label={infoTab === 1 ? t.tabColorDocs : t.tabPlasticParts} sx={{ py: 3, textAlign: "center" }}>
                   <Typography variant="caption" sx={{ color: "text.disabled" }}>{t.emptyState}</Typography>
                 </Box>
               )}

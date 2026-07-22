@@ -11,7 +11,7 @@ import type {
 } from "@/types";
 import type { Toner, CarMake } from "@/types";
 import { generateFormulaId } from "@/lib/id-generator";
-import { FONT, HEADER_BG, CELL_FONT_SIZE, COLUMN_BG, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx } from "@/components/admin-table-styles";
+import { FONT, HEADER_BG, CELL_FONT_SIZE, COLUMN_BG, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx, SEARCH_INPUT_SX } from "@/components/admin-table-styles";
 import { hexToRgb, filterTonersBySystem, matchingToners, matchingColors } from "./formula-helpers";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -367,7 +367,7 @@ export default function FormulasPanel() {
     width: "100%",
     boxSizing: "border-box",
     border: "1px solid #d1d5db",
-    borderRadius: 0,
+    borderRadius: 2,
     padding: "8px 12px",
     height: 38,
     fontSize: CELL_FONT_SIZE,
@@ -377,8 +377,8 @@ export default function FormulasPanel() {
   };
 
   const INPUT_FOCUS_HANDLER = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.target.style.borderColor = "#3b82f6";
-    e.target.style.boxShadow = "0 0 0 3px rgba(59,130,246,0.12)";
+    e.target.style.borderColor = "#2487ca";
+    e.target.style.boxShadow = "0 0 0 3px rgba(36,135,202,0.12)";
   };
   const INPUT_BLUR_HANDLER = (e: React.FocusEvent<HTMLInputElement>) => {
     e.target.style.borderColor = "#d1d5db";
@@ -410,21 +410,21 @@ export default function FormulasPanel() {
         flexDirection: "column",
       }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5, flexShrink: 0 }}>
-          <Box sx={{ fontWeight: 600, fontSize: "0.9375rem", color: "#111827", fontFamily: FONT, letterSpacing: "-0.01em" }}>{title}</Box>
+          <Box sx={{ fontWeight: 600, fontSize: "0.9375rem", color: "text.primary", fontFamily: FONT, letterSpacing: "-0.01em" }}>{title}</Box>
           <Button onClick={() => addComponent(group)} variant="outlined" size="small" sx={{
             fontFamily: FONT,
             fontSize: "0.8125rem",
             fontWeight: 500,
-            borderRadius: "0",
+            borderRadius: 2,
             px: 2,
             py: 0.75,
             textTransform: "none",
-            borderColor: "#d1d5db",
-            color: "#374151",
+            borderColor: "grey.300",
+            color: "text.secondary",
             transition: "all 0.2s ease",
             "&:hover": {
-              borderColor: "#3b82f6",
-              color: "#2563eb",
+              borderColor: "primary.main",
+              color: "primary.dark",
               bgcolor: "rgba(59,130,246,0.04)",
               transform: "translateY(-1px)",
               boxShadow: "0 2px 6px rgba(59,130,246,0.1)",
@@ -488,7 +488,7 @@ export default function FormulasPanel() {
             <TableBody>
               {filtered.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ color: "#9ca3af", fontSize: "0.8125rem", fontFamily: FONT, py: 8, fontStyle: "italic" }}>
+                  <TableCell colSpan={5} align="center" sx={{ color: "text.disabled", fontSize: "0.8125rem", fontFamily: FONT, py: 8, fontStyle: "italic" }}>
                     暂无色母，点击「+ 添加色母」开始
                   </TableCell>
                 </TableRow>
@@ -507,17 +507,17 @@ export default function FormulasPanel() {
                         style={INPUT_SMALL_STYLE}
                       />
                       {tonerDropdownFor === globalIndex && matchingToners(tonerQuery, tonerPool).length > 0 && (
-                        <Paper sx={{ position: "absolute", left: 8, top: "100%", zIndex: 50, mt: 0.5, maxHeight: 240, width: 280, overflow: "auto", boxShadow: "0 4px 16px rgba(0,0,0,0.1)", borderRadius: "0", border: "1px solid #e5e7eb" }}>
+                        <Paper sx={{ position: "absolute", left: 8, top: "100%", zIndex: 50, mt: 0.5, maxHeight: 240, width: 280, overflow: "auto", boxShadow: "0 4px 16px rgba(0,0,0,0.1)", borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
                           {matchingToners(tonerQuery, tonerPool).map((toner) => (
                             <Button
                               key={toner.code}
                               onMouseDown={() => { selectToner(globalIndex, toner); setTonerDropdownFor(null); }}
                               fullWidth
-                              sx={{ justifyContent: "flex-start", gap: 1, px: 1.5, py: 1, borderRadius: 0, fontSize: "0.8125rem", fontFamily: FONT, textTransform: "none", transition: "background-color 0.15s ease", "&:hover": { bgcolor: "rgba(59,130,246,0.06)" } }}
+                              sx={{ justifyContent: "flex-start", gap: 1, px: 1.5, py: 1, borderRadius: 0, fontSize: "0.8125rem", fontFamily: FONT, textTransform: "none", transition: "background-color 0.15s ease", "&:hover": { bgcolor: "rgba(36,135,202,0.06)" } }}
                             >
-                              <Box sx={{ width: 32, height: 20, borderRadius: 0, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: toner.hex }} />
-                              <Box component="span" sx={{ color: "#1a1a1a", fontWeight: 500 }}>{toner.code}</Box>
-                              <Box component="span" sx={{ fontWeight: 500, color: "#374151" }}>{toner.tradeName}</Box>
+                              <Box sx={{ width: 32, height: 20, borderRadius: 2, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: toner.hex }} />
+                              <Box component="span" sx={{ color: "text.primary", fontWeight: 500 }}>{toner.code}</Box>
+                              <Box component="span" sx={{ fontWeight: 500, color: "text.secondary" }}>{toner.tradeName}</Box>
                             </Button>
                           ))}
                         </Paper>
@@ -563,7 +563,7 @@ export default function FormulasPanel() {
                         placeholder="0"
                         style={{
                           ...INPUT_SMALL_STYLE,
-                          borderColor: c.percentage < 0 || c.percentage > 100 ? "#EF4444" : INPUT_SMALL_STYLE.borderColor,
+                          borderColor: c.percentage < 0 || c.percentage > 100 ? "error.main" : INPUT_SMALL_STYLE.borderColor,
                         }}
                       />
                     </TableCell>
@@ -606,18 +606,18 @@ export default function FormulasPanel() {
                           minWidth: 0,
                           px: 1.5,
                           py: 0.5,
-                          borderRadius: "0",
+                          borderRadius: 2,
                           fontSize: "0.75rem",
                           fontFamily: FONT,
                           fontWeight: 500,
-                          color: "#ef4444",
-                          bgcolor: "rgba(239,68,68,0.06)",
-                          border: "1px solid rgba(239,68,68,0.15)",
+                          color: "error.main",
+                          bgcolor: "rgba(220,38,38,0.06)",
+                          border: "1px solid rgba(220,38,38,0.15)",
                           textTransform: "none",
                           transition: "all 0.2s ease",
                           "&:hover": {
-                            bgcolor: "rgba(239,68,68,0.12)",
-                            borderColor: "rgba(239,68,68,0.3)",
+                            bgcolor: "rgba(220,38,38,0.12)",
+                            borderColor: "rgba(220,38,38,0.3)",
                             transform: "scale(1.03)",
                           },
                         }}
@@ -647,23 +647,24 @@ export default function FormulasPanel() {
               mt: 1.5,
               py: 1,
               px: 1.5,
-              borderRadius: "0",
+              borderRadius: 2,
               fontSize: "0.8125rem",
               fontFamily: FONT,
               fontWeight: 500,
-              bgcolor: isValid ? "#f0fdf4" : "#fef2f2",
-              border: isValid ? "1px solid #bbf7d0" : "1px solid #fecaca",
-              color: isValid ? "#166534" : "#991b1b",
+              bgcolor: isValid ? "success.light" : "error.light",
+              border: "1px solid",
+              borderColor: isValid ? "success.light" : "error.light",
+              color: isValid ? "success.dark" : "error.dark",
               display: "flex",
               alignItems: "center",
               gap: 1,
             }}>
               {isValid ? (
-                <Box component="svg" sx={{ width: 18, height: 18, flexShrink: 0, color: "#22c55e" }} viewBox="0 0 20 20" fill="currentColor">
+                <Box component="svg" sx={{ width: 18, height: 18, flexShrink: 0, color: "success.main" }} viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
                 </Box>
               ) : (
-                <Box component="svg" sx={{ width: 18, height: 18, flexShrink: 0, color: "#ef4444" }} viewBox="0 0 20 20" fill="currentColor">
+                <Box component="svg" sx={{ width: 18, height: 18, flexShrink: 0, color: "error.main" }} viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
                 </Box>
               )}
@@ -719,16 +720,7 @@ export default function FormulasPanel() {
                 ),
               },
             }}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                borderRadius: "0",
-                fontSize: "0.8125rem",
-                bgcolor: "#fff",
-                "& fieldset": { borderColor: "#3b82f6", borderWidth: 2 },
-                "&:hover fieldset": { borderColor: "#2563eb" },
-                "&.Mui-focused fieldset": { borderColor: "#2563eb", borderWidth: 2 },
-              },
-            }}
+            sx={{ ...SEARCH_INPUT_SX, width: "100%" }}
           />
         </Box>
         <Paper variant="outlined" sx={{ flex: 1, overflow: "auto", minHeight: 0 }}>
@@ -746,7 +738,7 @@ export default function FormulasPanel() {
                   "&:hover": { bgcolor: isSel ? "rgba(36,135,202,0.08)" : "grey.50" },
                 }}
               >
-                <Box component="span" sx={{ display: "block", fontWeight: 700, fontFamily: FONT, color: "#111827" }}>
+                <Box component="span" sx={{ display: "block", fontWeight: 700, fontFamily: FONT, color: "text.primary" }}>
                   {colors.find((c) => c.id === f.color_id)?.color_code || f.color_id}
                 </Box>
                 <Box component="span" sx={{ display: "block", fontWeight: 500, fontFamily: FONT, color: "text.disabled", fontSize: "0.75rem" }}>
@@ -766,8 +758,9 @@ export default function FormulasPanel() {
         display: "flex",
         flexDirection: "column",
         minHeight: 0,
-        borderRadius: "0",
-        border: "1px solid #e5e7eb",
+        borderRadius: 2,
+        border: "1px solid",
+        borderColor: "divider",
         boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
       }}>
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
@@ -856,9 +849,10 @@ export default function FormulasPanel() {
           gap: 1.5,
           p: 2.5,
           mt: 3,
-          borderTop: "1px solid #e5e7eb",
-          bgcolor: "#fafafa",
-          borderRadius: "0",
+          borderTop: "1px solid",
+          borderTopColor: "divider",
+          bgcolor: "grey.50",
+          borderRadius: 2,
           mx: -3,
           mb: -8,
           px: 3,
@@ -880,8 +874,8 @@ export default function FormulasPanel() {
               transition: "all 0.2s ease",
               "&:hover": { boxShadow: "0 2px 8px rgba(0,0,0,0.18)", transform: "translateY(-1px)" },
               "&.Mui-disabled": {
-                bgcolor: "#d1d5db",
-                color: "#fff",
+                bgcolor: "grey.400",
+                color: "grey.100",
               },
             }}
           >

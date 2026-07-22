@@ -44,7 +44,7 @@ export default function SiteHeader() {
       color="default"
       elevation={0}
       sx={{
-        bgcolor: "#ffffff",
+        bgcolor: "background.paper",
         zIndex: 1100,
       }}
     >
@@ -87,6 +87,7 @@ export default function SiteHeader() {
                   component={Link}
                   href={item.href}
                   disableElevation
+                  aria-current={active ? "page" : undefined}
                   sx={{
                     color: active ? "primary.main" : "text.secondary",
                     fontWeight: active ? 700 : 600,
@@ -106,29 +107,31 @@ export default function SiteHeader() {
           </Stack>
         </Stack>
 
-        {/* 右侧 actions */}
-        <Stack direction="row" spacing={{ xs: 1, md: 1.5 }} sx={{ alignItems: "center" }}>
+        {/* 右侧 actions：4 个元素统一高度 36px、字号 0.8125rem、居中对齐、间距 12px */}
+        <Stack direction="row" sx={{ alignItems: "center", gap: 1.5 }}>
           {authUser ? (
             <>
               {authUser.role === "admin" && (
                 <Button
                   component={Link}
                   href="/admin/data"
-                  variant="contained"
-                  color="inherit"
+                  variant="outlined"
                   size="small"
                   sx={{
                     display: { xs: "none", md: "inline-flex" },
-                    bgcolor: "#2487ca",
-                    color: "#fff",
-                    transition: "transform 0.1s, background-color 0.15s",
-                    "&:hover": { bgcolor: "#1d6ea8", color: "#fff" },
-                    "&:active": { transform: "scale(0.8)" },
                     textTransform: "none",
                     fontWeight: 600,
-                    minHeight: { xs: 26, md: "auto" },
-                    fontSize: { xs: "0.75rem", md: "0.8125rem" },
-                    px: { xs: 1.25, md: 1.5 },
+                    fontSize: "0.8125rem",
+                    px: 1.5,
+                    height: 36,
+                    borderRadius: 2,
+                    borderColor: "grey.300",
+                    color: "text.secondary",
+                    "&:hover": {
+                      borderColor: "primary.main",
+                      color: "primary.main",
+                      bgcolor: "rgba(36,135,202,0.04)",
+                    },
                   }}
                 >
                   {t.navAdmin}
@@ -138,15 +141,23 @@ export default function SiteHeader() {
                 <Button
                   component={Link}
                   href="/admin/users"
-                  variant="contained"
+                  variant="outlined"
                   size="small"
                   sx={{
                     display: { xs: "none", md: "inline-flex" },
                     textTransform: "none",
                     fontWeight: 600,
-                    minHeight: { xs: 26, md: "auto" },
-                    fontSize: { xs: "0.75rem", md: "0.8125rem" },
-                    px: { xs: 1.25, md: 1.5 },
+                    fontSize: "0.8125rem",
+                    px: 1.5,
+                    height: 36,
+                    borderRadius: 2,
+                    borderColor: "grey.300",
+                    color: "text.secondary",
+                    "&:hover": {
+                      borderColor: "primary.main",
+                      color: "primary.main",
+                      bgcolor: "rgba(36,135,202,0.04)",
+                    },
                   }}
                 >
                   {authUser.username}
@@ -154,16 +165,23 @@ export default function SiteHeader() {
               )}
               <Button
                 onClick={logout}
-                variant="contained"
+                variant="outlined"
+                color="error"
                 size="small"
                 sx={{
+                  display: { xs: "none", md: "inline-flex" },
                   textTransform: "none",
                   fontWeight: 600,
-                  minHeight: { xs: 28, md: "auto" },
-                  fontSize: { xs: "0.75rem", md: "0.8125rem" },
-                  lineHeight: 1.2,
-                  whiteSpace: "nowrap",
-                  px: { xs: 1.25, md: 1.5 },
+                  fontSize: "0.8125rem",
+                  px: 1.5,
+                  height: 36,
+                  borderRadius: 2,
+                  borderColor: "error.main",
+                  color: "error.main",
+                  "&:hover": {
+                    bgcolor: "rgba(220,38,38,0.06)",
+                    borderColor: "error.main",
+                  },
                 }}
               >
                 {t.logout}
@@ -178,9 +196,9 @@ export default function SiteHeader() {
               sx={{
                 textTransform: "none",
                 fontWeight: 600,
-                minHeight: { xs: 26, md: "auto" },
-                fontSize: { xs: "0.75rem", md: "0.8125rem" },
-                px: { xs: 1.25, md: 1.5 },
+                fontSize: "0.8125rem",
+                px: 1.5,
+                height: 36,
               }}
             >
               {t.login}
@@ -227,7 +245,7 @@ export default function SiteHeader() {
               <CloseIcon />
             </IconButton>
           </Box>
-          <List sx={{ pt: 1 }}>
+          <List sx={{ pt: 1 }} aria-label={t.navFormulaSearch}>
             {navItems.map((item) => {
               const active = isActive(item.href);
               return (
@@ -237,6 +255,7 @@ export default function SiteHeader() {
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
                     selected={active}
+                    aria-current={active ? "page" : undefined}
                     sx={{
                       py: 1.5,
                       minHeight: 48,

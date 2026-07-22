@@ -12,6 +12,10 @@ const theme = createTheme({
       light: "#3a9de0",
       contrastText: "#FFFFFF",
     },
+    error: {
+      main: "#DC2626",
+      light: "#FEF2F2",
+    },
     text: {
       primary: "#171717",
       secondary: "#4D4D4D",
@@ -23,7 +27,7 @@ const theme = createTheme({
     },
     divider: "#EBEBEB",
     grey: {
-      50: "#FAFAFA",
+      50: "#F9FAFB",
       100: "#F5F5F5",
       200: "#EBEBEB",
       300: "#E5E7EB",
@@ -36,7 +40,7 @@ const theme = createTheme({
     },
   },
   shape: {
-    borderRadius: 0,
+    borderRadius: 2,
   },
   typography: {
     fontFamily:
@@ -81,15 +85,14 @@ const theme = createTheme({
     "0 1px 1px rgba(0,0,0,0.02), 0 2px 2px rgba(0,0,0,0.04)",
   ],
   transitions: {
-    create: () => "none",
     duration: {
-      shortest: 0,
-      shorter: 0,
-      short: 0,
-      standard: 0,
-      complex: 0,
-      enteringScreen: 0,
-      leavingScreen: 0,
+      shortest: 100,
+      shorter: 150,
+      short: 200,
+      standard: 250,
+      complex: 300,
+      enteringScreen: 225,
+      leavingScreen: 195,
     },
   },
   components: {
@@ -107,7 +110,6 @@ const theme = createTheme({
         root: {
           textTransform: "none",
           fontWeight: 500,
-          borderRadius: 0,
         },
         contained: {
           boxShadow: "none",
@@ -144,9 +146,7 @@ const theme = createTheme({
     },
     MuiOutlinedInput: {
       styleOverrides: {
-        root: {
-          borderRadius: 0,
-        },
+        root: {},
       },
     },
     MuiTextField: {

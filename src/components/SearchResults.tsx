@@ -111,12 +111,12 @@ export default function SearchResults({
 
   if (rows.length === 0) {
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 300, p: 3 }}>
-        <SearchOffIcon sx={{ fontSize: 56, color: "#ffffff", mb: 2, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.8))" }} />
-        <Typography variant="body2" sx={{ color: "#ffffff", fontWeight: 600, fontFamily: FONT, fontSize: CELL_FONT_SIZE, textShadow: "0 2px 4px rgba(0,0,0,0.8)" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 300, p: 3 }} role="status">
+        <SearchOffIcon aria-hidden="true" sx={{ fontSize: 56, color: "background.paper", mb: 2, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.8))" }} />
+        <Typography variant="body2" sx={{ color: "background.paper", fontWeight: 600, fontFamily: FONT, fontSize: CELL_FONT_SIZE, textShadow: "0 2px 4px rgba(0,0,0,0.8)" }}>
           {t.noResults}
         </Typography>
-        <Typography variant="body2" sx={{ color: "#ffffff", fontWeight: 500, fontFamily: FONT, fontSize: CAPTION_FONT_SIZE, mt: 0.5, textShadow: "0 2px 4px rgba(0,0,0,0.8)" }}>
+        <Typography variant="body2" sx={{ color: "background.paper", fontWeight: 500, fontFamily: FONT, fontSize: CAPTION_FONT_SIZE, mt: 0.5, textShadow: "0 2px 4px rgba(0,0,0,0.8)" }}>
           {t.noResultsHint}
         </Typography>
       </Box>
@@ -127,19 +127,20 @@ export default function SearchResults({
 
   return (
     <Box sx={{ mx: { xs: -1, sm: 0 } }}>
-      <TableContainer component={Paper} variant="outlined" className="table-responsive-scroll" sx={{ borderRadius: 0, border: "1px solid", borderColor: "grey.200", borderTop: "2px solid #2487ca" }}>
+      <TableContainer component={Paper} variant="outlined" className="table-responsive-scroll" sx={{ borderRadius: 0, border: "1px solid", borderColor: "grey.200", borderTop: "2px solid", borderTopColor: "primary.main" }}>
         <Table sx={{ tableLayout: { xs: "auto", md: "fixed" }, width: "100%", minWidth: { xs: 560, md: "100%" } }}>
+          <caption className="sr-only">Formula search results table</caption>
           <TableHead>
-            <TableRow sx={{ bgcolor: "#2487ca" }}>
-              <TableCell sx={{ width: { md: COLUMN_WIDTHS.colorType }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.colorType}</TableCell>
-              <TableCell sx={{ width: { md: COLUMN_WIDTHS.manufacturer }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.manufacturerLabel}</TableCell>
-              <TableCell sx={{ width: { md: COLUMN_WIDTHS.code }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.codeLabel}</TableCell>
-              <TableCell sx={{ width: { md: COLUMN_WIDTHS.colorName }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.colorName}</TableCell>
-              <TableCell className="hide-on-mobile" sx={{ width: { md: COLUMN_WIDTHS.carModel }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.carModelLabel}</TableCell>
-              <TableCell className="hide-on-mobile" sx={{ width: { md: COLUMN_WIDTHS.years }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.yearsLabel}</TableCell>
-              <TableCell className="hide-on-mobile" sx={{ width: { md: COLUMN_WIDTHS.formulaVariants }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>Process</TableCell>
-              <TableCell className="hide-on-mobile" sx={{ width: { md: COLUMN_WIDTHS.version }, fontWeight: 700, color: "#FFFFFF", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.versionLabel}</TableCell>
-              <TableCell sx={{ width: { md: COLUMN_WIDTHS.action }, borderBottom: "none", py: 1 }}></TableCell>
+            <TableRow sx={{ bgcolor: "primary.main" }}>
+              <TableCell scope="col" sx={{ width: { md: COLUMN_WIDTHS.colorType }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.colorType}</TableCell>
+              <TableCell scope="col" sx={{ width: { md: COLUMN_WIDTHS.manufacturer }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.manufacturerLabel}</TableCell>
+              <TableCell scope="col" sx={{ width: { md: COLUMN_WIDTHS.code }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.codeLabel}</TableCell>
+              <TableCell scope="col" sx={{ width: { md: COLUMN_WIDTHS.colorName }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.colorName}</TableCell>
+              <TableCell scope="col" sx={{ display: { xs: "none", md: "table-cell" }, width: { md: COLUMN_WIDTHS.carModel }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.carModelLabel}</TableCell>
+              <TableCell scope="col" sx={{ display: { xs: "none", md: "table-cell" }, width: { md: COLUMN_WIDTHS.years }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.yearsLabel}</TableCell>
+              <TableCell scope="col" sx={{ display: { xs: "none", md: "table-cell" }, width: { md: COLUMN_WIDTHS.formulaVariants }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>Process</TableCell>
+              <TableCell scope="col" sx={{ display: { xs: "none", md: "table-cell" }, width: { md: COLUMN_WIDTHS.version }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.versionLabel}</TableCell>
+              <TableCell scope="col" sx={{ width: { md: COLUMN_WIDTHS.action }, borderBottom: "none", py: 1 }} aria-label="Actions"></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -148,7 +149,7 @@ export default function SearchResults({
                 key={`${row.formula.id}-${index}`}
                 sx={{
                   borderBottom: "1px solid #e5e7eb",
-                  bgcolor: index % 2 === 0 ? "#ffffff" : "#fafafa",
+                  bgcolor: index % 2 === 0 ? "background.paper" : "grey.100",
                   "&:last-child td": { borderBottom: "none" },
                   "&:hover": { bgcolor: "#f5f5f5" },
                   transition: "background-color 0.15s ease",
@@ -182,25 +183,25 @@ export default function SearchResults({
                   <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#1a1a1a" }}>{row.color.color_name}</Typography>
                 </TableCell>
                 {/* col 4: carModel (odd) — hidden on mobile */}
-                <TableCell className="hide-on-mobile" sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
                   <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
                     {row.color.car_model || "—"}
                   </Typography>
                 </TableCell>
                 {/* col 5: years (even) — hidden on mobile */}
-                <TableCell className="hide-on-mobile" sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
                   <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#9ca3af" }}>
                     {row.year ?? "—"}
                   </Typography>
                 </TableCell>
                 {/* col 6: Process (odd) — 配方类型，隐藏在移动端 */}
-                <TableCell className="hide-on-mobile" sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
                   <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
                     {row.formula.formula_type}
                   </Typography>
                 </TableCell>
                 {/* col 7: version (even) — hidden on mobile */}
-                <TableCell className="hide-on-mobile" sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
                   <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151", fontWeight: 500 }}>{row.formula.version}</Typography>
                 </TableCell>
                 {/* col 8: action (odd) */}
@@ -208,6 +209,7 @@ export default function SearchResults({
                   <IconButton
                     onClick={() => onOpenFormula(row)}
                     size="small"
+                    aria-label="View formula"
                     sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(36,135,202,0.08)", color: "primary.main" } }}
                   >
                     <ZoomInIcon fontSize="small" />
@@ -231,7 +233,7 @@ export default function SearchResults({
           labelRowsPerPage={t.pageSizeLabel}
         />
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, py: 1, borderTop: "1px solid", borderColor: "grey.200" }}>
-          <Typography sx={{ fontFamily: FONT, fontSize: CAPTION_FONT_SIZE, fontWeight: 600, color: "#2487ca" }}>
+          <Typography sx={{ fontFamily: FONT, fontSize: CAPTION_FONT_SIZE, fontWeight: 600, color: "primary.main" }} aria-live="polite">
             {t.foundFormulas(rows.length)}
           </Typography>
         </Box>

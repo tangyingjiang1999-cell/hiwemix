@@ -85,40 +85,58 @@ export default function ApplicationGuidePage() {
     <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", bgcolor: "background.default", overflowX: "clip" }}>
       <SiteHeader />
 
-      <Box sx={{ bgcolor: "#fff", pt: { xs: 9, md: 10 }, pb: { xs: 1.5, md: 2 }, px: { xs: 1.5, sm: 2, md: 3 } }}>
-        <TextField
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={t.guideSearchPlaceholder}
-          size="small"
-          fullWidth
-          sx={{ "& .MuiOutlinedInput-root": { borderRadius: { xs: "12px", md: 0 } } }}
-        />
-      </Box>
-
-      <Box sx={{ display: "flex", flex: 1, flexDirection: { xs: "column", lg: "row" }, overflow: { xs: "auto", lg: "hidden" } }}>
-        {/* 左栏：分类 */}
-        <Box sx={{ width: { lg: 256 }, flexShrink: 0, bgcolor: "#fff", borderRight: { lg: 1 }, borderBottom: { xs: 1, lg: 0 }, borderColor: "divider", p: { xs: 1.5, md: 2 }, maxHeight: { xs: 200, lg: "none" }, overflow: { xs: "auto", lg: "visible" } }}>
-          <Typography variant="overline" sx={{ color: "text.secondary", fontWeight: 600, px: 1 }}>{t.guideCategories}</Typography>
-          <List dense>
+      {/* Body 主体：三栏布局，左栏与 Header Logo 严格左对齐 */}
+      <Box sx={{ display: "flex", flex: 1, flexDirection: { xs: "column", lg: "row" }, overflow: { xs: "auto", lg: "hidden" }, pt: { xs: 9, md: 10 } }}>
+        {/* 左栏：分类菜单 —— 透明背景，左 padding 与 Header 一致 */}
+        <Box sx={{
+          width: { lg: 240 }, flexShrink: 0,
+          bgcolor: "transparent",
+          borderRight: { lg: 1 }, borderBottom: { xs: 1, lg: 0 }, borderColor: "divider",
+          pl: { xs: 1.5, sm: 3, md: "60px" }, pr: 2, pt: 3, pb: 2,
+          maxHeight: { xs: 200, lg: "none" }, overflow: { xs: "auto", lg: "visible" },
+        }}>
+          <Typography variant="overline" sx={{ color: "text.disabled", fontWeight: 600, display: "block", mb: 0.5 }}>
+            {t.guideCategories}
+          </Typography>
+          <List dense sx={{ p: 0 }}>
             <ListItemButton selected={selectedCategory === ""} onClick={() => setSelectedCategory("")}
-              sx={{ borderRadius: { xs: "10px", md: 0 }, minHeight: { xs: 36, md: "auto" }, "&.Mui-selected": { bgcolor: "rgba(36,135,202,0.08)", color: "primary.main" } }}>
-              <ListItemText primary={t.guideAllCategories} slotProps={{ primary: { sx: { fontSize: "0.8125rem" } } }} />
+              sx={{
+                borderRadius: "4px", mb: 0.25, pl: 1, pr: 1.5, py: 0.75, position: "relative",
+                "&.Mui-selected": {
+                  bgcolor: "rgba(36,135,202,0.08)", color: "primary.main",
+                  "&::before": { content: '""', position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 3, height: "60%", borderRadius: "0 2px 2px 0", bgcolor: "primary.main" },
+                },
+                "&:hover": { bgcolor: "rgba(0,0,0,0.03)" },
+              }}>
+              <ListItemText primary={t.guideAllCategories} slotProps={{ primary: { sx: { fontSize: "0.8125rem", fontWeight: selectedCategory === "" ? 600 : 400 } } }} />
             </ListItemButton>
             {categories.map((cat) => (
               <ListItemButton key={cat.id} selected={selectedCategory === cat.id} onClick={() => setSelectedCategory(cat.id)}
-                sx={{ borderRadius: { xs: "10px", md: 0 }, minHeight: { xs: 36, md: "auto" }, "&.Mui-selected": { bgcolor: "rgba(36,135,202,0.08)", color: "primary.main" } }}>
-                <ListItemText primary={lang === "zh" ? cat.nameZh : cat.name} slotProps={{ primary: { sx: { fontSize: "0.8125rem" } } }} />
+                sx={{
+                  borderRadius: "4px", mb: 0.25, pl: 1, pr: 1.5, py: 0.75, position: "relative",
+                  "&.Mui-selected": {
+                    bgcolor: "rgba(36,135,202,0.08)", color: "primary.main",
+                    "&::before": { content: '""', position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 3, height: "60%", borderRadius: "0 2px 2px 0", bgcolor: "primary.main" },
+                  },
+                  "&:hover": { bgcolor: "rgba(0,0,0,0.03)" },
+                }}>
+                <ListItemText primary={lang === "zh" ? cat.nameZh : cat.name} slotProps={{ primary: { sx: { fontSize: "0.8125rem", fontWeight: selectedCategory === cat.id ? 600 : 400 } } }} />
               </ListItemButton>
             ))}
           </List>
         </Box>
 
         {/* 中栏：指南列表 */}
-        <Box sx={{ width: { lg: 320 }, flexShrink: 0, bgcolor: "grey.50", borderRight: { lg: 1 }, borderBottom: { xs: 1, lg: 0 }, borderColor: "divider", p: { xs: 1.5, md: 2 }, maxHeight: { xs: 280, lg: "none" }, overflow: { xs: "auto", lg: "visible" } }}>
-          <Typography variant="overline" sx={{ color: "text.secondary", fontWeight: 600, px: 1 }}>
-            {t.guideListLabel} ({filteredGuides.length})
-          </Typography>
+        <Box sx={{ width: { lg: 320 }, flexShrink: 0, bgcolor: "grey.50", borderRight: { lg: 1 }, borderBottom: { xs: 1, lg: 0 }, borderColor: "divider", p: { xs: 1.5, md: 2 }, pt: { xs: 1.5, md: 3 }, maxHeight: { xs: 280, lg: "none" }, overflow: { xs: "auto", lg: "visible" } }}>
+          {/* 搜索框移动到中栏顶部 */}
+          <TextField
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={t.guideSearchPlaceholder}
+            size="small"
+            fullWidth
+            sx={{ mb: 2, "& .MuiOutlinedInput-root": { borderRadius: { xs: "12px", md: 2 }, fontSize: "0.8125rem" } }}
+          />
           <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 1 }}>
             {filteredGuides.map((guide) => (
               <Card
@@ -146,7 +164,7 @@ export default function ApplicationGuidePage() {
         </Box>
 
         {/* 右栏：内容 */}
-        <Box sx={{ flex: 1, p: { xs: 2, md: 3 }, minHeight: { xs: 320, lg: "auto" } }}>
+        <Box sx={{ flex: 1, px: { xs: 1.5, sm: 3, md: "60px" }, py: { xs: 2, md: 3 }, minHeight: { xs: 320, lg: "auto" } }}>
           {selectedGuide ? (
             <GuideContent guide={selectedGuide} />
           ) : (
