@@ -1,8 +1,8 @@
 // ============================================================
-// 色母数据访问层 — 读操作用 anon client，写操作用 supabaseAdmin
+// 色母数据访问层 — 读操作用 anon client，写操作用 getSupabaseAdmin()
 // ============================================================
 import { supabase } from "./supabase-client";
-import { supabaseAdmin } from "./supabase-server";
+import { getSupabaseAdmin } from "./supabase-server";
 import type { Toner } from "@/types";
 
 // ====== 读（anon，受 RLS SELECT 策略保护） ======
@@ -16,11 +16,11 @@ export async function getToners(): Promise<Toner[]> {
   return (data ?? []).map(mapTonerRow);
 }
 
-// ====== 写（supabaseAdmin，BYPASSRLS，仅服务端 API 调用） ======
+// ====== 写（getSupabaseAdmin()，BYPASSRLS，仅服务端 API 调用） ======
 
 export async function saveToner(toner: Toner): Promise<Toner> {
   const row = toTonerRow(toner);
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("toners")
     .upsert(row)
     .select()
@@ -30,14 +30,14 @@ export async function saveToner(toner: Toner): Promise<Toner> {
 }
 
 export async function deleteToner(code: string): Promise<void> {
-  const { error } = await supabaseAdmin.from("toners").delete().eq("code", code);
+  const { error } = await getSupabaseAdmin().from("toners").delete().eq("code", code);
   if (error) throw error;
 }
 
 /** 批量种子数据 — 首次导入使用（幂等：ON CONFLICT DO NOTHING 需在 SQL 中配合） */
 export async function seedToners(toners: Toner[]): Promise<void> {
   const rows = toners.map(toTonerRow);
-  const { error } = await supabaseAdmin.from("toners").upsert(rows, {
+  const { error } = await getSupabaseAdmin().from("toners").upsert(rows, {
     onConflict: "code",
     ignoreDuplicates: true,
   });

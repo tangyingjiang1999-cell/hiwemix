@@ -1,5 +1,5 @@
 import { supabase } from "./supabase-client";
-import { supabaseAdmin } from "./supabase-server";
+import { getSupabaseAdmin } from "./supabase-server";
 import type { GuideCategory, Guide } from "@/types";
 
 // ====== 读（anon，受 RLS，仅公开数据）======
@@ -22,10 +22,10 @@ export async function getGuides(): Promise<Guide[]> {
   return (data ?? []).map(mapGuideRow);
 }
 
-// ====== 写（supabaseAdmin，BYPASSRLS，仅服务端 API 调用）======
+// ====== 写（getSupabaseAdmin()，BYPASSRLS，仅服务端 API 调用）======
 
 export async function saveGuideCategory(cat: GuideCategory): Promise<GuideCategory> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("guide_categories")
     .upsert({
       id: cat.id,
@@ -40,12 +40,12 @@ export async function saveGuideCategory(cat: GuideCategory): Promise<GuideCatego
 }
 
 export async function deleteGuideCategory(id: string): Promise<void> {
-  const { error } = await supabaseAdmin.from("guide_categories").delete().eq("id", id);
+  const { error } = await getSupabaseAdmin().from("guide_categories").delete().eq("id", id);
   if (error) throw error;
 }
 
 export async function saveGuide(guide: Guide): Promise<Guide> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("guides")
     .upsert({
       id: guide.id,
@@ -63,7 +63,7 @@ export async function saveGuide(guide: Guide): Promise<Guide> {
 }
 
 export async function deleteGuide(id: string): Promise<void> {
-  const { error } = await supabaseAdmin.from("guides").delete().eq("id", id);
+  const { error } = await getSupabaseAdmin().from("guides").delete().eq("id", id);
   if (error) throw error;
 }
 

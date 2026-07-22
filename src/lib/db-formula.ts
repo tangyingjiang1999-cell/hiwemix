@@ -1,5 +1,5 @@
 import { supabase } from "./supabase-client";
-import { supabaseAdmin } from "./supabase-server";
+import { getSupabaseAdmin } from "./supabase-server";
 import type {
   CarMake,
   Color,
@@ -68,7 +68,7 @@ export async function getAllColorYears(): Promise<Record<string, number[]>> {
 
 export async function saveColorYears(colorId: string, years: number[]): Promise<void> {
   // 删除现有的年份
-  const { error: delErr } = await supabaseAdmin
+  const { error: delErr } = await getSupabaseAdmin()
     .from("color_years")
     .delete()
     .eq("color_id", colorId);
@@ -77,7 +77,7 @@ export async function saveColorYears(colorId: string, years: number[]): Promise<
   // 插入新的年份
   if (years.length > 0) {
     const rows = years.map((year) => ({ color_id: colorId, year }));
-    const { error: insErr } = await supabaseAdmin.from("color_years").insert(rows);
+    const { error: insErr } = await getSupabaseAdmin().from("color_years").insert(rows);
     if (insErr) throw insErr;
   }
 }
@@ -185,12 +185,12 @@ function mapFormulaRow(row: Record<string, unknown>): Formula {
   };
 }
 
-// ====== 写操作（仅服务端，用 supabaseAdmin，BYPASSRLS）======
+// ====== 写操作（仅服务端，用 getSupabaseAdmin()，BYPASSRLS）======
 
 // --- Brands ---
 
 export async function saveBrand(brand: CarMake): Promise<CarMake> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("brands")
     .upsert({ id: brand.id, name: brand.name, region: brand.region })
     .select()
@@ -200,7 +200,7 @@ export async function saveBrand(brand: CarMake): Promise<CarMake> {
 }
 
 export async function deleteBrand(id: string): Promise<void> {
-  const { error } = await supabaseAdmin.from("brands").delete().eq("id", id);
+  const { error } = await getSupabaseAdmin().from("brands").delete().eq("id", id);
   if (error) throw error;
 }
 
@@ -209,13 +209,13 @@ export async function deleteBrand(id: string): Promise<void> {
 export async function saveFormulaType(variant: ColorVariant, originalId?: string): Promise<ColorVariant> {
   // 如果 ID 发生了变更，先删除旧记录再插入新记录
   if (originalId && originalId !== variant.id) {
-    const { error: delErr } = await supabaseAdmin
+    const { error: delErr } = await getSupabaseAdmin()
       .from("formula_types")
       .delete()
       .eq("id", originalId);
     if (delErr) throw delErr;
   }
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("formula_types")
     .upsert({ id: variant.id, name: variant.name, year_range: variant.year_range })
     .select()
@@ -225,7 +225,7 @@ export async function saveFormulaType(variant: ColorVariant, originalId?: string
 }
 
 export async function deleteFormulaType(id: string): Promise<void> {
-  const { error } = await supabaseAdmin.from("formula_types").delete().eq("id", id);
+  const { error } = await getSupabaseAdmin().from("formula_types").delete().eq("id", id);
   if (error) throw error;
 }
 
@@ -252,14 +252,14 @@ export async function saveColor(
       hex_preview: color.hex_preview,
       car_model: color.car_model || null,
     };
-    const res = await supabaseAdmin.from("colors").insert(row).select().single();
+    const res = await getSupabaseAdmin().from("colors").insert(row).select().single();
     data = res.data; error = res.error;
     // 23505 = unique_violation（主键冲突）：给出可读的重复提示
     if (error?.code === "23505") {
       throw new Error(`颜色 ID「${color.id}」已存在，无法重复新增。请修改颜色代码/类型，或使用编辑功能。`);
     }
   } else {
-    const res = await supabaseAdmin
+    const res = await getSupabaseAdmin()
       .from("colors")
       .update({
         make_id: color.make_id,
@@ -283,7 +283,7 @@ export async function saveColor(
   if (variantIds.length > 0) {
     // 将 formula_types 中新增的 ID 同步到 color_variants（幂等 upsert）
     for (const vid of variantIds) {
-      const { error: syncErr } = await supabaseAdmin
+      const { error: syncErr } = await getSupabaseAdmin()
         .from("color_variants")
         .upsert({ id: vid, name: vid, year_range: "" });
       if (syncErr) throw new Error("sync color_variants failed: " + syncErr.message);
@@ -291,7 +291,7 @@ export async function saveColor(
   }
 
   // 清理旧映射
-  const { error: delErr } = await supabaseAdmin
+  const { error: delErr } = await getSupabaseAdmin()
     .from("color_variant_map")
     .delete()
     .eq("color_id", color.id);
@@ -300,7 +300,7 @@ export async function saveColor(
   // 写入新映射
   if (variantIds.length > 0) {
     const rows = variantIds.map((variant_id) => ({ color_id: color.id, variant_id }));
-    const { error: insErr } = await supabaseAdmin.from("color_variant_map").insert(rows);
+    const { error: insErr } = await getSupabaseAdmin().from("color_variant_map").insert(rows);
     if (insErr) throw new Error(insErr.message || JSON.stringify(insErr));
   }
 
@@ -308,7 +308,7 @@ export async function saveColor(
 }
 
 export async function deleteColor(id: string): Promise<void> {
-  const { error } = await supabaseAdmin.from("colors").delete().eq("id", id);
+  const { error } = await getSupabaseAdmin().from("colors").delete().eq("id", id);
   if (error) throw error;
 }
 
@@ -316,7 +316,7 @@ export async function deleteColor(id: string): Promise<void> {
 
 export async function saveFormula(formula: Formula): Promise<Formula> {
   // 1. upsert 配方主行（variant_id 空字符串转 null）
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("formulas")
     .upsert({
       id: formula.id,
@@ -332,7 +332,7 @@ export async function saveFormula(formula: Formula): Promise<Formula> {
   if (error) throw error;
 
   // 2. 全量同步 components：先删后插（id 是 SERIAL 自增，无稳定客户端 id）
-  const { error: delErr } = await supabaseAdmin
+  const { error: delErr } = await getSupabaseAdmin()
     .from("formula_components")
     .delete()
     .eq("formula_id", formula.id);
@@ -356,7 +356,7 @@ export async function saveFormula(formula: Formula): Promise<Formula> {
       }
       return row;
     });
-    const { error: insErr } = await supabaseAdmin.from("formula_components").insert(rows);
+    const { error: insErr } = await getSupabaseAdmin().from("formula_components").insert(rows);
     if (insErr) throw insErr;
   }
 
@@ -364,14 +364,14 @@ export async function saveFormula(formula: Formula): Promise<Formula> {
 }
 
 export async function deleteFormula(id: string): Promise<void> {
-  const { error } = await supabaseAdmin.from("formulas").delete().eq("id", id);
+  const { error } = await getSupabaseAdmin().from("formulas").delete().eq("id", id);
   if (error) throw error;
 }
 
 // --- Settings ---
 
 export async function saveSettings(settings: AppSettings): Promise<AppSettings> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("settings")
     .upsert({
       id: 1,

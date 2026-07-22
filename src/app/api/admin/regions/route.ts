@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserFromRequest, requireAdmin } from "@/lib/auth";
 import { applyRateLimit, ADMIN_LIMIT } from "@/lib/rate-limit";
-import { supabaseAdmin } from "@/lib/supabase-server";
+import { getSupabaseAdmin } from "@/lib/supabase-server";
 import type { Region } from "@/types";
 
 // GET /api/admin/regions - Get all regions (requires admin)
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const forbidden = requireAdmin(user);
   if (forbidden) return forbidden;
 
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("regions")
     .select("code")
     .order("code", { ascending: true });
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Check if region already exists
-  const { data: existing } = await supabaseAdmin
+  const { data: existing } = await getSupabaseAdmin()
     .from("regions")
     .select("code")
     .eq("code", code)
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Insert new region
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("regions")
     .insert({ code })
     .select("code")
@@ -90,7 +90,7 @@ export async function DELETE(req: NextRequest) {
   const code = body.code;
 
   // Check if any brands are using this region
-  const { data: brandsWithRegion, error: checkError } = await supabaseAdmin
+  const { data: brandsWithRegion, error: checkError } = await getSupabaseAdmin()
     .from("brands")
     .select("id")
     .eq("region", code)
@@ -109,7 +109,7 @@ export async function DELETE(req: NextRequest) {
   }
 
   // Delete region
-  const { error } = await supabaseAdmin
+  const { error } = await getSupabaseAdmin()
     .from("regions")
     .delete()
     .eq("code", code);

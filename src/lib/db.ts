@@ -1,4 +1,4 @@
-import { supabaseAdmin } from "./supabase-server";
+import { getSupabaseAdmin } from "./supabase-server";
 
 export interface User {
   id: number;
@@ -31,7 +31,7 @@ function rowToUser(row: UserRow): User {
 // 用户名统一存小写，查询端也转小写，登录时输入大小写不敏感。
 
 export async function getUsers(): Promise<User[]> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("users")
     .select("id, username, role, created_at, updated_at")
     .order("id", { ascending: true });
@@ -42,7 +42,7 @@ export async function getUsers(): Promise<User[]> {
 export async function getUserByUsername(
   username: string
 ): Promise<(User & { password_hash: string }) | null> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("users")
     .select("*")
     .eq("username", username.toLowerCase())
@@ -53,7 +53,7 @@ export async function getUserByUsername(
 }
 
 export async function getUserById(id: number): Promise<User | null> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("users")
     .select("id, username, role, created_at, updated_at")
     .eq("id", id)
@@ -68,7 +68,7 @@ export async function createUser(
   password_hash: string,
   role = "user"
 ): Promise<User> {
-  const { data, error } = await supabaseAdmin
+  const { data, error } = await getSupabaseAdmin()
     .from("users")
     .insert({ username: username.toLowerCase(), password_hash, role })
     .select("id, username, role, created_at, updated_at")
@@ -86,13 +86,13 @@ export async function updateUser(
   if (fields.password_hash) update.password_hash = fields.password_hash;
   if (fields.role) update.role = fields.role;
   update.updated_at = new Date().toISOString();
-  const { error } = await supabaseAdmin.from("users").update(update).eq("id", id);
+  const { error } = await getSupabaseAdmin().from("users").update(update).eq("id", id);
   if (error) throw error;
 }
 
 export async function deleteUser(id: number): Promise<void> {
   const target = await getUserById(id);
   if (!target || target.username === "admin") return;
-  const { error } = await supabaseAdmin.from("users").delete().eq("id", id);
+  const { error } = await getSupabaseAdmin().from("users").delete().eq("id", id);
   if (error) throw error;
 }
