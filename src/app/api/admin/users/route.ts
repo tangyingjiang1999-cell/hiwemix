@@ -1,20 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getTokenFromRequest, verifyToken, requireAdmin } from "@/lib/auth";
+import { getUserFromRequest, requireAdmin } from "@/lib/auth";
 import { applyRateLimit, ADMIN_LIMIT } from "@/lib/rate-limit";
 import { getUsers, getUserById, updateUser, createUser, deleteUser, getUserByUsername } from "@/lib/db";
 import { hashPassword } from "@/lib/auth-helpers";
-
-function getUser(req: NextRequest): { userId: number; username: string; role: string } | null {
-  const token = getTokenFromRequest(req);
-  if (!token) return null;
-  return verifyToken(token);
-}
+import { safeJson, errorResponse, successResponse } from "@/lib/utils";
 
 export async function GET(req: NextRequest) {
   // 管理后台限流：每分钟 60 次
   const limitRes_GET = applyRateLimit(req, ADMIN_LIMIT);
   if (limitRes_GET) return limitRes_GET;
-  const user = getUser(req);
+  const user = getUserFromRequest(req);
   const forbidden = requireAdmin(user);
   if (forbidden) return forbidden;
 
@@ -25,51 +20,57 @@ export async function POST(req: NextRequest) {
   // 管理后台限流：每分钟 60 次
   const limitRes_POST = applyRateLimit(req, ADMIN_LIMIT);
   if (limitRes_POST) return limitRes_POST;
-  const user = getUser(req);
+  const user = getUserFromRequest(req);
   const forbidden = requireAdmin(user);
   if (forbidden) return forbidden;
 
-  const body = await req.json();
+  const body = await safeJson<{ username?: string; password?: string; role?: string }>(req);
+  if (!body) {
+    return errorResponse("请求格式错误");
+  }
   const { username, password, role } = body;
 
   if (!username || !password) {
-    return NextResponse.json({ error: "用户名和密码不能为空" }, { status: 400 });
+    return errorResponse("用户名和密码不能为空");
   }
 
   // 检查用户名是否已存在
   const existing = await getUserByUsername(username);
   if (existing) {
-    return NextResponse.json({ error: "用户名已存在" }, { status: 409 });
+    return errorResponse("用户名已存在", 409);
   }
 
   // 创建用户（bcrypt 加密存储）
   const password_hash = hashPassword(password);
   const newUser = await createUser(username, password_hash, role || "user");
 
-  return NextResponse.json(newUser, { status: 201 });
+  return successResponse(newUser, 201);
 }
 
 export async function PUT(req: NextRequest) {
   // 管理后台限流：每分钟 60 次
   const limitRes_PUT = applyRateLimit(req, ADMIN_LIMIT);
   if (limitRes_PUT) return limitRes_PUT;
-  const user = getUser(req);
+  const user = getUserFromRequest(req);
   const forbidden = requireAdmin(user);
   if (forbidden) return forbidden;
 
-  const body = await req.json();
+  const body = await safeJson<{ id?: string; userId?: string; password?: string; newPassword?: string; role?: string }>(req);
+  if (!body) {
+    return errorResponse("请求格式错误");
+  }
   const { id, userId, password, newPassword, role } = body;
   const targetUserId = userId || id;
   const targetNewPassword = newPassword || password;
 
   if (!targetUserId) {
-    return NextResponse.json({ error: "缺少必要参数" }, { status: 400 });
+    return errorResponse("缺少必要参数");
   }
 
   // 验证目标用户存在
-  const targetUser = await getUserById(targetUserId);
+  const targetUser = await getUserById(Number(targetUserId));
   if (!targetUser) {
-    return NextResponse.json({ error: "用户不存在" }, { status: 404 });
+    return errorResponse("用户不存在", 404);
   }
 
   // 构建更新字段：密码和角色都可以单独或同时更新
@@ -82,45 +83,48 @@ export async function PUT(req: NextRequest) {
   }
 
   if (!fields.password_hash && !fields.role) {
-    return NextResponse.json({ error: "缺少需要更新的字段" }, { status: 400 });
+    return errorResponse("缺少需要更新的字段");
   }
 
-  await updateUser(targetUserId, fields);
+  await updateUser(Number(targetUserId), fields);
 
-  return NextResponse.json({ success: true, message: "用户信息更新成功" });
+  return successResponse({ success: true, message: "用户信息更新成功" });
 }
 
 export async function DELETE(req: NextRequest) {
   // 管理后台限流：每分钟 60 次
   const limitRes_DELETE = applyRateLimit(req, ADMIN_LIMIT);
   if (limitRes_DELETE) return limitRes_DELETE;
-  const user = getUser(req);
+  const user = getUserFromRequest(req);
   const forbidden = requireAdmin(user);
   if (forbidden) return forbidden;
 
-  const body = await req.json();
+  const body = await safeJson<{ id?: string }>(req);
+  if (!body) {
+    return errorResponse("请求格式错误");
+  }
   const { id } = body;
 
   if (!id) {
-    return NextResponse.json({ error: "缺少用户ID" }, { status: 400 });
+    return errorResponse("缺少用户ID");
   }
 
   // 不能删除自己
   if (Number(id) === Number(user!.userId)) {
-    return NextResponse.json({ error: "不能删除自己的账号" }, { status: 400 });
+    return errorResponse("不能删除自己的账号");
   }
 
   // 检查目标用户是否存在
-  const targetUser = await getUserById(id);
+  const targetUser = await getUserById(Number(id));
   if (!targetUser) {
-    return NextResponse.json({ error: "用户不存在" }, { status: 404 });
+    return errorResponse("用户不存在", 404);
   }
 
   // 不允许删除 admin 账号（超級管理員保护）
   if (targetUser.username === "admin") {
-    return NextResponse.json({ error: "不能删除超级管理员" }, { status: 403 });
+    return errorResponse("不能删除超级管理员", 403);
   }
 
-  await deleteUser(id);
-  return NextResponse.json({ success: true, message: "用户已删除" });
+  await deleteUser(Number(id));
+  return successResponse({ success: true, message: "用户已删除" });
 }

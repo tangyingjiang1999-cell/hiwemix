@@ -1,8 +1,7 @@
-import { NextResponse } from "next/server";
-import { applyRateLimit, PUBLIC_LIMIT } from "@/lib/rate-limit";
 import { getFormulas } from "@/lib/db-formula";
+import { safeJson } from "@/lib/api-error";
 
 // 公开读取接口：搜索页普通用户可访问（无需登录）
 export async function GET() {
-  return NextResponse.json(await getFormulas());
+  return safeJson(() => getFormulas());
 }

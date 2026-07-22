@@ -1,4 +1,5 @@
 import TableCell from "@mui/material/TableCell";
+import type { SxProps, Theme } from "@mui/material/styles";
 import { getCellSx, COLUMN_BG } from "./admin-table-styles";
 
 interface AdminTableCellProps {
@@ -7,7 +8,7 @@ interface AdminTableCellProps {
   width?: number;
   colBg?: { odd: string; even: string };
   children: React.ReactNode;
-  sx?: any;
+  sx?: SxProps<Theme>;
 }
 
 export function AdminTableCell({

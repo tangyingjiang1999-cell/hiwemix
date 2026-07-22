@@ -1,6 +1,6 @@
 // FormulasPanel 工具函数 — 纯函数，无状态依赖
 
-import type { Toner, Color, CarMake, FormulaType } from "@/types";
+import type { Toner, Color, CarMake } from "@/types";
 
 /** hex → RGB 转换 */
 export function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
@@ -41,8 +41,3 @@ export function matchingColors(query: string, colors: Color[], brands: CarMake[]
     return false;
   });
 }
-
-/** 旧数据兼容映射：将已更名的配方类型映射到新名称 */
-export const LEGACY_FORMULA_TYPE_MAP: Record<string, FormulaType> = {
-  "Pearl Paint": "Three Stages",
-};

@@ -1,10 +1,8 @@
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { useLang } from "@/components/LanguageContext";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
-import { TONER_CATEGORIES } from "@/data/toners";
 import type { Toner, TonerCategory } from "@/types";
 import { useAuth } from "@/components/AuthContext";
 import Box from "@mui/material/Box";
@@ -39,6 +37,15 @@ import Slider from "@mui/material/Slider";
 
 const FONT = 'var(--font-inter), var(--font-noto), "Helvetica Neue", Arial, sans-serif';
 
+// 色母分类标签（count 由 API 数据动态计算，不再依赖静态数据）
+const TONER_CATEGORIES: { key: TonerCategory; label: string }[] = [
+  { key: "2K_BASECOAT", label: "2K Basecoat" },
+  { key: "1K_BASECOAT", label: "1K Basecoat" },
+  { key: "1K_SILVER_BASECOAT", label: "1K Silver Basecoat" },
+  { key: "1K_PEARL_BASECOAT", label: "1K Pearl Basecoat" },
+  { key: "SUPPLEMENTARY", label: "辅料" },
+];
+
 // ==================== 工具函数 ====================
 
 /** 判断颜色是否过浅（白色/接近白色），需要特殊处理边框 */
@@ -57,6 +64,7 @@ function rgbToHex(r: number, g: number, b: number): string {
 }
 
 /** 十六进制颜色字符串 → RGB 对象 */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function hexToRgb(hex: string): { r: number; g: number; b: number } {
   const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   if (!m) return { r: 255, g: 255, b: 255 };
@@ -709,7 +717,6 @@ function ManagementModal({
 // ==================== 主页面 ====================
 
 export default function TonerPage() {
-  const { t } = useLang();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const [activeCategory, setActiveCategory] = useState<TonerCategory>("2K_BASECOAT");

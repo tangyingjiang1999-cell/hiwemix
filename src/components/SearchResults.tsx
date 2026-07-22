@@ -31,15 +31,6 @@ const HEADER_FONT_SIZE = "0.8125rem";
 const CELL_FONT_SIZE = "0.9375rem";
 const CAPTION_FONT_SIZE = "0.875rem";
 
-// 配方类型显示名称映射（兼容旧数据）
-const FORMULA_TYPE_DISPLAY: Record<string, string> = {
-  "Pearl Paint": "Three Stages",
-};
-
-function displayFormulaType(type: string): string {
-  return FORMULA_TYPE_DISPLAY[type] ?? type;
-}
-
 // 列宽定义，确保间距均匀
 const COLUMN_WIDTHS = {
   colorType: 105,
@@ -205,7 +196,7 @@ export default function SearchResults({
                 {/* col 6: Process (odd) — 配方类型，隐藏在移动端 */}
                 <TableCell className="hide-on-mobile" sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
                   <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
-                    {displayFormulaType(row.formula.formula_type)}
+                    {row.formula.formula_type}
                   </Typography>
                 </TableCell>
                 {/* col 7: version (even) — hidden on mobile */}

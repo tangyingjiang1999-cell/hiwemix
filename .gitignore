@@ -16,6 +16,7 @@
 # misc
 .DS_Store
 *.pem
+cookies.txt
 
 # debug
 npm-debug.log*
@@ -39,12 +40,28 @@ next-env.d.ts
 # IDEs
 .idea/
 .vscode/
+*.swp
+*.swo
 
-.vercel
-.env*
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Reasonix desktop app config
+.reasonix/
 
 # WorkBuddy agent workspace
 .workbuddy/
 
 # Reasonix session metadata
 .reasonix/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Build artifacts
+dist/
+build/

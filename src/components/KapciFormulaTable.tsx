@@ -73,7 +73,7 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
     }
     const next = formula.components.map((c) => calcWeight(c.grams_per_100g, totalGrams));
     setWeights(next);
-  }, [formula.id, totalGrams]);
+  }, [formula.id, formula.components, totalGrams]);
 
   function handleVolumeChange(raw: string) {
     const num = parsePositiveNumber(raw);

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { ColorVariant } from "@/types";
 import { generateVariantId } from "@/lib/id-generator";
-import { FONT, HEADER_BG, CELL_FONT_SIZE, COLUMN_BG, ROW_BG, HOVER_BG, HOVER_TRANSITION, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx, actionButtonSx, deleteButtonSx } from "@/components/admin-table-styles";
+import { FONT, HEADER_BG, CELL_FONT_SIZE, COLUMN_BG, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx, actionButtonSx, deleteButtonSx } from "@/components/admin-table-styles";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";

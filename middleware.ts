@@ -7,6 +7,13 @@ async function verifyJwtSignature(token: string): Promise<Record<string, unknown
     const parts = token.split(".");
     if (parts.length !== 3) return null;
 
+    // 与 auth.ts 保持一致：生产环境无 JWT_SECRET 则拒绝，开发环境用 fallback
+    if (!process.env.JWT_SECRET) {
+      if (process.env.NODE_ENV === "production") {
+        console.error("FATAL: JWT_SECRET 未设置，middleware 无法验证 token");
+        return null;
+      }
+    }
     const secret = process.env.JWT_SECRET || "hiwen-mix-secret-key-dev-only";
     const key = await crypto.subtle.importKey(
       "raw",

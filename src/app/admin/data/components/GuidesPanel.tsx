@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Guide, GuideCategory } from "@/types";
 import { generateGuideId, generateGuideCategoryId } from "@/lib/id-generator";
-import { FONT, HEADER_BG, CELL_FONT_SIZE, COLUMN_BG, ROW_BG, HOVER_BG, HOVER_TRANSITION, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx, actionButtonSx, deleteButtonSx } from "@/components/admin-table-styles";
+import { FONT, HEADER_BG, CELL_FONT_SIZE, COLUMN_BG, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx, actionButtonSx, deleteButtonSx } from "@/components/admin-table-styles";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
@@ -31,7 +31,7 @@ interface GuideRow extends Guide { categoryName: string; }
 export default function GuidesPanel() {
   const [guides, setGuides] = useState<Guide[]>([]);
   const [categories, setCategories] = useState<GuideCategory[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [filterCat, setFilterCat] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [showCatModal, setShowCatModal] = useState(false);

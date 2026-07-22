@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import type { SearchResult, Formula, FormulaComponent, ComponentGroup, Color } from "@/types";
-import { COLOR_TYPE_MAP } from "@/lib/constants";
+import type { SearchResult, Formula, FormulaComponent, ComponentGroup } from "@/types";
 import { colorSwatchStyle } from "@/lib/utils";
 import { useLang } from "@/components/LanguageContext";
 import KapciFormulaTable from "./KapciFormulaTable";
@@ -16,10 +15,8 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
-import TextField from "@mui/material/TextField";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
-import Divider from "@mui/material/Divider";
 import CloseIcon from "@mui/icons-material/Close";
 import PrintIcon from "@mui/icons-material/Print";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -55,13 +52,13 @@ function formatFormulaAsText(result: SearchResult, activeFormula: Formula, makeN
   lines.push(`Color Code: ${result.color.color_code}`);
   lines.push(`Make: ${makeName}`);
   lines.push(`Type: ${result.color.color_type}`);
-  lines.push(`Process: ${displayFormulaType(activeFormula.formula_type)}`);
+  lines.push(`Process: ${activeFormula.formula_type}`);
   lines.push(`Paint System: ${activeFormula.paint_system}`);
   lines.push(`Formula Type: ${activeFormula.formula_type}`);
   lines.push(`Version: ${activeFormula.version}`);
   lines.push("-".repeat(50));
 
-  if (activeFormula.formula_type === "Three Stages" || (activeFormula.formula_type as string) === "Pearl Paint") {
+  if (activeFormula.formula_type === "Three Stages") {
     lines.push("[Pearl Paint]");
     lines.push(...formatComponents(activeFormula.components.filter((c) => c.component_group === "Pearl Paint")));
     lines.push("");
@@ -79,14 +76,6 @@ function formatFormulaAsText(result: SearchResult, activeFormula: Formula, makeN
 
 const HEX_RE = /^#?([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
-// 配方类型显示名称映射（兼容旧数据）
-const FORMULA_TYPE_DISPLAY: Record<string, string> = {
-  "Pearl Paint": "Three Stages",
-};
-
-function displayFormulaType(type: string): string {
-  return FORMULA_TYPE_DISPLAY[type] ?? type;
-}
 function parseHexInput(raw: string, fallback: string): string {
   const t = raw.trim();
   if (!HEX_RE.test(t)) return fallback;
@@ -140,8 +129,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
   const previewColor = parseHexInput(hexInput, color.hex_preview);
 
   let displayedFormula: Formula | null = activeFormula ?? null;
-  // 兼容旧数据："Pearl Paint" 已更名为 "Three Stages"
-  const isGroupedType = activeFormula?.formula_type === "Three Stages" || (activeFormula?.formula_type as string) === "Pearl Paint";
+  const isGroupedType = activeFormula?.formula_type === "Three Stages";
   if (activeFormula && isGroupedType) {
     displayedFormula = {
       ...activeFormula,
@@ -158,7 +146,6 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
   }
 
   const currentYear = initialYear?.toString() || "-";
-  const typeLabel = color.color_type;
 
   return (
     <>
@@ -217,7 +204,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                   <Chip label={activeFormula?.paint_system} size="small"
                     sx={{ fontWeight: 600, fontSize: "0.75rem",
                       ...(activeFormula?.paint_system === "2K" ? { bgcolor: "#DBEAFE", color: "#1D4ED8" } : { bgcolor: "#D1FAE5", color: "#047857" }) }} />
-                  <Chip label={displayFormulaType(activeFormula?.formula_type ?? "")} size="small"
+                  <Chip label={activeFormula?.formula_type ?? ""} size="small"
                     sx={{ fontWeight: 600, fontSize: "0.75rem", bgcolor: "#FEF3C7", color: "#92400E" }} />
                 </Stack>
 
@@ -276,7 +263,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                   <InfoRow label={t.colorName} value={color.color_name} />
                   <InfoRow label={t.carModelLabel} value={color.car_model || "-"} />
                   <InfoRow label={t.yearsLabel} value={currentYear} />
-                  <InfoRow label={t.processLabel} value={displayFormulaType(activeFormula?.formula_type || "-")} />
+                  <InfoRow label={t.processLabel} value={activeFormula?.formula_type || "-"} />
                   <InfoRow label={t.versionLabel} value={activeFormula?.version || "-"} />
                 </Stack>
               )}

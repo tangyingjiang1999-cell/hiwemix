@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
           ignoreRestSiblings: true,
         },
       ],
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/preserve-manual-memoization": "off",
     },
   },
   // Override default ignores of eslint-config-next.

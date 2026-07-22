@@ -54,7 +54,7 @@ export const getCellSx = (colIndex: number, rowIndex: number, colBgOdd = COLUMN_
 });
 
 // 行样式
-export const getRowSx = (rowIndex: number) => ({
+export const getRowSx = (_rowIndex: number) => ({
   borderBottom: `1px solid ${CELL_BORDER_COLOR}`,
   "&:last-child td": { borderBottom: "none" },
   transition: "background-color 0.15s ease",

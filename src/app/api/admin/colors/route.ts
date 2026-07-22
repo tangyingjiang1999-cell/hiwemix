@@ -29,8 +29,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "缺少必填字段（id/make_id/color_code）" }, { status: 400 });
   }
   try {
-    // 打印收到的 variantIds 供调试
-    console.error("DEBUG variantIds:", JSON.stringify(variantIds));
     const saved = await saveColor(color, (variantIds as string[]) ?? [], true);
 
     // 保存年份
@@ -40,8 +38,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(saved, { status: 201 });
   } catch (e) {
-    console.error("保存颜色失败详情:", e, typeof e);
-    // Supabase PostgREST 错误可能是纯对象，非 Error 实例
     const detail = (e as { code?: string; message?: string; details?: string })?.details
                 || (e as { code?: string; message?: string; details?: string })?.message
                 || (e instanceof Error ? e.message : "")
@@ -65,8 +61,6 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "缺少 ID" }, { status: 400 });
   }
   try {
-    // 打印收到的 variantIds 供调试
-    console.error("DEBUG variantIds:", JSON.stringify(variantIds));
     const saved = await saveColor(color, (variantIds as string[]) ?? []);
 
     // 保存年份
@@ -76,7 +70,6 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(saved);
   } catch (e) {
-    console.error("保存颜色失败详情:", e, typeof e);
     const detail = (e as { code?: string; message?: string; details?: string })?.details
                 || (e as { code?: string; message?: string; details?: string })?.message
                 || (e instanceof Error ? e.message : "")

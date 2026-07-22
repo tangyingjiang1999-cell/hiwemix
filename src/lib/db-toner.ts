@@ -47,21 +47,33 @@ export async function seedToners(toners: Toner[]): Promise<void> {
 // ====== 内部映射（snake_case → camelCase） ======
 
 function mapTonerRow(row: Record<string, unknown>): Toner {
-  return {
+  const t: Toner = {
     code: row.code as string,
     tradeName: row.trade_name as string,
     nameZh: row.name_zh as string,
     category: row.category as Toner["category"],
     hex: (row.hex as string) ?? "#FFFFFF",
   };
+  if (row.rgb_r != null) {
+    t.rgb_r = Number(row.rgb_r);
+    t.rgb_g = Number(row.rgb_g);
+    t.rgb_b = Number(row.rgb_b);
+  }
+  return t;
 }
 
 function toTonerRow(toner: Toner): Record<string, unknown> {
-  return {
+  const row: Record<string, unknown> = {
     code: toner.code,
     trade_name: toner.tradeName,
     name_zh: toner.nameZh,
     category: toner.category,
     hex: toner.hex,
   };
+  if (toner.rgb_r != null) {
+    row.rgb_r = toner.rgb_r;
+    row.rgb_g = toner.rgb_g;
+    row.rgb_b = toner.rgb_b;
+  }
+  return row;
 }

@@ -2,15 +2,22 @@ import { NextRequest, NextResponse as NextResponseClass } from "next/server";
 import jwt from "jsonwebtoken";
 
 // JWT_SECRET：生产环境必须通过环境变量设置，否则终止启动
+// 延迟到运行时求值，避免 next build 的 page data collection 阶段触发 throw
 const FALLBACK_SECRET = "hiwen-mix-secret-key-dev-only";
-const JWT_SECRET = (() => {
-  if (process.env.JWT_SECRET) return process.env.JWT_SECRET;
+let _jwtSecret: string | null = null;
+function getJwtSecret(): string {
+  if (_jwtSecret !== null) return _jwtSecret;
+  if (process.env.JWT_SECRET) {
+    _jwtSecret = process.env.JWT_SECRET;
+    return _jwtSecret;
+  }
   if (process.env.NODE_ENV === "production") {
     throw new Error("FATAL: JWT_SECRET 环境变量未设置，生产环境无法启动。");
   }
   console.warn("⚠️  JWT_SECRET 未设置，使用开发默认密钥。生产环境请配置环境变量。");
-  return FALLBACK_SECRET;
-})();
+  _jwtSecret = FALLBACK_SECRET;
+  return _jwtSecret;
+}
 
 export interface AuthToken {
   userId: number;
@@ -21,14 +28,14 @@ export interface AuthToken {
 export function signToken(user: { id: number; username: string; role: string }): string {
   return jwt.sign(
     { userId: user.id, username: user.username, role: user.role },
-    JWT_SECRET,
+    getJwtSecret(),
     { expiresIn: "7d" }
   );
 }
 
 export function verifyToken(token: string): AuthToken | null {
   try {
-    return jwt.verify(token, JWT_SECRET) as AuthToken;
+    return jwt.verify(token, getJwtSecret()) as AuthToken;
   } catch {
     return null;
   }

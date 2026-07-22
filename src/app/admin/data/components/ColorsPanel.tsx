@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { CarMake, Color, ColorVariant } from "@/types";
 import { colorSwatchStyle } from "@/lib/utils";
 import { generateUniqueColorId } from "@/lib/id-generator";
-import { FONT, HEADER_BG, HEADER_FONT_SIZE, CELL_FONT_SIZE, COLUMN_BG, ROW_BG, HOVER_BG, HOVER_TRANSITION, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx, actionButtonSx, deleteButtonSx } from "@/components/admin-table-styles";
+import { FONT, CELL_FONT_SIZE, COLUMN_BG } from "@/components/admin-table-styles";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -27,7 +27,6 @@ import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
 import Chip from "@mui/material/Chip";
-import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -86,7 +85,7 @@ export default function ColorsPanel() {
   const [colors, setColors] = useState<Color[]>([]);
   const [brands, setBrands] = useState<CarMake[]>([]);
   const [allVariants, setAllVariants] = useState<ColorVariant[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Color | null>(null);
   const [form, setForm] = useState({ id: "", make_id: "", color_code: "", color_name: "", color_type: "solid" as Color["color_type"], hex_preview: "#FFFFFF", car_model: "" });
@@ -173,7 +172,6 @@ export default function ColorsPanel() {
   const allExpandedRows: ExpandedColorRow[] = useMemo(() => colors.flatMap((c) => {
     const brandName = brandMap.get(c.make_id) ?? c.make_id;
     const sortedYears = [...(c.years ?? [])].sort((a, b) => a - b);
-    const groupSize = Math.max(sortedYears.length, 1);
 
     if (sortedYears.length === 0) {
       // 没有年份：单行，year = undefined
@@ -288,7 +286,7 @@ export default function ColorsPanel() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {pageRows.map((row, index) => (
+            {pageRows.map((row, _index) => (
               <TableRow
                 key={`${row.colorId}-${row.year ?? 'none'}`}
                 sx={{

@@ -38,6 +38,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         setLangState(stored as Lang);
       }
     } catch { /* noop */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 同步 <html lang> 与 dir 属性（阿语/希语切到 RTL）

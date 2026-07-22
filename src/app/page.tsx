@@ -18,7 +18,6 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [drawerResult, setDrawerResult] = useState<SearchResult | null>(null);
-  const [drawerInitialIdx, setDrawerInitialIdx] = useState(0);
   const [drawerFormulaId, setDrawerFormulaId] = useState<string | undefined>();
   const [drawerYear, setDrawerYear] = useState<number | undefined>();
 

@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS public.formulas (
   paint_system TEXT NOT NULL DEFAULT '2K'
     CHECK (paint_system IN ('1K', '2K')),
   formula_type TEXT NOT NULL DEFAULT 'Single Stage'
-    CHECK (formula_type IN ('Single Stage', 'Two Stages', 'Pearl Paint')),
+    CHECK (formula_type IN ('Single Stage', 'Two Stages', 'Three Stages')),
   notes TEXT NOT NULL DEFAULT '',
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

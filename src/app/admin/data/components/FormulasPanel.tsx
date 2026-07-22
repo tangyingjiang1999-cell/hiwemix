@@ -11,8 +11,8 @@ import type {
 } from "@/types";
 import type { Toner, CarMake } from "@/types";
 import { generateFormulaId } from "@/lib/id-generator";
-import { FONT, HEADER_BG, HEADER_FONT_SIZE, CELL_FONT_SIZE, COLUMN_BG, ROW_BG, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx } from "@/components/admin-table-styles";
-import { hexToRgb, filterTonersBySystem, matchingToners, matchingColors, LEGACY_FORMULA_TYPE_MAP } from "./formula-helpers";
+import { FONT, HEADER_BG, CELL_FONT_SIZE, COLUMN_BG, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx } from "@/components/admin-table-styles";
+import { hexToRgb, filterTonersBySystem, matchingToners, matchingColors } from "./formula-helpers";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -153,7 +153,7 @@ export default function FormulasPanel() {
       color_id: formula.color_id,
       version: formula.version,
       paint_system: formula.paint_system,
-      formula_type: LEGACY_FORMULA_TYPE_MAP[formula.formula_type] ?? formula.formula_type,
+      formula_type: formula.formula_type,
       notes: formula.notes,
       year: formula.year,
     });

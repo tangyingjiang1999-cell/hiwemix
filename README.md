@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# HIWE Formula Search
 
-## Getting Started
+汽车修补漆配方检索网站，帮助汽修喷漆师快速找到对应的调漆配方。
 
-First, run the development server:
+## 功能特性
+
+- 🔍 按车辆品牌/年份/颜色代码搜索配方
+- 🎨 颜色库浏览和筛选
+- 📋 详细的色母配方表（克重比例）
+- 📱 响应式设计，支持移动端
+- 🔐 用户认证和管理后台
+- 🌐 多语言支持（中文/英文）
+
+## 技术栈
+
+- **前端**: Next.js 16 App Router + TypeScript + Tailwind CSS
+- **UI 组件**: Material-UI (MUI)
+- **后端**: Supabase (PostgreSQL)
+- **认证**: JWT + bcrypt
+- **部署**: Vercel
+
+## 快速开始
+
+### 环境要求
+
+- Node.js 18+
+- Supabase 项目（需要配置环境变量）
+
+### 安装和运行
 
 ```bash
+# 安装依赖
+npm install
+
+# 配置环境变量
+cp .env.example .env.local
+# 编辑 .env.local 填入 Supabase 配置
+
+# 启动开发服务器
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+访问 [http://localhost:3000](http://localhost:3000) 查看应用。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 环境变量
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+在 `.env.local` 中配置以下变量：
 
-## Learn More
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+JWT_SECRET=your_jwt_secret
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 项目结构
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/           # 页面路由
+│   ├── api/       # API 路由
+│   ├── admin/     # 管理后台
+│   └── ...        # 前端页面
+├── components/    # 可复用组件
+├── lib/           # 工具函数和数据库操作
+├── types/         # TypeScript 类型定义
+└── data/          # 静态数据
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 开发指南
 
-## Deploy on Vercel
+- 组件使用 `function` 关键字定义
+- 所有 TypeScript 接口放在 `src/types/index.ts`
+- 数据库操作封装在 `src/lib/db.ts` 和 `src/lib/db-formula.ts`
+- 使用 Tailwind CSS 进行样式管理
+- 中文注释说明业务逻辑
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 部署
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+推荐使用 Vercel 部署：
+
+```bash
+npm run build
+npm run start
+```
+
+或直接连接 Git 仓库到 Vercel 进行自动部署。
