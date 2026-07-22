@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo, type CSSProperties, type FocusEvent } from "react";
 import type {
   Formula,
   FormulaComponent,
@@ -18,6 +18,8 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
+import Popper from "@mui/material/Popper";
+import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -60,6 +62,9 @@ export default function FormulasPanel() {
   const [formulaSearch, setFormulaSearch] = useState("");
   const [availableYears, setAvailableYears] = useState<number[]>([]);
 
+  // 存储每行色母编号输入框的 DOM 引用（key = globalIndex），供 Popper 锚点使用
+  const tonerInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+
   // 百分比输入框的原始字符串（允许输入中间态如 "5."）
   const [pctInputs, setPctInputs] = useState<Record<number, string>>({});
 
@@ -97,7 +102,12 @@ export default function FormulasPanel() {
   // 色母搜索下拉
   const [tonerDropdownFor, setTonerDropdownFor] = useState<number | null>(null);
   const [tonerQuery, setTonerQuery] = useState("");
-  const tonerBlurRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 强制关闭色母下拉
+  function closeTonerDropdown() {
+    setTonerDropdownFor(null);
+    setTonerQuery("");
+  }
 
   // 选中颜色后的预览文本
   // 根据体系过滤色母列表
@@ -110,12 +120,11 @@ export default function FormulasPanel() {
     : "";
 
   function openTonerDropdown(index: number, currentCode: string) {
-    if (tonerBlurRef.current) { clearTimeout(tonerBlurRef.current); tonerBlurRef.current = null; }
     setTonerDropdownFor(index);
     setTonerQuery(currentCode);
   }
   function scheduleCloseTonerDropdown() {
-    tonerBlurRef.current = setTimeout(() => setTonerDropdownFor(null), 150);
+    // 不再基于 blur 关闭，改由 ClickAwayListener + Popper 按钮 onMouseDown 控制
   }
 
   // 新建时：颜色 + 版本变化自动生成 ID
@@ -363,7 +372,7 @@ export default function FormulasPanel() {
   }
 
   // 输入框样式常量
-  const INPUT_STYLE: React.CSSProperties = {
+  const INPUT_STYLE: CSSProperties = {
     width: "100%",
     boxSizing: "border-box",
     border: "1px solid #d1d5db",
@@ -376,22 +385,22 @@ export default function FormulasPanel() {
     transition: "border-color 0.2s ease, box-shadow 0.2s ease",
   };
 
-  const INPUT_FOCUS_HANDLER = (e: React.FocusEvent<HTMLInputElement>) => {
+  const INPUT_FOCUS_HANDLER = (e: FocusEvent<HTMLInputElement>) => {
     e.target.style.borderColor = "#2487ca";
     e.target.style.boxShadow = "0 0 0 3px rgba(36,135,202,0.12)";
   };
-  const INPUT_BLUR_HANDLER = (e: React.FocusEvent<HTMLInputElement>) => {
+  const INPUT_BLUR_HANDLER = (e: FocusEvent<HTMLInputElement>) => {
     e.target.style.borderColor = "#d1d5db";
     e.target.style.boxShadow = "none";
   };
 
-  const INPUT_SMALL_STYLE: React.CSSProperties = {
+  const INPUT_SMALL_STYLE: CSSProperties = {
     ...INPUT_STYLE,
     width: "100%",
     maxWidth: 130,
   };
 
-  const RGB_INPUT_STYLE: React.CSSProperties = {
+  const RGB_INPUT_STYLE: CSSProperties = {
     ...INPUT_STYLE,
     width: "31%",
     padding: "8px 6px",
@@ -408,7 +417,10 @@ export default function FormulasPanel() {
         mt: 2,
         display: "flex",
         flexDirection: "column",
+        // 自身不设 scroll，保持 header/footer 固定
+        overflow: "visible",
       }}>
+        {/* ★ 标题行：固定在滚动区外顶部 */}
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1.5, flexShrink: 0 }}>
           <Box sx={{ fontWeight: 600, fontSize: "0.9375rem", color: "text.primary", fontFamily: FONT, letterSpacing: "-0.01em" }}>{title}</Box>
           <Button onClick={() => addComponent(group)} variant="outlined" size="small" sx={{
@@ -431,9 +443,15 @@ export default function FormulasPanel() {
             },
           }}>+ 添加色母</Button>
         </Box>
+
+        {/* ★ 可滚动表格区域：最多显示约 4 行高度（约 220px），超多则纵向滚动 */}
         <TableContainer component={Paper} variant="outlined" sx={{
           ...tableContainerSx,
-          minHeight: 250,
+          minHeight: 80,
+          maxHeight: 300,
+          overflowY: "auto",
+          overflowX: "auto",
+          flexShrink: 0,
         }}>
           <Table sx={tableSx}>
             <TableHead>
@@ -495,32 +513,49 @@ export default function FormulasPanel() {
               )}
               {filtered.map((c, rowIndex) => {
                 const globalIndex = components.indexOf(c);
+                // 使用顶层 ref 的 callback 模式存储每个色母行输入框的 DOM 引用
+                const isDropdownOpen = tonerDropdownFor === globalIndex && matchingToners(tonerQuery, tonerPool).length > 0;
                 return (
                   <TableRow key={c.uid ?? globalIndex} sx={getRowSx(rowIndex)}>
-                    <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd, position: "relative" }}>
+                    <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
                       <input
+                        ref={(el) => { tonerInputRefs.current[globalIndex] = el; }}
                         type="text"
                         value={c.toner_code}
                         onChange={(e) => { updateComponent(globalIndex, "toner_code", e.target.value); setTonerQuery(e.target.value); }}
                         onFocus={(e) => { INPUT_FOCUS_HANDLER(e); openTonerDropdown(globalIndex, c.toner_code); }}
-                        onBlur={(e) => { INPUT_BLUR_HANDLER(e); scheduleCloseTonerDropdown(); }}
+                        onBlur={(e) => { INPUT_BLUR_HANDLER(e); /* 不再通过 blur 关闭下拉 */ }}
                         style={INPUT_SMALL_STYLE}
                       />
-                      {tonerDropdownFor === globalIndex && matchingToners(tonerQuery, tonerPool).length > 0 && (
-                        <Paper sx={{ position: "absolute", left: 8, top: "100%", zIndex: 50, mt: 0.5, maxHeight: 240, width: 280, overflow: "auto", boxShadow: "0 4px 16px rgba(0,0,0,0.1)", borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
-                          {matchingToners(tonerQuery, tonerPool).map((toner) => (
-                            <Button
-                              key={toner.code}
-                              onMouseDown={() => { selectToner(globalIndex, toner); setTonerDropdownFor(null); }}
-                              fullWidth
-                              sx={{ justifyContent: "flex-start", gap: 1, px: 1.5, py: 1, borderRadius: 0, fontSize: "0.8125rem", fontFamily: FONT, textTransform: "none", transition: "background-color 0.15s ease", "&:hover": { bgcolor: "rgba(36,135,202,0.06)" } }}
-                            >
-                              <Box sx={{ width: 32, height: 20, borderRadius: 2, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: toner.hex }} />
-                              <Box component="span" sx={{ color: "text.primary", fontWeight: 500 }}>{toner.code}</Box>
-                              <Box component="span" sx={{ fontWeight: 500, color: "text.secondary" }}>{toner.tradeName}</Box>
-                            </Button>
-                          ))}
-                        </Paper>
+                      {/* ★ Popper 下拉：固定定位挂载到 body，zIndex 9999 确保不被任何容器裁剪 */}
+                      {isDropdownOpen && (
+                        <Popper
+                          open={isDropdownOpen}
+                          anchorEl={tonerInputRefs.current[globalIndex] ?? null}
+                          placement="bottom-start"
+                          disablePortal={false}
+                          sx={{ zIndex: 9999 }}
+                          modifiers={[
+                            { name: "offset", options: { offset: [0, 4] } },
+                          ]}
+                        >
+                          <ClickAwayListener onClickAway={() => closeTonerDropdown()}>
+                            <Paper sx={{ maxHeight: 250, width: 280, overflow: "auto", boxShadow: "0 8px 32px rgba(0,0,0,0.14)", borderRadius: 2, border: "1px solid", borderColor: "divider" }}>
+                              {matchingToners(tonerQuery, tonerPool).map((toner) => (
+                                <Button
+                                  key={toner.code}
+                                  onMouseDown={(e) => { e.preventDefault(); selectToner(globalIndex, toner); closeTonerDropdown(); }}
+                                  fullWidth
+                                  sx={{ justifyContent: "flex-start", gap: 1, px: 1.5, py: 1, borderRadius: 0, fontSize: "0.8125rem", fontFamily: FONT, textTransform: "none", transition: "background-color 0.15s ease", "&:hover": { bgcolor: "rgba(36,135,202,0.06)" } }}
+                                >
+                                  <Box sx={{ width: 32, height: 20, borderRadius: 2, border: 1, borderColor: "grey.200", flexShrink: 0, bgcolor: toner.hex }} />
+                                  <Box component="span" sx={{ color: "text.primary", fontWeight: 500 }}>{toner.code}</Box>
+                                  <Box component="span" sx={{ fontWeight: 500, color: "text.secondary" }}>{toner.tradeName}</Box>
+                                </Button>
+                              ))}
+                            </Paper>
+                          </ClickAwayListener>
+                        </Popper>
                       )}
                     </TableCell>
                     <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
@@ -540,7 +575,6 @@ export default function FormulasPanel() {
                         value={globalIndex in pctInputs ? pctInputs[globalIndex] : (c.percentage || "")}
                         onChange={(e) => {
                           const raw = e.target.value;
-                          // 只允许数字和小数点
                           if (raw !== "" && !/^[\d.]*$/.test(raw)) return;
                           setPctInputs((prev) => ({ ...prev, [globalIndex]: raw }));
                         }}
@@ -634,7 +668,8 @@ export default function FormulasPanel() {
             </TableBody>
           </Table>
         </TableContainer>
-        {/* 百分比总和提示 */}
+
+        {/* ★ 百分比总和条：固定在滚动区外底部 */}
         {(() => {
           const sum = group
             ? (percentageSums as Record<ComponentGroup, number>)[group] ?? 0
@@ -647,6 +682,7 @@ export default function FormulasPanel() {
               mt: 1.5,
               py: 1,
               px: 1.5,
+              flexShrink: 0,
               borderRadius: 2,
               fontSize: "0.8125rem",
               fontFamily: FONT,

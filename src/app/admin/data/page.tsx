@@ -179,7 +179,7 @@ export default function DataManagementPage() {
           sx={{
             flex: 1,
             minHeight: "calc(100vh - 64px)",
-            overflow: "auto",
+            overflow: "visible",
             px: { xs: 1.5, sm: 3, md: "60px" },
             py: { xs: 2, md: 3 },
           }}

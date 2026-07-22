@@ -74,7 +74,7 @@ export const tableContainerSx = {
   boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
   overflowX: "auto",
   overflowY: "hidden",
-  "-webkit-overflow-scrolling": "touch",
+  WebkitOverflowScrolling: "touch",
 };
 
 // 表格元素样式（移动端用最小宽度撑出横滚）
