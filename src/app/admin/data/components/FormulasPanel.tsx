@@ -794,6 +794,7 @@ export default function FormulasPanel() {
         display: "flex",
         flexDirection: "column",
         minHeight: 0,
+        overflow: "hidden",
         borderRadius: 2,
         border: "1px solid",
         borderColor: "divider",
@@ -866,14 +867,16 @@ export default function FormulasPanel() {
         </Box>
         <TextField label="施工备注" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} size="small" multiline rows={2} fullWidth sx={{ mt: 2 }} />
 
-        {/* 色母组件表 */}
-        {form.formula_type === "Three Stages" ? (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {PEARL_GROUPS.map((g) => renderComponentTable(g))}
-          </Box>
-        ) : (
-          renderComponentTable()
-        )}
+        {/* 色母组件表 —— 可滚动区域，父级已 overflow:hidden，自身 flex:1 撑满 */}
+        <Box sx={{ flex: 1, minHeight: 0, overflow: "auto", mt: 1 }}>
+          {form.formula_type === "Three Stages" ? (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {PEARL_GROUPS.map((g) => renderComponentTable(g))}
+            </Box>
+          ) : (
+            renderComponentTable()
+          )}
+        </Box>
 
         {error && <Box sx={{ color: "error.main", fontSize: "0.8125rem", mt: 2 }}>{error}</Box>}
         {message && <Box sx={{ color: "success.main", fontSize: "0.8125rem", mt: 2 }}>{message}</Box>}
@@ -884,7 +887,8 @@ export default function FormulasPanel() {
           justifyContent: "flex-end",
           gap: 1.5,
           p: 2.5,
-          mt: 3,
+          mt: "auto",
+          flexShrink: 0,
           borderTop: "1px solid",
           borderTopColor: "divider",
           bgcolor: "grey.50",
