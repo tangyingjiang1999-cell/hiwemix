@@ -123,9 +123,6 @@ export default function FormulasPanel() {
     setTonerDropdownFor(index);
     setTonerQuery(currentCode);
   }
-  function scheduleCloseTonerDropdown() {
-    // 不再基于 blur 关闭，改由 ClickAwayListener + Popper 按钮 onMouseDown 控制
-  }
 
   // 新建时：颜色 + 版本变化自动生成 ID
   useEffect(() => {
