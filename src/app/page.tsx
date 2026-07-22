@@ -6,6 +6,7 @@ import SearchResults from "@/components/SearchResults";
 import FormulaDrawer from "@/components/FormulaDrawer";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
+import SplitText from "@/components/SplitText";
 import { useLang } from "@/components/LanguageContext";
 import type { CarMake, Color, Formula, SearchParams, SearchResult, FormulaTableRow } from "@/types";
 import Box from "@mui/material/Box";
@@ -201,22 +202,6 @@ export default function Home() {
               onMouseEnter={handleGlassEnter}
               onMouseLeave={handleGlassLeave}
             >
-              <Typography
-                sx={{
-                  fontWeight: 800,
-                  fontSize: { xs: "1.125rem", sm: "1.375rem", md: "1.875rem", lg: "2.375rem" },
-                  lineHeight: 1.2,
-                  color: "primary.main",
-                  letterSpacing: "-0.02em",
-                  opacity: shouldBeBlurred ? 0.2 : 0.8,
-                  willChange: "opacity",
-                  transitionProperty: "opacity",
-                  transitionDuration: "1.5s",
-                  transitionTimingFunction: "ease",
-                }}
-              >
-                {t.heroTitlePrefix} {t.heroTitleHighlight}
-              </Typography>
             </Box>
 
             {/* 玻璃拟态搜索框容器 */}
@@ -225,22 +210,49 @@ export default function Home() {
               onMouseEnter={handleGlassEnter}
               onMouseLeave={handleGlassLeave}
               sx={{
-                p: { xs: 2, sm: 3, md: 4 },
-                borderRadius: 0,
+                pt: { xs: 3, md: 4 },
+                pb: { xs: 3, md: 4 },
+                px: { xs: 2.5, md: 4 },
+                width: "100%",
+                maxWidth: "95vw",  // 宽屏布局，确保右侧按钮不折行
+                borderRadius: "15px",
                 // 玻璃拟态：半透明白底 + 毛玻璃
                 bgcolor: shouldBeBlurred ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.3)",
                 backdropFilter: shouldBeBlurred ? "blur(16px)" : "blur(8px)",
                 WebkitBackdropFilter: shouldBeBlurred ? "blur(16px)" : "blur(8px)",
                 border: "1px solid rgba(255,255,255,0.4)",
+                // 激活态去掉阴影，非激活态轻微弥散阴影凸显搜索框
                 boxShadow: shouldBeBlurred
-                  ? "0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)"
-                  : "0 4px 16px rgba(0,0,0,0.04)",
+                  ? "none"
+                  : "0 10px 30px rgba(0,0,0,0.1)",
                 willChange: "background-color, backdrop-filter, box-shadow",
                 transitionProperty: "background-color, backdrop-filter, box-shadow",
                 transitionDuration: "1.5s",
                 transitionTimingFunction: "ease",
               }}
             >
+              {/* 标题移至卡片内部顶部居中 */}
+              <Box
+                sx={{
+                  fontWeight: 800,
+                  fontSize: { xs: "1.125rem", sm: "1.375rem", md: "1.875rem", lg: "2.375rem" },
+                  lineHeight: 1.2,
+                  color: "primary.main",
+                  letterSpacing: "-0.02em",
+                  textAlign: "center",
+                  width: "100%",
+                  mb: { xs: 2.5, md: 3.5 },
+                }}
+              >
+                <SplitText
+                  text={`${t.heroTitlePrefix} ${t.heroTitleHighlight}`}
+                  tag="h1"
+                  stagger={0.03}
+                  duration={0.4}
+                  from={{ opacity: 0, y: 20 }}
+                  to={{ opacity: 1, y: 0 }}
+                />
+              </Box>
               <SearchPanel
                 onSearch={handleSearch}
                 isLoading={isLoading}

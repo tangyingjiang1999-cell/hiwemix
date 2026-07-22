@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { LanguageProvider } from "@/components/LanguageContext";
 import { AuthProvider } from "@/components/AuthContext";
 import Providers from "@/components/Providers";
-import { Inter, Noto_Sans_SC, Noto_Sans_Arabic, Noto_Sans_Hebrew } from "next/font/google";
+import { Inter, Noto_Sans_SC, Noto_Sans_Arabic, Noto_Sans_Hebrew, Outfit } from "next/font/google";
+
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -26,7 +28,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${notoSansSC.variable} ${notoSansArabic.variable} ${notoSansHebrew.variable} h-full antialiased`}
+      className={`${inter.variable} ${notoSansSC.variable} ${notoSansArabic.variable} ${notoSansHebrew.variable} ${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <Providers>

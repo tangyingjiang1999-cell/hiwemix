@@ -19,7 +19,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
-import TablePagination from "@mui/material/TablePagination";
+import CustomPagination from "@/components/ui/CustomPagination";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Chip from "@mui/material/Chip";
@@ -147,10 +147,10 @@ export default function BrandsPanel() {
       {/* Header with buttons */}
       <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mb: 1.5 }}>
         <Button onClick={openCreateRegion} variant="outlined" size="small" startIcon={<AddIcon />}>
-          + 新增产地
+          新增产地
         </Button>
         <Button onClick={openCreateBrand} variant="contained" size="small">
-          + 新增品牌
+          新增品牌
         </Button>
       </Box>
 
@@ -197,18 +197,12 @@ export default function BrandsPanel() {
             ))}
           </TableBody>
         </Table>
-        <TablePagination
-          component="div"
-          count={brands.length}
+        <CustomPagination
+          totalCount={brands.length}
           page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) => {
-            setRowsPerPage(parseInt(e.target.value, 10));
-            setPage(0);
-          }}
-          rowsPerPageOptions={[10, 25, 50]}
-          labelRowsPerPage="每页行数"
+          pageSize={rowsPerPage}
+          onPageChange={setPage}
+          unitName="brands"
         />
       </TableContainer>
 

@@ -16,7 +16,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import TablePagination from "@mui/material/TablePagination";
+import CustomPagination from "@/components/ui/CustomPagination";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -337,18 +337,12 @@ export default function ColorsPanel() {
             ))}
           </TableBody>
         </Table>
-        <TablePagination
-          component="div"
-          count={filteredRows.length}
+        <CustomPagination
+          totalCount={filteredRows.length}
           page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) => {
-            setRowsPerPage(parseInt(e.target.value, 10));
-            setPage(0);
-          }}
-          rowsPerPageOptions={[10, 25, 50]}
-          labelRowsPerPage="每页行数"
+          pageSize={rowsPerPage}
+          onPageChange={setPage}
+          unitName="colors"
         />
       </TableContainer>
 

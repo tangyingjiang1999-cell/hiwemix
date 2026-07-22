@@ -95,65 +95,68 @@ export default function SiteHeader() {
           pl: { xs: 1.5, sm: 3, md: "60px" },
           pr: { xs: 1.5, sm: 3, md: "60px" },
           minHeight: 64,
-          gap: { xs: 1, md: 4 },
+          position: "relative",
         }}
       >
-        {/* 左侧组：Logo + 中间 3 个 nav 链接 */}
-        <Stack direction="row" spacing={4} sx={{ flex: 1, alignItems: "center" }}>
-          <Link href="/" style={{ display: "flex", flexShrink: 0 }}>
-            <Box
-              component="img"
-              src="/hiwemix2-01.png"
-              alt="HIWE MIX"
-              sx={{
-                height: { xs: 19, md: 32 },
-                width: "auto",
-                objectFit: "contain",
-                display: "block",
-                // 首页保持原色；非首页蓝底下用滤镜变白，与背景渐变同步
-                filter: isHome ? "none" : "brightness(0) invert(1)",
-                transition: transitionStyle,
-              }}
-            />
-          </Link>
+        {/* Logo 左侧 */}
+        <Link href="/" style={{ display: "flex", flexShrink: 0, zIndex: 1 }}>
+          <Box
+            component="img"
+            src="/hiwemix2-01.png"
+            alt="HIWE MIX"
+            sx={{
+              height: { xs: 19, md: 32 },
+              width: "auto",
+              objectFit: "contain",
+              display: "block",
+              filter: isHome ? "none" : "brightness(0) invert(1)",
+              transition: transitionStyle,
+            }}
+          />
+        </Link>
 
-          {/* 中间导航链接 - 桌面端 */}
-          <Stack
-            direction="row"
-            spacing={3}
-            sx={{ display: { xs: "none", md: "flex" } }}
-          >
-            {navItems.map((item) => {
-              const active = isActive(item.href);
-              return (
-                <Button
-                  key={item.label}
-                  component={Link}
-                  href={item.href}
-                  disableElevation
-                  aria-current={active ? "page" : undefined}
-                  sx={{
-                    color: active ? headerTextColor : headerMutedColor,
-                    fontWeight: active ? 700 : 600,
-                    fontSize: "0.9375rem",
-                    minWidth: "auto",
-                    px: 1.5,
-                    transition: transitionStyle,
-                    "&:hover": {
-                      bgcolor: "transparent",
-                      color: headerTextColor,
-                    },
-                  }}
-                >
-                  {item.label}
-                </Button>
-              );
-            })}
-          </Stack>
+        {/* 中间导航链接 — 绝对定位水平居中 */}
+        <Stack
+          direction="row"
+          spacing={2.5}
+          sx={{
+            display: { xs: "none", md: "flex" },
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        >
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Button
+                key={item.label}
+                component={Link}
+                href={item.href}
+                disableElevation
+                aria-current={active ? "page" : undefined}
+                sx={{
+                  color: active ? headerTextColor : headerMutedColor,
+                  fontWeight: active ? 700 : 600,
+                  fontSize: "0.8125rem",
+                  minWidth: "auto",
+                  px: 1.5,
+                  transition: transitionStyle,
+                  "&:hover": {
+                    bgcolor: "transparent",
+                    color: headerTextColor,
+                  },
+                }}
+              >
+                {item.label}
+              </Button>
+            );
+          })}
         </Stack>
 
-        {/* 右侧 actions：统一高度 36px、字号 0.8125rem、居中对齐、间距 12px */}
-        <Stack direction="row" sx={{ alignItems: "center", gap: 1.5 }}>
+        {/* 右侧 actions：吸附在最右侧 */}
+        <Box sx={{ flex: 1 }} />
+        <Stack direction="row" sx={{ alignItems: "center", gap: 1.5, flexShrink: 0, zIndex: 1 }}>
           {authUser ? (
             <>
               {authUser.role === "admin" && (

@@ -10,12 +10,12 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import TablePagination from "@mui/material/TablePagination";
 import Paper from "@mui/material/Paper";
 import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Skeleton from "@mui/material/Skeleton";
+import CustomPagination from "@/components/ui/CustomPagination";
 import SearchOffIcon from "@mui/icons-material/SearchOff";
 import ZoomInIcon from "@mui/icons-material/ZoomIn";
 
@@ -249,24 +249,13 @@ export default function SearchResults({
             ))}
           </TableBody>
         </Table>
-        <TablePagination
-          component="div"
-          count={rows.length}
+        <CustomPagination
+          totalCount={rows.length}
           page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) => {
-            setRowsPerPage(parseInt(e.target.value, 10));
-            setPage(0);
-          }}
-          rowsPerPageOptions={[10, 20, 50]}
-          labelRowsPerPage={t.pageSizeLabel}
+          pageSize={rowsPerPage}
+          onPageChange={setPage}
+          unitName="formulas"
         />
-        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, py: 1, borderTop: "1px solid", borderColor: "grey.200" }}>
-          <Typography sx={{ fontFamily: FONT, fontSize: CAPTION_FONT_SIZE, fontWeight: 600, color: "primary.main" }} aria-live="polite">
-            {t.foundFormulas(rows.length)}
-          </Typography>
-        </Box>
       </TableContainer>
     </Box>
   );

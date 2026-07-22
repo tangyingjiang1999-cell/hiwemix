@@ -9,6 +9,8 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -21,8 +23,12 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
+import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Alert from "@mui/material/Alert";
 
 interface User {
@@ -43,6 +49,18 @@ export default function AdminUsersPage() {
   const [form, setForm] = useState({ username: "", password: "", role: "user" });
   const [error, setError] = useState("");
   const router = useRouter();
+
+  function formatDate(iso: string): string {
+    const d = new Date(iso);
+    const y = d.getFullYear();
+    const mo = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    let h = d.getHours();
+    const ampm = h >= 12 ? "PM" : "AM";
+    h = h % 12 || 12;
+    const mi = String(d.getMinutes()).padStart(2, "0");
+    return `${y}-${mo}-${day} ${String(h).padStart(2, "0")}:${mi} ${ampm}`;
+  }
 
   const fetchUsers = useCallback(async () => {
     const res = await fetch("/api/admin/users");
@@ -96,10 +114,24 @@ export default function AdminUsersPage() {
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default", overflowX: "clip" }}>
       <SiteHeader />
       <Container maxWidth={false} disableGutters sx={{ pt: { xs: 9, md: 10 }, pb: 4, px: { xs: 1.5, sm: 3, md: "60px" } }}>
-        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", alignItems: { sm: "center" }, mb: 3, gap: 1.5 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, fontSize: { xs: "1.05rem", md: "1.25rem" } }}>{t.adminTitle}</Typography>
-          <Button onClick={openCreate} variant="contained" sx={{ borderRadius: { xs: "12px", md: 2 }, textTransform: "none", minHeight: { xs: 36, md: "auto" }, alignSelf: { xs: "flex-start", sm: "auto" } }}>
-            + {t.adminNewUser}
+        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 3 }}>
+          <Button
+            onClick={openCreate}
+            variant="contained"
+            startIcon={<AddIcon />}
+            sx={{
+              borderRadius: "6px",
+              textTransform: "none",
+              fontWeight: 600,
+              bgcolor: "#111827",
+              color: "#ffffff",
+              px: 2.5,
+              "&:hover": {
+                bgcolor: "#374151",
+              },
+            }}
+          >
+            {t.adminNewUser}
           </Button>
         </Box>
 
@@ -107,11 +139,11 @@ export default function AdminUsersPage() {
           <Table size="small" sx={{ minWidth: 520 }}>
             <TableHead>
               <TableRow sx={{ bgcolor: "grey.50" }}>
-                <TableCell sx={{ fontWeight: 500, color: "text.secondary", whiteSpace: "nowrap" }}>{t.adminColId}</TableCell>
-                <TableCell sx={{ fontWeight: 500, color: "text.secondary" }}>{t.adminColUsername}</TableCell>
-                <TableCell sx={{ fontWeight: 500, color: "text.secondary" }}>{t.adminColRole}</TableCell>
-                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, fontWeight: 500, color: "text.secondary", whiteSpace: "nowrap" }}>{t.adminColCreatedAt}</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 500, color: "text.secondary" }}>{t.adminColActions}</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: "grey.600", whiteSpace: "nowrap" }}>{t.adminColId}</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: "grey.600" }}>{t.adminColUsername}</TableCell>
+                <TableCell sx={{ fontWeight: 600, color: "grey.600" }}>{t.adminColRole}</TableCell>
+                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, fontWeight: 600, color: "grey.600", whiteSpace: "nowrap" }}>Joined Date</TableCell>
+                <TableCell align="right" sx={{ fontWeight: 600, color: "grey.600" }}>{t.adminColActions}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -120,18 +152,46 @@ export default function AdminUsersPage() {
                   <TableCell sx={{ fontSize: "0.8125rem", color: "text.secondary" }}>{user.id}</TableCell>
                   <TableCell sx={{ fontSize: "0.8125rem", fontWeight: 600, wordBreak: "break-all" }}>{user.username}</TableCell>
                   <TableCell>
-                    <Chip
-                      label={user.role === "admin" ? t.adminRoleAdmin : t.adminRoleUser}
-                      size="small"
-                      variant="filled"
-                      color={user.role === "admin" ? "primary" : "default"}
-                      sx={{ fontWeight: 500 }}
-                    />
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box
+                        sx={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: "50%",
+                          flexShrink: 0,
+                          bgcolor: user.role === "admin" ? "#EF4444" : "#9CA3AF",
+                        }}
+                      />
+                      <Typography sx={{ fontSize: "0.8125rem", color: "#374151" }}>
+                        {user.role === "admin" ? t.adminRoleAdmin : t.adminRoleUser}
+                      </Typography>
+                    </Box>
                   </TableCell>
-                  <TableCell sx={{ display: { xs: "none", md: "table-cell" }, fontSize: "0.8125rem", color: "text.secondary", whiteSpace: "nowrap" }}>{user.created_at}</TableCell>
+                  <TableCell sx={{ display: { xs: "none", md: "table-cell" }, fontSize: "0.8125rem", color: "text.secondary", whiteSpace: "nowrap" }}>{formatDate(user.created_at)}</TableCell>
                   <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
-                    <Button onClick={() => openEdit(user)} size="small" sx={{ textTransform: "none", mr: { xs: 0, sm: 1 } }}>{t.adminEdit}</Button>
-                    <Button onClick={() => handleDelete(user)} size="small" color="error" disabled={user.username === "admin"} sx={{ textTransform: "none" }}>{t.adminDelete}</Button>
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
+                      <Tooltip title={t.adminEdit}>
+                        <IconButton onClick={() => openEdit(user)} size="small"
+                          sx={{ color: "text.secondary", "&:hover": { color: "primary.main" } }}
+                        >
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title={t.adminDelete}>
+                        <span>
+                          <IconButton onClick={() => handleDelete(user)} size="small"
+                            disabled={user.username === "admin"}
+                            sx={{
+                              color: "text.secondary",
+                              "&:hover": { color: "error.main" },
+                              "&.Mui-disabled": { color: "action.disabled" },
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}
@@ -142,32 +202,40 @@ export default function AdminUsersPage() {
 
       {toastElement}
 
-      <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>{editingUser ? t.adminEditTitle : t.adminNewUser}</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
-            <TextField label={t.adminColUsername} value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} disabled={!!editingUser} fullWidth size="small" />
-            <TextField
-              type="password"
-              label={`${t.adminLabelPassword} ${editingUser ? t.adminPasswordHint : ""}`}
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              placeholder={editingUser ? t.adminPasswordPlaceholder : ""}
-              fullWidth
-              size="small"
-            />
-            <TextField select label={t.adminLabelRole} value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} fullWidth size="small">
-              <MenuItem value="user">{t.adminRoleUser}</MenuItem>
-              <MenuItem value="admin">{t.adminRoleAdmin}</MenuItem>
-            </TextField>
-            {error && <Alert severity="error" variant="outlined" sx={{ fontSize: "0.8125rem" }}>{error}</Alert>}
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setShowModal(false)} variant="outlined" sx={{ textTransform: "none" }}>{t.adminCancel}</Button>
-          <Button onClick={handleSave} variant="contained" sx={{ textTransform: "none" }}>{editingUser ? t.adminSave : t.adminCreate}</Button>
-        </DialogActions>
-      </Dialog>
+      <Dialog
+          open={showModal}
+          onClose={() => setShowModal(false)}
+          maxWidth="xs"
+          fullWidth
+          slotProps={{ paper: { sx: { borderRadius: 3, p: { xs: 3, sm: 4 } } } }}
+        >
+          <DialogTitle sx={{ fontWeight: 700, fontSize: "1.25rem", pt: 0, pb: 2, mb: 1 }}>
+            {editingUser ? t.adminEditTitle : t.adminNewUser}
+          </DialogTitle>
+          <DialogContent sx={{ pt: "16px !important", pb: 1.5, overflow: "visible" }}>
+            <Stack spacing={3} sx={{ overflow: "visible", pt: 1 }}>
+              <TextField label={t.adminColUsername} value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} disabled={!!editingUser} fullWidth size="small" />
+              <TextField
+                type="password"
+                label={`${t.adminLabelPassword} ${editingUser ? t.adminPasswordHint : ""}`}
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                placeholder={editingUser ? t.adminPasswordPlaceholder : ""}
+                fullWidth
+                size="small"
+              />
+              <TextField select label={t.adminLabelRole} value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} fullWidth size="small">
+                <MenuItem value="user">{t.adminRoleUser}</MenuItem>
+                <MenuItem value="admin">{t.adminRoleAdmin}</MenuItem>
+              </TextField>
+              {error && <Alert severity="error" variant="outlined" sx={{ fontSize: "0.8125rem" }}>{error}</Alert>}
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ px: 0, pb: 0 }}>
+            <Button onClick={() => setShowModal(false)} variant="outlined" sx={{ textTransform: "none" }}>{t.adminCancel}</Button>
+            <Button onClick={handleSave} variant="contained" sx={{ textTransform: "none" }}>{editingUser ? t.adminSave : t.adminCreate}</Button>
+          </DialogActions>
+        </Dialog>
     </Box>
   );
 }

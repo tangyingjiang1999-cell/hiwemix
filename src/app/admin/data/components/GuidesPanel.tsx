@@ -20,7 +20,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
-import TablePagination from "@mui/material/TablePagination";
+import CustomPagination from "@/components/ui/CustomPagination";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import EditIcon from "@mui/icons-material/Edit";
@@ -152,18 +152,12 @@ export default function GuidesPanel() {
             ))}
           </TableBody>
         </Table>
-        <TablePagination
-          component="div"
-          count={filtered.length}
+        <CustomPagination
+          totalCount={filtered.length}
           page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          rowsPerPage={rowsPerPage}
-          onRowsPerPageChange={(e) => {
-            setRowsPerPage(parseInt(e.target.value, 10));
-            setPage(0);
-          }}
-          rowsPerPageOptions={[10, 25, 50]}
-          labelRowsPerPage="每页行数"
+          pageSize={rowsPerPage}
+          onPageChange={setPage}
+          unitName="guides"
         />
       </TableContainer>
 

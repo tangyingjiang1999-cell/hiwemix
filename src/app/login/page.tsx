@@ -97,9 +97,8 @@ export default function LoginPage() {
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh", flexDirection: { xs: "column", lg: "row" }, alignItems: { xs: "center", lg: "stretch" }, overflowX: "clip" }}>
-      {/* ===== 左侧渐变区 (40%) — 桌面端保留，移动端完全隐藏 ===== */}
+      {/* ===== 左侧背景区 (40%) — 珍珠漆图片背景 ===== */}
       <Box
-        className="fluid-gradient"
         sx={{
           position: "relative",
           display: { xs: "none", lg: "flex" },
@@ -109,9 +108,11 @@ export default function LoginPage() {
           py: { xs: 3, sm: 4, lg: 6 },
           width: { lg: "40%" },
           minHeight: { xs: 160, lg: "auto" },
+          backgroundImage: "url('/car-paint.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
         }}
       >
-        <Box className="fluid-blob" />
 
         {/* Logo - 移动端 */}
         <Box sx={{ position: "relative", zIndex: 10, display: { xs: "flex", lg: "none" }, alignItems: "center", gap: 1.5 }}>
