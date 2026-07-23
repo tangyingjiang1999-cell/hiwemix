@@ -33,7 +33,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AddIcon from "@mui/icons-material/Add";
-import Slider from "@mui/material/Slider";
 
 const FONT = 'var(--font-inter), var(--font-noto), "Helvetica Neue", Arial, sans-serif';
 
@@ -139,9 +138,7 @@ const ADD_FORM_INITIAL = {
   code: "",
   tradeName: "",
   nameZh: "",
-  r: 128,
-  g: 128,
-  b: 128,
+  hex: "#808080",
 };
 
 function AddMaterialDialog({
@@ -180,25 +177,22 @@ function AddMaterialDialog({
     if (!form.tradeName.trim()) { setError("英文名称不能为空"); return; }
     if (!form.nameZh.trim()) { setError("中文名称不能为空"); return; }
 
+    // HEX → RGB 自动换算
+    const { r, g, b } = hexToRgb(form.hex);
     const newToner: Toner = {
       code: form.code.trim(),
       tradeName: form.tradeName.trim(),
       nameZh: form.nameZh.trim(),
       category: form.category as TonerCategory,
-      hex: displayHex,
-      rgb_r: form.r,
-      rgb_g: form.g,
-      rgb_b: form.b,
+      hex: form.hex,
+      rgb_r: r,
+      rgb_g: g,
+      rgb_b: b,
     };
 
     onSave(newToner);
     onClose();
   }
-
-  const RGB_MAX = 255;
-
-  // RGB 颜色信息
-  const displayHex = rgbToHex(form.r, form.g, form.b);
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -254,113 +248,54 @@ function AddMaterialDialog({
             placeholder="例如 纯白"
           />
 
-          {/* RGB 颜色调节区 */}
-          <Paper variant="outlined" sx={{ borderRadius: "0", border: "1px solid", borderColor: "grey.200", p: 2 }}>
-            <Stack spacing={2}>
-              {/* 实时颜色预览 */}
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          {/* 颜色拾取器：色块预览 + HEX 输入 并排 */}
+          <Paper variant="outlined" sx={{ border: "1px solid", borderColor: "grey.200", p: 2 }}>
+            <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
+              {/* 色块 — 点击打开原生拾色器 */}
+              <Box sx={{ position: "relative", flexShrink: 0 }}>
                 <Box
                   sx={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: "0",
+                    width: 48,
+                    height: 48,
+                    borderRadius: 1,
                     border: "2px solid",
                     borderColor: "grey.300",
-                    flexShrink: 0,
-                    transition: "background-color 0.15s",
+                    cursor: "pointer",
+                    transition: "box-shadow 0.15s",
+                    "&:hover": { boxShadow: "0 0 0 4px rgba(36,135,202,0.15)" },
                   }}
-                  style={{ backgroundColor: displayHex }}
+                  style={{ backgroundColor: form.hex }}
                 />
-                <Box>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: "#1a1a1a" }}>
-                    {displayHex}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    R: {form.r} &nbsp; G: {form.g} &nbsp; B: {form.b}
-                  </Typography>
-                </Box>
+                <Box
+                  component="input"
+                  type="color"
+                  value={form.hex}
+                  onChange={(e) => setForm({ ...form, hex: e.target.value })}
+                  sx={{
+                    position: "absolute",
+                    inset: 0,
+                    opacity: 0,
+                    cursor: "pointer",
+                    "&::-webkit-color-swatch-wrapper": { padding: 0 },
+                    "&::-webkit-color-swatch": { border: "none", borderRadius: 0 },
+                  }}
+                />
               </Box>
-
-              {/* R 通道 */}
-              <Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: "#ef4444", mb: 0.5 }}>
-                  R — Red（红色）
-                </Typography>
-                <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
-                  <Slider
-                    value={form.r}
-                    onChange={(_, v) => setForm({ ...form, r: v as number })}
-                    min={0}
-                    max={RGB_MAX}
-                    sx={{ flex: 1, color: "#ef4444", "& .MuiSlider-thumb": { borderRadius: "0" } }}
-                  />
-                  <TextField
-                    type="number"
-                    value={form.r}
-                    onChange={(e) => {
-                      const v = parseInt(e.target.value, 10);
-                      if (!isNaN(v)) setForm({ ...form, r: v });
-                    }}
-                    size="small"
-                    slotProps={{ htmlInput: { min: 0, max: RGB_MAX } }}
-                    sx={{ width: 72 }}
-                  />
-                </Stack>
-              </Box>
-
-              {/* G 通道 */}
-              <Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: "#22c55e", mb: 0.5 }}>
-                  G — Green（绿色）
-                </Typography>
-                <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
-                  <Slider
-                    value={form.g}
-                    onChange={(_, v) => setForm({ ...form, g: v as number })}
-                    min={0}
-                    max={RGB_MAX}
-                    sx={{ flex: 1, color: "#22c55e", "& .MuiSlider-thumb": { borderRadius: "0" } }}
-                  />
-                  <TextField
-                    type="number"
-                    value={form.g}
-                    onChange={(e) => {
-                      const v = parseInt(e.target.value, 10);
-                      if (!isNaN(v)) setForm({ ...form, g: v });
-                    }}
-                    size="small"
-                    slotProps={{ htmlInput: { min: 0, max: RGB_MAX } }}
-                    sx={{ width: 72 }}
-                  />
-                </Stack>
-              </Box>
-
-              {/* B 通道 */}
-              <Box>
-                <Typography variant="caption" sx={{ fontWeight: 600, color: "#3b82f6", mb: 0.5 }}>
-                  B — Blue（蓝色）
-                </Typography>
-                <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
-                  <Slider
-                    value={form.b}
-                    onChange={(_, v) => setForm({ ...form, b: v as number })}
-                    min={0}
-                    max={RGB_MAX}
-                    sx={{ flex: 1, color: "#3b82f6", "& .MuiSlider-thumb": { borderRadius: "0" } }}
-                  />
-                  <TextField
-                    type="number"
-                    value={form.b}
-                    onChange={(e) => {
-                      const v = parseInt(e.target.value, 10);
-                      if (!isNaN(v)) setForm({ ...form, b: v });
-                    }}
-                    size="small"
-                    slotProps={{ htmlInput: { min: 0, max: RGB_MAX } }}
-                    sx={{ width: 72 }}
-                  />
-                </Stack>
-              </Box>
+              {/* HEX 文本输入框 */}
+              <TextField
+                label="HEX"
+                value={form.hex}
+                onChange={(e) => {
+                  let raw = e.target.value;
+                  if (!raw.startsWith("#")) raw = "#" + raw;
+                  if (/^#[0-9a-fA-F]{0,6}$/.test(raw)) {
+                    setForm({ ...form, hex: raw.length === 7 ? raw.toUpperCase() : raw });
+                  }
+                }}
+                size="small"
+                sx={{ flex: 1 }}
+                slotProps={{ htmlInput: { maxLength: 7 } }}
+              />
             </Stack>
           </Paper>
 
@@ -402,7 +337,7 @@ function ManagementModal({
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [editingItem, setEditingItem] = useState<Toner | null>(null);
-  const [form, setForm] = useState({ code: "", tradeName: "", nameZh: "", category: "" as TonerCategory | "", hex: "#FFFFFF", rgb_r: 128, rgb_g: 128, rgb_b: 128 });
+  const [form, setForm] = useState({ code: "", tradeName: "", nameZh: "", category: "" as TonerCategory | "", hex: "#FFFFFF" });
   const [error, setError] = useState("");
   const [addOpen, setAddOpen] = useState(false);
 
@@ -446,9 +381,6 @@ function ManagementModal({
       nameZh: item.nameZh,
       category: item.category,
       hex: item.hex,
-      rgb_r: item.rgb_r ?? 128,
-      rgb_g: item.rgb_g ?? 128,
-      rgb_b: item.rgb_b ?? 128,
     });
     setError("");
   }
@@ -459,15 +391,17 @@ function ManagementModal({
       setError("所有字段不能为空");
       return;
     }
+    // HEX → RGB 自动换算
+    const { r, g, b } = hexToRgb(form.hex);
     const updated: Toner = {
       code: form.code,
       tradeName: form.tradeName,
       nameZh: form.nameZh,
       category: form.category as TonerCategory,
       hex: form.hex,
-      rgb_r: form.rgb_r,
-      rgb_g: form.rgb_g,
-      rgb_b: form.rgb_b,
+      rgb_r: r,
+      rgb_g: g,
+      rgb_b: b,
     };
     // 等待 API 调用完成后再关闭编辑对话框
     try {
@@ -690,13 +624,19 @@ function ManagementModal({
               ))}
             </TextField>
             <TextField
-              label="预览色"
-              type="color"
+              label="预览色 HEX"
               value={form.hex}
-              onChange={(e) => setForm({ ...form, hex: e.target.value })}
+              onChange={(e) => {
+                let raw = e.target.value;
+                if (!raw.startsWith("#")) raw = "#" + raw;
+                if (/^#[0-9a-fA-F]{0,6}$/.test(raw)) {
+                  setForm({ ...form, hex: raw.length === 7 ? raw.toUpperCase() : raw });
+                }
+              }}
               size="small"
               fullWidth
-              sx={{ "& input": { height: 32, p: 0.5 } }}
+              slotProps={{ htmlInput: { maxLength: 7 } }}
+              sx={{ "& input": { fontFamily: "monospace" } }}
             />
             {error && (
               <Typography variant="body2" color="error">{error}</Typography>
