@@ -68,31 +68,33 @@ export default function FormulasPanel() {
   // 百分比输入框的原始字符串（允许输入中间态如 "5."）
   const [pctInputs, setPctInputs] = useState<Record<number, string>>({});
 
-  // 计算百分比总和（按组件组或全部）
+  // 计算百分比总和（仅统计色母编号非空的行，与保存时的过滤逻辑一致）
   const percentageSums = useMemo(() => {
+    const filled = components.filter((c) => c.toner_code.trim() !== "");
     if (form.formula_type === "Three Stages") {
       return {
-        "Pearl Paint": components
+        "Pearl Paint": filled
           .filter((c) => c.component_group === "Pearl Paint")
           .reduce((s, c) => s + c.percentage, 0),
-        "Ground Paint": components
+        "Ground Paint": filled
           .filter((c) => c.component_group === "Ground Paint")
           .reduce((s, c) => s + c.percentage, 0),
       } as Record<ComponentGroup, number>;
     }
-    return { all: components.reduce((s, c) => s + c.percentage, 0) };
+    return { all: filled.reduce((s, c) => s + c.percentage, 0) };
   }, [components, form.formula_type]);
 
-  // 百分比是否全部合法（总和=100%）
+  // 百分比是否全部合法（总和=100%，仅统计已填色母编号的行）
   const percentageValid = useMemo(() => {
-    if (components.length === 0) return false;
+    const filled = components.filter((c) => c.toner_code.trim() !== "");
+    if (filled.length === 0) return false;
     if (form.formula_type === "Three Stages") {
       const sums = percentageSums as Record<ComponentGroup, number>;
       return Math.abs((sums["Pearl Paint"] ?? 0) - 100) < 0.01
         && Math.abs((sums["Ground Paint"] ?? 0) - 100) < 0.01;
     }
     return Math.abs(((percentageSums as { all: number }).all) - 100) < 0.01;
-  }, [percentageSums, form.formula_type, components.length]);
+  }, [percentageSums, form.formula_type, components]);
 
   // 关联颜色搜索下拉
   const [colorQuery, setColorQuery] = useState("");
