@@ -131,6 +131,35 @@ function TonerCard({ code, tradeName, hex }: { code: string; tradeName: string; 
   );
 }
 
+/** 外置标签 + 输入区域组合：label 与 InputBase 合体 */
+function FieldGroup({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Stack spacing={0.75}>
+      <Typography
+        variant="body2"
+        component="span"
+        sx={{
+          fontWeight: 500,
+          color: "#4D4D4D",
+          fontSize: "0.875rem",
+        }}
+      >
+        {label}
+      </Typography>
+      {children}
+    </Stack>
+  );
+}
+
+/** 表单间统一间距 */
+const FIELD_GAP = 2.5; // 20px
+
 // ==================== 新增材料表单（次级弹窗） ====================
 
 const ADD_FORM_INITIAL = {
@@ -201,122 +230,125 @@ function AddMaterialDialog({
         新增材料
       </DialogTitle>
       <DialogContent sx={{ py: 3, px: 4 }}>
-        <Stack spacing={3}>
+        <Stack spacing={FIELD_GAP}>
 
-          {/* 分类选择 */}
-          <TextField
-            select
-            label="所属分类"
-            value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value as TonerCategory })}
-            size="small"
-            fullWidth
-            slotProps={{
-              inputLabel: { shrink: true },
-              select: {
-                displayEmpty: true,
-                MenuProps: {
-                  disableScrollLock: true,
-                  anchorOrigin: { vertical: "bottom", horizontal: "left" },
-                  transformOrigin: { vertical: "top", horizontal: "left" },
-                  marginThreshold: 8,
-                  slotProps: { paper: { sx: { maxHeight: 200, mt: "6px" } } },
+          {/* 所属分类 — 外置标签 + 无 label OutlinedInput */}
+          <FieldGroup label="所属分类">
+            <TextField
+              select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value as TonerCategory })}
+              size="small"
+              fullWidth
+              slotProps={{
+                select: {
+                  displayEmpty: true,
+                  MenuProps: {
+                    disableScrollLock: true,
+                    anchorOrigin: { vertical: "bottom", horizontal: "left" },
+                    transformOrigin: { vertical: "top", horizontal: "left" },
+                    marginThreshold: 8,
+                    slotProps: { paper: { sx: { maxHeight: 200, mt: "6px" } } },
+                  },
                 },
-              },
-            }}
-            sx={{
-              "& .MuiInputLabel-outlined": {
-                background: "#fff",
-                px: "4px",
-              },
-            }}
-          >
-            <MenuItem value="">请选择分类</MenuItem>
-            {TONER_CATEGORIES.map((cat) => (
-              <MenuItem key={cat.key} value={cat.key}>{cat.label}</MenuItem>
-            ))}
-          </TextField>
+              }}
+              sx={{
+                "& .MuiSelect-select": {
+                  color: form.category ? "text.primary" : "text.disabled",
+                },
+              }}
+            >
+              <MenuItem value="" disabled>请选择分类</MenuItem>
+              {TONER_CATEGORIES.map((cat) => (
+                <MenuItem key={cat.key} value={cat.key}>{cat.label}</MenuItem>
+              ))}
+            </TextField>
+          </FieldGroup>
 
           {/* 产品代码（自动生成，可手动修改） */}
-          <TextField
-            label="产品代码"
-            value={form.code}
-            onChange={(e) => setForm({ ...form, code: e.target.value })}
-            size="small"
-            fullWidth
-            helperText="选择分类后自动生成，也可手动修改"
-          />
+          <FieldGroup label="产品代码">
+            <TextField
+              value={form.code}
+              onChange={(e) => setForm({ ...form, code: e.target.value })}
+              size="small"
+              fullWidth
+              helperText="选择分类后自动生成，也可手动修改"
+            />
+          </FieldGroup>
 
           {/* 英文名称 */}
-          <TextField
-            label="英文名称"
-            value={form.tradeName}
-            onChange={(e) => setForm({ ...form, tradeName: e.target.value })}
-            size="small"
-            fullWidth
-            placeholder="例如 Titanium White"
-          />
+          <FieldGroup label="英文名称">
+            <TextField
+              value={form.tradeName}
+              onChange={(e) => setForm({ ...form, tradeName: e.target.value })}
+              size="small"
+              fullWidth
+              placeholder="例如 Titanium White"
+            />
+          </FieldGroup>
 
           {/* 中文名称 */}
-          <TextField
-            label="中文名称"
-            value={form.nameZh}
-            onChange={(e) => setForm({ ...form, nameZh: e.target.value })}
-            size="small"
-            fullWidth
-            placeholder="例如 纯白"
-          />
+          <FieldGroup label="中文名称">
+            <TextField
+              value={form.nameZh}
+              onChange={(e) => setForm({ ...form, nameZh: e.target.value })}
+              size="small"
+              fullWidth
+              placeholder="例如 纯白"
+            />
+          </FieldGroup>
 
           {/* 颜色拾取器：色块预览 + HEX 输入 并排 */}
-          <Paper variant="outlined" sx={{ border: "1px solid", borderColor: "grey.200", p: 2, mb: 1 }}>
-            <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
-              {/* 色块 — 点击打开原生拾色器 */}
-              <Box sx={{ position: "relative", flexShrink: 0 }}>
-                <Box
-                  sx={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 1,
-                    border: "2px solid",
-                    borderColor: "grey.300",
-                    cursor: "pointer",
-                    transition: "box-shadow 0.15s",
-                    "&:hover": { boxShadow: "0 0 0 4px rgba(36,135,202,0.15)" },
-                  }}
-                  style={{ backgroundColor: form.hex }}
-                />
-                <Box
-                  component="input"
-                  type="color"
+          <FieldGroup label="预览色">
+            <Paper variant="outlined" sx={{ border: "1px solid", borderColor: "grey.200", p: 1.5, mb: 0 }}>
+              <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
+                {/* 色块 — 点击打开原生拾色器 */}
+                <Box sx={{ position: "relative", flexShrink: 0 }}>
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 1,
+                      border: "2px solid",
+                      borderColor: "grey.300",
+                      cursor: "pointer",
+                      transition: "box-shadow 0.15s",
+                      "&:hover": { boxShadow: "0 0 0 4px rgba(36,135,202,0.15)" },
+                    }}
+                    style={{ backgroundColor: form.hex || "#808080" }}
+                  />
+                  <Box
+                    component="input"
+                    type="color"
+                    value={form.hex}
+                    onChange={(e) => setForm({ ...form, hex: e.target.value })}
+                    sx={{
+                      position: "absolute",
+                      inset: 0,
+                      opacity: 0,
+                      cursor: "pointer",
+                      "&::-webkit-color-swatch-wrapper": { padding: 0 },
+                      "&::-webkit-color-swatch": { border: "none", borderRadius: 0 },
+                    }}
+                  />
+                </Box>
+                {/* HEX 文本输入框 */}
+                <TextField
                   value={form.hex}
-                  onChange={(e) => setForm({ ...form, hex: e.target.value })}
-                  sx={{
-                    position: "absolute",
-                    inset: 0,
-                    opacity: 0,
-                    cursor: "pointer",
-                    "&::-webkit-color-swatch-wrapper": { padding: 0 },
-                    "&::-webkit-color-swatch": { border: "none", borderRadius: 0 },
+                  onChange={(e) => {
+                    let raw = e.target.value;
+                    if (!raw.startsWith("#")) raw = "#" + raw;
+                    if (/^#[0-9a-fA-F]{0,6}$/.test(raw)) {
+                      setForm({ ...form, hex: raw.length === 7 ? raw.toUpperCase() : raw });
+                    }
                   }}
+                  size="small"
+                  sx={{ flex: 1 }}
+                  slotProps={{ htmlInput: { maxLength: 7 } }}
                 />
-              </Box>
-              {/* HEX 文本输入框 */}
-              <TextField
-                label="HEX"
-                value={form.hex}
-                onChange={(e) => {
-                  let raw = e.target.value;
-                  if (!raw.startsWith("#")) raw = "#" + raw;
-                  if (/^#[0-9a-fA-F]{0,6}$/.test(raw)) {
-                    setForm({ ...form, hex: raw.length === 7 ? raw.toUpperCase() : raw });
-                  }
-                }}
-                size="small"
-                sx={{ flex: 1 }}
-                slotProps={{ htmlInput: { maxLength: 7 } }}
-              />
-            </Stack>
-          </Paper>
+              </Stack>
+            </Paper>
+          </FieldGroup>
 
           {/* 错误提示 */}
           {error && (
@@ -605,76 +637,77 @@ function ManagementModal({
         <DialogTitle sx={{ borderBottom: "1px solid #e5e7eb", pb: 2, mb: 0 }}>
           编辑色母 — {editingItem?.code}
         </DialogTitle>
-        <DialogContent sx={{ pt: 4, pb: 1, px: { xs: 2, sm: 3 } }}>
-          <Stack spacing={2} sx={{ mt: 1 }}>
+        <DialogContent sx={{ pt: 3, pb: 1, px: 4 }}>
+          <Stack spacing={FIELD_GAP}>
             {/* 色母代码仅做标识，不可编辑 */}
             <Box>
-              <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: "block", fontWeight: 500 }}>
+              <Typography variant="body2" sx={{ fontWeight: 500, color: "#4D4D4D", fontSize: "0.875rem", mb: 0.75 }}>
                 色母代码
               </Typography>
               <Typography variant="body1" sx={{ fontWeight: 700, fontSize: "1rem", color: "#1a1a1a" }}>
                 {editingItem?.code}
               </Typography>
             </Box>
-            <TextField
-              label="英文商品名"
-              value={form.tradeName}
-              onChange={(e) => setForm({ ...form, tradeName: e.target.value })}
-              size="small"
-              fullWidth
-            />
-            <TextField
-              label="中文品名"
-              value={form.nameZh}
-              onChange={(e) => setForm({ ...form, nameZh: e.target.value })}
-              size="small"
-              fullWidth
-            />
-            <TextField
-              select
-              label="所属分类"
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value as TonerCategory })}
-              size="small"
-              fullWidth
-              slotProps={{
-                inputLabel: { shrink: true },
-                select: {
-                  displayEmpty: true,
-                  MenuProps: {
-                    disableScrollLock: true,
-                    anchorOrigin: { vertical: "bottom", horizontal: "left" },
-                    transformOrigin: { vertical: "top", horizontal: "left" },
-                    slotProps: { paper: { sx: { maxHeight: 200 } } },
+
+            <FieldGroup label="英文商品名">
+              <TextField
+                value={form.tradeName}
+                onChange={(e) => setForm({ ...form, tradeName: e.target.value })}
+                size="small"
+                fullWidth
+              />
+            </FieldGroup>
+
+            <FieldGroup label="中文品名">
+              <TextField
+                value={form.nameZh}
+                onChange={(e) => setForm({ ...form, nameZh: e.target.value })}
+                size="small"
+                fullWidth
+              />
+            </FieldGroup>
+
+            <FieldGroup label="所属分类">
+              <TextField
+                select
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value as TonerCategory })}
+                size="small"
+                fullWidth
+                slotProps={{
+                  select: {
+                    displayEmpty: true,
+                    MenuProps: {
+                      disableScrollLock: true,
+                      anchorOrigin: { vertical: "bottom", horizontal: "left" },
+                      transformOrigin: { vertical: "top", horizontal: "left" },
+                      slotProps: { paper: { sx: { maxHeight: 200 } } },
+                    },
                   },
-                },
-              }}
-              sx={{
-                "& .MuiInputLabel-outlined": {
-                  background: "#fff",
-                  px: "4px",
-                },
-              }}
-            >
-              {TONER_CATEGORIES.map((cat) => (
-                <MenuItem key={cat.key} value={cat.key}>{cat.label}</MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              label="预览色 HEX"
-              value={form.hex}
-              onChange={(e) => {
-                let raw = e.target.value;
-                if (!raw.startsWith("#")) raw = "#" + raw;
-                if (/^#[0-9a-fA-F]{0,6}$/.test(raw)) {
-                  setForm({ ...form, hex: raw.length === 7 ? raw.toUpperCase() : raw });
-                }
-              }}
-              size="small"
-              fullWidth
-              slotProps={{ htmlInput: { maxLength: 7 } }}
-              sx={{ "& input": { fontFamily: "monospace" } }}
-            />
+                }}
+              >
+                {TONER_CATEGORIES.map((cat) => (
+                  <MenuItem key={cat.key} value={cat.key}>{cat.label}</MenuItem>
+                ))}
+              </TextField>
+            </FieldGroup>
+
+            <FieldGroup label="预览色 HEX">
+              <TextField
+                value={form.hex}
+                onChange={(e) => {
+                  let raw = e.target.value;
+                  if (!raw.startsWith("#")) raw = "#" + raw;
+                  if (/^#[0-9a-fA-F]{0,6}$/.test(raw)) {
+                    setForm({ ...form, hex: raw.length === 7 ? raw.toUpperCase() : raw });
+                  }
+                }}
+                size="small"
+                fullWidth
+                slotProps={{ htmlInput: { maxLength: 7 } }}
+                sx={{ "& input": { fontFamily: "monospace" } }}
+              />
+            </FieldGroup>
             {error && (
               <Typography variant="body2" color="error">{error}</Typography>
             )}
