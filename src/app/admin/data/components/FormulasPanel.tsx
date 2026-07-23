@@ -104,9 +104,24 @@ export default function FormulasPanel() {
   // 色母搜索下拉
   const [tonerDropdownFor, setTonerDropdownFor] = useState<number | null>(null);
   const [tonerQuery, setTonerQuery] = useState("");
+  // ★ 延迟关闭守卫：防止 mousedown→mouseup 冒泡误触 ClickAwayListener
+  const clickawayGuardRef = useRef(false);
+  const clickawayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // 强制关闭色母下拉
   function closeTonerDropdown() {
+    // 如果刚从打开守卫中出来，忽略本次关闭（ClickAwayListener 的 mouseup 冒泡延迟到达）
+    if (clickawayGuardRef.current) {
+      clickawayGuardRef.current = false;
+      return;
+    }
+    setTonerDropdownFor(null);
+    setTonerQuery("");
+  }
+
+  // ★★ 包一层安全的关闭：确保先清掉旧 timer，防止刷新行后误关闭新打开的下拉
+  function safeCloseCurrentDropdown() {
+    if (clickawayTimerRef.current) clearTimeout(clickawayTimerRef.current);
     setTonerDropdownFor(null);
     setTonerQuery("");
   }
@@ -531,7 +546,17 @@ export default function FormulasPanel() {
                             setTonerDropdownFor(globalIndex);
                           }
                         }}
-                        onFocus={(e) => { INPUT_FOCUS_HANDLER(e); setTonerQuery(c.toner_code); setTonerDropdownFor(globalIndex); }}
+                        onFocus={(e) => {
+                          INPUT_FOCUS_HANDLER(e);
+                          setTonerQuery(c.toner_code);
+                          setTonerDropdownFor(globalIndex);
+                        }}
+                        onMouseDown={() => {
+                          // ★ 守卫：mousedown 表示用户意图在当前 input 操作，忽略接下来 ClickAway 的关闭
+                          clickawayGuardRef.current = true;
+                          if (clickawayTimerRef.current) clearTimeout(clickawayTimerRef.current);
+                          clickawayTimerRef.current = setTimeout(() => { clickawayGuardRef.current = false; }, 300);
+                        }}
                         onBlur={(e) => { INPUT_BLUR_HANDLER(e); }}
                         style={INPUT_SMALL_STYLE}
                       />
