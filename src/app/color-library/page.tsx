@@ -402,7 +402,7 @@ function ManagementModal({
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [editingItem, setEditingItem] = useState<Toner | null>(null);
-  const [form, setForm] = useState({ code: "", tradeName: "", nameZh: "", category: "" as TonerCategory | "", hex: "#FFFFFF" });
+  const [form, setForm] = useState({ code: "", tradeName: "", nameZh: "", category: "" as TonerCategory | "", hex: "#FFFFFF", rgb_r: 128, rgb_g: 128, rgb_b: 128 });
   const [error, setError] = useState("");
   const [addOpen, setAddOpen] = useState(false);
 
@@ -446,6 +446,9 @@ function ManagementModal({
       nameZh: item.nameZh,
       category: item.category,
       hex: item.hex,
+      rgb_r: item.rgb_r ?? 128,
+      rgb_g: item.rgb_g ?? 128,
+      rgb_b: item.rgb_b ?? 128,
     });
     setError("");
   }
@@ -462,6 +465,9 @@ function ManagementModal({
       nameZh: form.nameZh,
       category: form.category as TonerCategory,
       hex: form.hex,
+      rgb_r: form.rgb_r,
+      rgb_g: form.rgb_g,
+      rgb_b: form.rgb_b,
     };
     // 等待 API 调用完成后再关闭编辑对话框
     try {
@@ -786,7 +792,11 @@ export default function TonerPage() {
         const d = await res.json();
         alert(d.error || "删除失败");
       }
-    } catch { alert("网络错误，请重试"); }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[handleDeleteItem]", msg);
+      alert("网络错误，请重试：" + msg);
+    }
   }, []);
 
   const handleAddItem = useCallback(async (newToner: Toner) => {
@@ -803,7 +813,11 @@ export default function TonerPage() {
         const d = await res.json();
         alert(d.error || "新增失败");
       }
-    } catch { alert("网络错误，请重试"); }
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("[handleAddItem]", msg);
+      alert("网络错误，请重试：" + msg);
+    }
   }, []);
 
   return (
