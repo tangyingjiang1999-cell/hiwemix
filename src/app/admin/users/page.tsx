@@ -5,31 +5,32 @@ import { useRouter } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
 import { useToast } from "@/components/Toast";
 import { useLang } from "@/components/LanguageContext";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import Chip from "@mui/material/Chip";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
-import AddIcon from "@mui/icons-material/Add";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Alert from "@mui/material/Alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Plus, Edit, Trash2 } from "lucide-react";
 
 interface User {
   id: number;
@@ -107,135 +108,96 @@ export default function AdminUsersPage() {
   }
 
   if (loading) {
-    return <Box sx={{ p: 4, textAlign: "center" }}><Typography variant="body2" sx={{ color: "text.secondary" }}>{t.adminLoading}</Typography></Box>;
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p className="text-sm text-gray-500">{t.adminLoading}</p>
+      </div>
+    );
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default", overflowX: "clip" }}>
+    <div className="min-h-screen overflow-x-clip bg-white">
       <SiteHeader />
-      <Container maxWidth={false} disableGutters sx={{ pt: { xs: 9, md: 10 }, pb: 4, px: { xs: 1.5, sm: 3, md: "60px" } }}>
-        <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 3 }}>
-          <Button
-            onClick={openCreate}
-            variant="contained"
-            startIcon={<AddIcon />}
-            sx={{
-              borderRadius: "6px",
-              textTransform: "none",
-              fontWeight: 600,
-              bgcolor: "#111827",
-              color: "#ffffff",
-              px: 2.5,
-              "&:hover": {
-                bgcolor: "#374151",
-              },
-            }}
-          >
-            {t.adminNewUser}
+      <div className="pt-20 pb-8 px-6 sm:px-8 md:px-[60px]">
+        <div className="flex justify-end mb-5">
+          <Button onClick={openCreate} className="rounded-lg bg-gray-900 text-white hover:bg-gray-700">
+            <Plus className="size-4" /> {t.adminNewUser}
           </Button>
-        </Box>
+        </div>
 
-        <TableContainer component={Paper} variant="outlined" className="table-responsive-scroll">
-          <Table size="small" sx={{ minWidth: 520 }}>
-            <TableHead>
-              <TableRow sx={{ bgcolor: "grey.50" }}>
-                <TableCell sx={{ fontWeight: 600, color: "grey.600", whiteSpace: "nowrap" }}>{t.adminColId}</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "grey.600" }}>{t.adminColUsername}</TableCell>
-                <TableCell sx={{ fontWeight: 600, color: "grey.600" }}>{t.adminColRole}</TableCell>
-                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, fontWeight: 600, color: "grey.600", whiteSpace: "nowrap" }}>Joined Date</TableCell>
-                <TableCell align="right" sx={{ fontWeight: 600, color: "grey.600" }}>{t.adminColActions}</TableCell>
+        <div className="overflow-x-auto rounded-lg border border-gray-200">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-50">
+                <TableHead className="py-2.5 text-xs font-semibold text-gray-500 uppercase">{t.adminColId}</TableHead>
+                <TableHead className="py-2.5 text-xs font-semibold text-gray-500 uppercase">{t.adminColUsername}</TableHead>
+                <TableHead className="py-2.5 text-xs font-semibold text-gray-500 uppercase">{t.adminColRole}</TableHead>
+                <TableHead className="hidden md:table-cell py-2.5 text-xs font-semibold text-gray-500 uppercase">Joined Date</TableHead>
+                <TableHead className="py-2.5 text-right text-xs font-semibold text-gray-500 uppercase">{t.adminColActions}</TableHead>
               </TableRow>
-            </TableHead>
+            </TableHeader>
             <TableBody>
               {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell sx={{ fontSize: "0.8125rem", color: "text.secondary" }}>{user.id}</TableCell>
-                  <TableCell sx={{ fontSize: "0.8125rem", fontWeight: 600, wordBreak: "break-all" }}>{user.username}</TableCell>
-                  <TableCell>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Box
-                        sx={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: "50%",
-                          flexShrink: 0,
-                          bgcolor: user.role === "admin" ? "#EF4444" : "#9CA3AF",
-                        }}
-                      />
-                      <Typography sx={{ fontSize: "0.8125rem", color: "#374151" }}>
-                        {user.role === "admin" ? t.adminRoleAdmin : t.adminRoleUser}
-                      </Typography>
-                    </Box>
+                <TableRow key={user.id} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
+                  <TableCell className="py-3 text-[13px] text-gray-500">{user.id}</TableCell>
+                  <TableCell className="py-3 text-[13px] font-semibold text-gray-900 break-all">{user.username}</TableCell>
+                  <TableCell className="py-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-block size-2 rounded-full ${user.role === "admin" ? "bg-red-500" : "bg-gray-400"}`} />
+                      <span className="text-[13px] text-gray-700">{user.role === "admin" ? t.adminRoleAdmin : t.adminRoleUser}</span>
+                    </div>
                   </TableCell>
-                  <TableCell sx={{ display: { xs: "none", md: "table-cell" }, fontSize: "0.8125rem", color: "text.secondary", whiteSpace: "nowrap" }}>{formatDate(user.created_at)}</TableCell>
-                  <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
-                    <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 0.5 }}>
-                      <Tooltip title={t.adminEdit}>
-                        <IconButton onClick={() => openEdit(user)} size="small"
-                          sx={{ color: "text.secondary", "&:hover": { color: "primary.main" } }}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title={t.adminDelete}>
-                        <span>
-                          <IconButton onClick={() => handleDelete(user)} size="small"
-                            disabled={user.username === "admin"}
-                            sx={{
-                              color: "text.secondary",
-                              "&:hover": { color: "error.main" },
-                              "&.Mui-disabled": { color: "action.disabled" },
-                            }}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </span>
-                      </Tooltip>
-                    </Box>
+                  <TableCell className="hidden md:table-cell py-3 text-[13px] text-gray-500 whitespace-nowrap">{formatDate(user.created_at)}</TableCell>
+                  <TableCell className="py-3 text-right whitespace-nowrap">
+                    <div className="flex justify-end gap-1">
+                      <button onClick={() => openEdit(user)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-primary/10 hover:text-primary"><Edit className="size-4" /></button>
+                      <button onClick={() => handleDelete(user)} disabled={user.username === "admin"} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-30"><Trash2 className="size-4" /></button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </TableContainer>
-      </Container>
+        </div>
+      </div>
 
       {toastElement}
 
-      <Dialog
-          open={showModal}
-          onClose={() => setShowModal(false)}
-          maxWidth="xs"
-          fullWidth
-          slotProps={{ paper: { sx: { borderRadius: 3, p: { xs: 3, sm: 4 } } } }}
-        >
-          <DialogTitle sx={{ fontWeight: 700, fontSize: "1.25rem", pt: 0, pb: 2, mb: 1 }}>
-            {editingUser ? t.adminEditTitle : t.adminNewUser}
-          </DialogTitle>
-          <DialogContent sx={{ pt: "16px !important", pb: 1.5, overflow: "visible" }}>
-            <Stack spacing={3} sx={{ overflow: "visible", pt: 1 }}>
-              <TextField label={t.adminColUsername} value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} disabled={!!editingUser} fullWidth size="small" />
-              <TextField
-                type="password"
-                label={`${t.adminLabelPassword} ${editingUser ? t.adminPasswordHint : ""}`}
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder={editingUser ? t.adminPasswordPlaceholder : ""}
-                fullWidth
-                size="small"
-              />
-              <TextField select label={t.adminLabelRole} value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} fullWidth size="small">
-                <MenuItem value="user">{t.adminRoleUser}</MenuItem>
-                <MenuItem value="admin">{t.adminRoleAdmin}</MenuItem>
-              </TextField>
-              {error && <Alert severity="error" variant="outlined" sx={{ fontSize: "0.8125rem" }}>{error}</Alert>}
-            </Stack>
-          </DialogContent>
-          <DialogActions sx={{ px: 0, pb: 0 }}>
-            <Button onClick={() => setShowModal(false)} variant="outlined" sx={{ textTransform: "none" }}>{t.adminCancel}</Button>
-            <Button onClick={handleSave} variant="contained" sx={{ textTransform: "none" }}>{editingUser ? t.adminSave : t.adminCreate}</Button>
-          </DialogActions>
-        </Dialog>
-    </Box>
+      {/* User create/edit dialog */}
+      <Dialog open={showModal} onOpenChange={(v) => { if (!v) setShowModal(false); }}>
+        <DialogContent className="max-w-sm bg-white">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">{editingUser ? t.adminEditTitle : t.adminNewUser}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-2">
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">{t.adminColUsername}</Label>
+              <Input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} disabled={!!editingUser} className="h-9 rounded-lg" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">{`${t.adminLabelPassword} ${editingUser ? t.adminPasswordHint : ""}`}</Label>
+              <Input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder={editingUser ? t.adminPasswordPlaceholder : ""} className="h-9 rounded-lg" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">{t.adminLabelRole}</Label>
+              <Select value={form.role} onValueChange={(v) => setForm({ ...form, role: v || "user" })}>
+                <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue /></SelectTrigger>
+                <SelectContent className="z-[130]">
+                  <SelectItem value="user">{t.adminRoleUser}</SelectItem>
+                  <SelectItem value="admin">{t.adminRoleAdmin}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {error && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700">{error}</div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowModal(false)} className="rounded-lg">{t.adminCancel}</Button>
+            <Button onClick={handleSave} className="rounded-lg bg-gray-900 hover:bg-gray-700">{editingUser ? t.adminSave : t.adminCreate}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

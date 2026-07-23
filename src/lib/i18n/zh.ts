@@ -18,10 +18,10 @@ const dict_zh = dict({
     guideSelectHint: "请从左侧选择指南",
     navSearch: "配方搜索", navProducts: "产品", navAbout: "关于",
 
-    navFormulaSearch: "Formula Search",
-    navColorLibrary: "Toner",
-    navAppGuide: "Application Guide",
-    navAdmin: "Data Management",
+    navFormulaSearch: "配方搜索",
+    navColorLibrary: "色母库",
+    navAppGuide: "应用指南",
+    navAdmin: "数据管理",
     userManagement: "用户管理",
     logout: "退出",
 

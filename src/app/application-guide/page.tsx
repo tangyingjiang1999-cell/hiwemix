@@ -5,14 +5,8 @@ import { useLang } from "@/components/LanguageContext";
 import SiteHeader from "@/components/SiteHeader";
 import Footer from "@/components/Footer";
 import type { Guide, GuideCategory } from "@/types";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import List from "@mui/material/List";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 function GuideContent({ guide }: { guide: Guide }) {
   const { lang } = useLang();
@@ -20,35 +14,35 @@ function GuideContent({ guide }: { guide: Guide }) {
   const lines = content.split("\n");
 
   return (
-    <Box>
-      <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
+    <div>
+      <h2 className="mb-4 text-base font-bold text-gray-900">
         {lang === "zh" ? guide.titleZh : guide.title}
-      </Typography>
-      <Box>
+      </h2>
+      <div>
         {lines.map((line, index) => {
           if (line.endsWith(":") && !line.startsWith(" ")) {
             return (
-              <Typography key={index} variant="subtitle2" sx={{ fontWeight: 600, mt: 3, mb: 1 }}>
+              <h3 key={index} className="mt-5 mb-1 text-sm font-semibold text-gray-800">
                 {line}
-              </Typography>
+              </h3>
             );
           }
           if (line.match(/^\d+\./)) {
             return (
-              <Box key={index} sx={{ ml: 2 }}>
-                <Typography variant="body2">{line}</Typography>
-              </Box>
+              <div key={index} className="ml-4">
+                <p className="text-sm text-gray-600">{line}</p>
+              </div>
             );
           }
           if (line.trim() === "") return <br key={index} />;
           return (
-            <Typography key={index} variant="body2" sx={{ lineHeight: 1.7 }}>
+            <p key={index} className="text-sm leading-relaxed text-gray-600">
               {line}
-            </Typography>
+            </p>
           );
         })}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 
@@ -62,9 +56,15 @@ export default function ApplicationGuidePage() {
 
   useEffect(() => {
     fetch("/api/guides")
-      .then((r) => r.ok ? r.json() : { categories: [], guides: [] })
-      .then((d: { categories: GuideCategory[]; guides: Guide[] }) => { setCategories(d.categories ?? []); setGuides(d.guides ?? []); })
-      .catch(() => { setCategories([]); setGuides([]); });
+      .then((r) => (r.ok ? r.json() : { categories: [], guides: [] }))
+      .then((d: { categories: GuideCategory[]; guides: Guide[] }) => {
+        setCategories(d.categories ?? []);
+        setGuides(d.guides ?? []);
+      })
+      .catch(() => {
+        setCategories([]);
+        setGuides([]);
+      });
   }, []);
 
   const filteredGuides = useMemo(() => {
@@ -82,100 +82,97 @@ export default function ApplicationGuidePage() {
   }, [guides, selectedCategory, searchQuery, lang]);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh", bgcolor: "background.default", overflowX: "clip" }}>
+    <div className="flex min-h-screen flex-col overflow-x-clip bg-white">
       <SiteHeader />
 
-      {/* Body 主体：三栏布局，左栏与 Header Logo 严格左对齐 */}
-      <Box sx={{ display: "flex", flex: 1, flexDirection: { xs: "column", lg: "row" }, overflow: { xs: "auto", lg: "hidden" }, pt: { xs: 9, md: 10 } }}>
-        {/* 左栏：分类菜单 —— 透明背景，左 padding 与 Header 一致 */}
-        <Box sx={{
-          width: { lg: 240 }, flexShrink: 0,
-          bgcolor: "transparent",
-          borderRight: { lg: 1 }, borderBottom: { xs: 1, lg: 0 }, borderColor: "divider",
-          pl: { xs: 1.5, sm: 3, md: "60px" }, pr: 2, pt: 3, pb: 2,
-          maxHeight: { xs: 200, lg: "none" }, overflow: { xs: "auto", lg: "visible" },
-        }}>
-          <Typography variant="overline" sx={{ color: "text.disabled", fontWeight: 600, display: "block", mb: 0.5 }}>
+      {/* Body: 三栏布局 */}
+      <div className="flex flex-1 flex-col pt-16 lg:flex-row lg:overflow-hidden">
+        {/* 左栏：分类菜单 */}
+        <div className="border-b border-gray-200 px-6 pt-5 pb-3 sm:px-8 md:pl-[60px] md:pr-4 lg:w-[240px] lg:flex-shrink-0 lg:border-b-0 lg:border-r lg:pt-8 lg:overflow-y-auto lg:max-h-[calc(100vh-64px)]">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-400">
             {t.guideCategories}
-          </Typography>
-          <List dense sx={{ p: 0 }}>
-            <ListItemButton selected={selectedCategory === ""} onClick={() => setSelectedCategory("")}
-              sx={{
-                borderRadius: "4px", mb: 0.25, pl: 1, pr: 1.5, py: 0.75, position: "relative",
-                "&.Mui-selected": {
-                  bgcolor: "rgba(36,135,202,0.08)", color: "primary.main",
-                  "&::before": { content: '""', position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 3, height: "60%", borderRadius: "0 2px 2px 0", bgcolor: "primary.main" },
-                },
-                "&:hover": { bgcolor: "rgba(0,0,0,0.03)" },
-              }}>
-              <ListItemText primary={t.guideAllCategories} slotProps={{ primary: { sx: { fontSize: "0.8125rem", fontWeight: selectedCategory === "" ? 600 : 400 } } }} />
-            </ListItemButton>
+          </span>
+          <div className="flex flex-col gap-0.5">
+            <button
+              onClick={() => setSelectedCategory("")}
+              className={`relative rounded-lg px-3 py-2 text-left text-[13px] transition-colors ${
+                selectedCategory === ""
+                  ? "bg-blue-50/60 font-semibold text-primary"
+                  : "font-normal text-gray-600 hover:bg-gray-50"
+              }`}
+            >
+              {selectedCategory === "" && (
+                <span className="absolute left-0 top-1/2 h-3/5 w-[3px] -translate-y-1/2 rounded-r bg-primary" />
+              )}
+              {t.guideAllCategories}
+            </button>
             {categories.map((cat) => (
-              <ListItemButton key={cat.id} selected={selectedCategory === cat.id} onClick={() => setSelectedCategory(cat.id)}
-                sx={{
-                  borderRadius: "4px", mb: 0.25, pl: 1, pr: 1.5, py: 0.75, position: "relative",
-                  "&.Mui-selected": {
-                    bgcolor: "rgba(36,135,202,0.08)", color: "primary.main",
-                    "&::before": { content: '""', position: "absolute", left: 0, top: "50%", transform: "translateY(-50%)", width: 3, height: "60%", borderRadius: "0 2px 2px 0", bgcolor: "primary.main" },
-                  },
-                  "&:hover": { bgcolor: "rgba(0,0,0,0.03)" },
-                }}>
-                <ListItemText primary={lang === "zh" ? cat.nameZh : cat.name} slotProps={{ primary: { sx: { fontSize: "0.8125rem", fontWeight: selectedCategory === cat.id ? 600 : 400 } } }} />
-              </ListItemButton>
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`relative rounded-lg px-3 py-2 text-left text-[13px] transition-colors ${
+                  selectedCategory === cat.id
+                    ? "bg-blue-50/60 font-semibold text-primary"
+                    : "font-normal text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                {selectedCategory === cat.id && (
+                  <span className="absolute left-0 top-1/2 h-3/5 w-[3px] -translate-y-1/2 rounded-r bg-primary" />
+                )}
+                {lang === "zh" ? cat.nameZh : cat.name}
+              </button>
             ))}
-          </List>
-        </Box>
+          </div>
+        </div>
 
         {/* 中栏：指南列表 */}
-        <Box sx={{ width: { lg: 320 }, flexShrink: 0, bgcolor: "grey.50", borderRight: { lg: 1 }, borderBottom: { xs: 1, lg: 0 }, borderColor: "divider", p: { xs: 1.5, md: 2 }, pt: { xs: 1.5, md: 3 }, maxHeight: { xs: 280, lg: "none" }, overflow: { xs: "auto", lg: "visible" } }}>
-          {/* 搜索框移动到中栏顶部 */}
-          <TextField
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t.guideSearchPlaceholder}
-            size="small"
-            fullWidth
-            sx={{ mb: 2, "& .MuiOutlinedInput-root": { borderRadius: { xs: "12px", md: 2 }, fontSize: "0.8125rem" } }}
-          />
-          <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+        <div className="border-b border-gray-200 bg-gray-50/50 p-4 pt-4 sm:p-5 lg:w-[320px] lg:flex-shrink-0 lg:border-b-0 lg:border-r lg:pt-5 lg:overflow-y-auto lg:max-h-[calc(100vh-64px)]">
+          {/* 搜索框 */}
+          <div className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t.guideSearchPlaceholder}
+              className="h-9 rounded-xl pl-9 text-[13px]"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
             {filteredGuides.map((guide) => (
-              <Card
+              <div
                 key={guide.id}
                 onClick={() => setSelectedGuide(guide)}
-                sx={{
-                  cursor: "pointer",
-                  borderRadius: { xs: "12px", md: 0 },
-                  borderColor: selectedGuide?.id === guide.id ? "primary.main" : "grey.200",
-                  boxShadow: selectedGuide?.id === guide.id ? 1 : 0,
-                  "&:hover": { borderColor: "primary.main" },
-                }}
+                className={`cursor-pointer rounded-xl border px-3.5 py-3 transition-colors ${
+                  selectedGuide?.id === guide.id
+                    ? "border-primary bg-blue-50/30 shadow-sm"
+                    : "border-gray-200/60 bg-white hover:border-primary"
+                }`}
               >
-                <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
-                  <Typography variant="body2" sx={{ fontWeight: 600, fontSize: { xs: "0.8125rem", md: "0.875rem" } }}>
-                    {lang === "zh" ? guide.titleZh : guide.title}
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "text.secondary", mt: 0.5 }}>
-                    {categories.find((c) => c.id === guide.categoryId)?.[lang === "zh" ? "nameZh" : "name"] || guide.categoryId}
-                  </Typography>
-                </CardContent>
-              </Card>
+                <p className="text-[13px] font-semibold text-gray-900 md:text-sm">
+                  {lang === "zh" ? guide.titleZh : guide.title}
+                </p>
+                <p className="mt-1 text-xs text-gray-400">
+                  {categories.find((c) => c.id === guide.categoryId)?.[lang === "zh" ? "nameZh" : "name"] || guide.categoryId}
+                </p>
+              </div>
             ))}
-          </Box>
-        </Box>
+          </div>
+        </div>
 
-        {/* 右栏：内容 */}
-        <Box sx={{ flex: 1, px: { xs: 1.5, sm: 3, md: "60px" }, py: { xs: 2, md: 3 }, minHeight: { xs: 320, lg: "auto" } }}>
+        {/* 右栏：文章内容 */}
+        <div className="flex-1 overflow-y-auto px-6 py-5 sm:px-8 md:px-[60px] md:py-6">
           {selectedGuide ? (
             <GuideContent guide={selectedGuide} />
           ) : (
-            <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 256 }}>
-              <Typography variant="body2" sx={{ color: "text.disabled" }}>{t.guideSelectHint}</Typography>
-            </Box>
+            <div className="flex min-h-[256px] items-center justify-center">
+              <p className="text-sm text-gray-400">{t.guideSelectHint}</p>
+            </div>
           )}
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       <Footer />
-    </Box>
+    </div>
   );
 }

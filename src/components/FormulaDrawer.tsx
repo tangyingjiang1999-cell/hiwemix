@@ -6,28 +6,10 @@ import { colorSwatchStyle } from "@/lib/utils";
 import { useLang } from "@/components/LanguageContext";
 import KapciFormulaTable from "./KapciFormulaTable";
 import Toast from "./Toast";
-import Dialog from "@mui/material/Dialog";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Chip from "@mui/material/Chip";
-import Stack from "@mui/material/Stack";
-import CloseIcon from "@mui/icons-material/Close";
-import PrintIcon from "@mui/icons-material/Print";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-
-// 字体大小常量（移动端缩小，桌面端 +6px）
-const FONT_SIZES = {
-  caption: { xs: "0.8125rem", md: "1.125rem" }, // 13px → 18px
-  body: { xs: "0.875rem", md: "1.25rem" },       // 14px → 20px
-  small: { xs: "0.8125rem", md: "1.0625rem" },   // 13px → 17px
-  tiny: { xs: "0.75rem", md: "1rem" },           // 12px → 16px
-} as const;
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { X, Printer, Copy } from "lucide-react";
 
 interface FormulaDrawerProps {
   result: SearchResult | null;
@@ -54,7 +36,6 @@ function formatFormulaAsText(result: SearchResult, activeFormula: Formula, makeN
   lines.push(`Type: ${result.color.color_type}`);
   lines.push(`Process: ${activeFormula.formula_type}`);
   lines.push(`Paint System: ${activeFormula.paint_system}`);
-  lines.push(`Formula Type: ${activeFormula.formula_type}`);
   lines.push(`Version: ${activeFormula.version}`);
   lines.push("-".repeat(50));
 
@@ -82,6 +63,15 @@ function parseHexInput(raw: string, fallback: string): string {
   return t.startsWith("#") ? t : `#${t}`;
 }
 
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-6">
+      <span className="w-28 flex-shrink-0 text-[13px] text-gray-500 md:text-base">{label}</span>
+      <span className="min-w-0 flex-1 break-words text-[14px] md:text-xl">{value}</span>
+    </div>
+  );
+}
+
 export default function FormulaDrawer({ result, onClose, initialFormulaIdx, formulaId, initialYear }: FormulaDrawerProps) {
   const { t } = useLang();
   const [activeFormulaIdx, setActiveFormulaIdx] = useState(0);
@@ -97,7 +87,6 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
 
   useEffect(() => {
     if (result) {
-      // 优先通过 formulaId 精确定位，否则用 initialFormulaIdx
       if (formulaId) {
         const idx = result.formulas.findIndex((f) => f.id === formulaId);
         setActiveFormulaIdx(idx >= 0 ? idx : 0);
@@ -146,148 +135,146 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
   }
 
   const currentYear = initialYear?.toString() || "-";
+  const TAB_KEYS = ["info", "docs", "plastic"] as const;
 
   return (
     <>
-      <Dialog open onClose={handleClose} maxWidth={false} fullScreen aria-labelledby="formula-drawer-title" slotProps={{ paper: { sx: { borderRadius: 0, m: 0, p: 0 } } }}>
-        <AppBar position="static" color="default" elevation={0} sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Toolbar sx={{ gap: { xs: 1, md: 2 }, minHeight: { xs: 56, md: 64 }, px: { xs: 1, sm: 2 } }}>
-            <Box
-              sx={{ width: { xs: 36, md: 48 }, height: { xs: 36, md: 48 }, borderRadius: 0, border: 1, borderColor: "grey.200", flexShrink: 0 }}
+      <Sheet open onOpenChange={(v) => { if (!v) handleClose(); }}>
+        <SheetContent side="right" className="!fixed !inset-0 !w-screen !max-w-full !translate-x-0 !rounded-none p-0 gap-0 overflow-y-auto bg-white">
+          {/* Header Bar */}
+          <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3">
+            <div
+              className="size-9 flex-shrink-0 border border-gray-200 sm:size-12"
               style={colorSwatchStyle(previewColor)}
             />
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1, minWidth: 0, flex: 1 }}>
-              <Box sx={{ minWidth: 0 }}>
-                <Typography id="formula-drawer-title" variant="subtitle1" noWrap sx={{ fontWeight: 600, fontSize: { xs: "0.9rem", md: "1rem" } }}>{color.color_name}</Typography>
-                <Typography variant="caption" sx={{ color: "text.secondary" }}>{color.color_code}</Typography>
-              </Box>
-            </Box>
+            <div className="min-w-0 flex-1">
+              <h2 className="truncate text-[15px] font-semibold text-gray-900 md:text-base">{color.color_name}</h2>
+              <p className="text-xs text-gray-500">{color.color_code}</p>
+            </div>
 
             {/* Print + Copy buttons (移动端图标-only) */}
-            <Button onClick={handlePrint} variant="outlined" startIcon={<PrintIcon />}
-              sx={{ color: "text.primary", borderColor: "grey.300", textTransform: "none", flexShrink: 0, display: { xs: "none", sm: "inline-flex" }, minWidth: 64, px: 1.5 }}>
+            <Button onClick={handlePrint} variant="outline" size="sm" className="hidden rounded-lg sm:inline-flex">
+              <Printer className="size-4" />
               {t.print}
             </Button>
-            <IconButton onClick={handlePrint} sx={{ display: { xs: "inline-flex", sm: "none" }, color: "text.primary" }} aria-label={t.print}>
-              <PrintIcon fontSize="small" />
-            </IconButton>
-            <Button onClick={handleCopy} variant="contained" startIcon={<ContentCopyIcon />}
-              sx={{ textTransform: "none", flexShrink: 0, display: { xs: "none", sm: "inline-flex" }, minWidth: 64, px: 1.5 }}>
+            <Button onClick={handlePrint} size="icon" variant="ghost" className="inline-flex sm:hidden size-9 rounded-lg text-gray-700">
+              <Printer className="size-4" />
+            </Button>
+            <Button onClick={handleCopy} variant="default" size="sm" className="hidden rounded-lg bg-[#2487ca] sm:inline-flex">
+              <Copy className="size-4" />
               {t.copy}
             </Button>
-            <IconButton onClick={handleCopy} sx={{ display: { xs: "inline-flex", sm: "none" }, bgcolor: "primary.main", color: "primary.contrastText", "&:hover": { bgcolor: "primary.dark" } }} aria-label={t.copy}>
-              <ContentCopyIcon fontSize="small" />
-            </IconButton>
+            <Button onClick={handleCopy} size="icon" className="inline-flex sm:hidden size-9 rounded-lg bg-[#2487ca] text-white">
+              <Copy className="size-4" />
+            </Button>
 
-            <IconButton onClick={handleClose} edge="end" aria-label="Close"><CloseIcon /></IconButton>
-          </Toolbar>
-        </AppBar>
+            <Button onClick={handleClose} variant="ghost" size="icon" className="size-9 rounded-lg">
+              <X className="size-5" />
+            </Button>
+          </div>
 
-        <Box sx={{ display: "flex", flex: 1, flexDirection: { xs: "column", md: "row" }, overflow: { xs: "auto", md: "hidden" }, width: "100%", height: "100%" }}>
+          {/* Body: 两栏布局 */}
+          <div className="flex flex-col md:flex-row flex-1">
+            {/* 左侧：配方详情 (~62.5%) */}
+            <div className="flex-1 overflow-auto border-b border-gray-200 p-4 sm:p-5 md:flex-[62.5%] md:border-b-0 md:border-r">
+              {activeFormula && displayedFormula && (
+                <div>
+                  {/* Version + Chips */}
+                  <div className="mb-4 flex flex-wrap items-center gap-2">
+                    <span className="text-[13px] font-semibold text-gray-900 md:text-lg">
+                      {t.version} {activeFormula.version}
+                    </span>
+                    <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${
+                      activeFormula?.paint_system === "2K"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-emerald-100 text-emerald-700"
+                    }`}>
+                      {activeFormula?.paint_system}
+                    </span>
+                    <span className="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                      {activeFormula?.formula_type ?? ""}
+                    </span>
+                  </div>
 
-          {/* 左侧：配方详情 (~62.5% 宽度) */}
-          <Box sx={{
-            flex: { xs: "1 1 auto", md: "1 1 62.5%" },
-            overflow: { xs: "visible", md: "auto" },
-            p: { xs: 2, sm: 3, md: 4 },
-            borderRight: { md: 1 },
-            borderBottom: { xs: 1, md: "none" },
-            borderColor: "divider",
-          }}>
-            {activeFormula && displayedFormula && (
-              <Box>
-                <Stack direction="row" spacing={1} sx={{ alignItems: "center", mb: 1.5, flexWrap: "wrap", gap: 0.5 }}>
-                  <Typography variant="caption" sx={{ color: "#1a1a1a", fontSize: FONT_SIZES.caption, fontWeight: 600 }}>
-                    {t.version} {activeFormula.version}
-                  </Typography>
+                  <KapciFormulaTable
+                    key={`${activeFormula.id}-${activeGroup}`}
+                    formula={displayedFormula}
+                    activeGroup={activeGroup}
+                    onGroupChange={setActiveGroup}
+                    showGroupToggle={true}
+                  />
 
-                  <Chip label={activeFormula?.paint_system} size="small"
-                    sx={{ fontWeight: 600, fontSize: "0.75rem",
-                      ...(activeFormula?.paint_system === "2K" ? { bgcolor: "#DBEAFE", color: "#1D4ED8" } : { bgcolor: "#D1FAE5", color: "#047857" }) }} />
-                  <Chip label={activeFormula?.formula_type ?? ""} size="small"
-                    sx={{ fontWeight: 600, fontSize: "0.75rem", bgcolor: "#FEF3C7", color: "#92400E" }} />
-                </Stack>
+                  {activeFormula.notes && (
+                    <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50/50 p-3">
+                      <span className="text-xs font-semibold text-amber-700">{t.notesLabel}</span>
+                      <p className="mt-1 text-xs text-amber-600">{activeFormula.notes}</p>
+                    </div>
+                  )}
+                  <p className="mt-3 text-xs text-gray-400">
+                    {t.updatedLabel} {activeFormula.updated_at}
+                  </p>
+                </div>
+              )}
+            </div>
 
-                <KapciFormulaTable
-                  key={`${activeFormula.id}-${activeGroup}`}
-                  formula={displayedFormula}
-                  activeGroup={activeGroup}
-                  onGroupChange={setActiveGroup}
-                  showGroupToggle={true}
+            {/* 右侧：颜色预览+信息 (~37.5%) */}
+            <div className="flex-shrink-0 overflow-auto md:flex-[37.5%]">
+              {/* 颜色预览 */}
+              <div className="p-4 sm:p-5">
+                <span className="text-xs font-semibold uppercase tracking-wider text-gray-900 md:text-[17px]">
+                  {t.colorPreview}
+                </span>
+                <div
+                  className="mt-3 h-[60px] border border-gray-200 sm:h-[120px]"
+                  style={colorSwatchStyle(previewColor)}
                 />
+              </div>
 
-                {activeFormula.notes && (
-                  <Box sx={{ mt: 2, p: 2, borderRadius: 0, border: 1, borderColor: "#FDE68A", bgcolor: "rgba(254,243,199,0.5)" }}>
-                    <Typography variant="caption" sx={{ fontWeight: 600, color: "#92400E" }}>{t.notesLabel}</Typography>
-                    <Typography variant="caption" sx={{ display: "block", mt: 0.5, color: "#B45309" }}>{activeFormula.notes}</Typography>
-                  </Box>
+              <Separator />
+
+              {/* Tab Switcher */}
+              <div className="flex border-b border-gray-200">
+                {[t.tabColorInfo, t.tabColorDocs, t.tabPlasticParts].map((label, idx) => (
+                  <button
+                    key={label}
+                    onClick={() => setInfoTab(idx)}
+                    className={`flex-1 py-2.5 text-center text-xs font-medium transition-colors md:text-sm ${
+                      infoTab === idx
+                        ? "border-b-2 border-primary text-primary"
+                        : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Tab Panels */}
+              <div className="p-4 sm:p-5">
+                {infoTab === 0 && (
+                  <div className="flex flex-col gap-3 md:gap-5">
+                    <InfoRow label={t.manufacturerLabel} value={make} />
+                    <InfoRow label={t.originLabel} value={origin} />
+                    <InfoRow label={t.codeLabel} value={color.color_code} />
+                    <InfoRow label={t.colorName} value={color.color_name} />
+                    <InfoRow label={t.carModelLabel} value={color.car_model || "-"} />
+                    <InfoRow label={t.yearsLabel} value={currentYear} />
+                    <InfoRow label={t.processLabel} value={activeFormula?.formula_type || "-"} />
+                    <InfoRow label={t.versionLabel} value={activeFormula?.version || "-"} />
+                  </div>
                 )}
-                <Typography variant="caption" sx={{ display: "block", mt: 1.5, color: "text.disabled" }}>
-                  {t.updatedLabel} {activeFormula.updated_at}
-                </Typography>
-              </Box>
-            )}
-          </Box>
-
-          {/* 右侧：颜色预览+信息 (~37.5% 宽度) */}
-          <Box sx={{
-            flex: { xs: "none", md: "1 1 37.5%" },
-            overflow: "auto",
-            flexShrink: 0,
-          }}>
-            <Box sx={{ p: { xs: 2, sm: 3 } }}>
-              <Typography variant="overline" sx={{ color: "#1a1a1a", fontWeight: 600, letterSpacing: 1, fontSize: FONT_SIZES.small }}>
-                {t.colorPreview}
-              </Typography>
-              <Box
-                sx={{ mt: 1.5, height: { xs: 60, sm: 120 }, borderRadius: 0, border: 1, borderColor: "grey.200" }}
-                style={colorSwatchStyle(previewColor)}
-              />
-            </Box>
-
-            <Box sx={{ borderTop: 1, borderColor: "divider" }}>
-              <Tabs value={infoTab} onChange={(_, v) => setInfoTab(v)} variant="fullWidth" aria-label={t.tabColorInfo}
-                sx={{ minHeight: { xs: 36, md: 48 }, "& .MuiTab-root": { minHeight: { xs: 36, md: 48 }, fontSize: { xs: "0.75rem", md: "0.875rem" }, py: 0 } }}>
-                <Tab label={t.tabColorInfo} />
-                <Tab label={t.tabColorDocs} />
-                <Tab label={t.tabPlasticParts} />
-              </Tabs>
-            </Box>
-
-            <Box role="tabpanel" id="formula-tabpanel-info" aria-labelledby="formula-tab-info" sx={{ p: { xs: 2, sm: 3 } }}>
-              {infoTab === 0 && (
-                <Stack spacing={{ xs: 1.25, md: 2 }}>
-                  <InfoRow label={t.manufacturerLabel} value={make} />
-                  <InfoRow label={t.originLabel} value={origin} />
-                  <InfoRow label={t.codeLabel} value={color.color_code} />
-                  <InfoRow label={t.colorName} value={color.color_name} />
-                  <InfoRow label={t.carModelLabel} value={color.car_model || "-"} />
-                  <InfoRow label={t.yearsLabel} value={currentYear} />
-                  <InfoRow label={t.processLabel} value={activeFormula?.formula_type || "-"} />
-                  <InfoRow label={t.versionLabel} value={activeFormula?.version || "-"} />
-                </Stack>
-              )}
-              {(infoTab === 1 || infoTab === 2) && (
-                <Box role="tabpanel" id={infoTab === 1 ? "formula-tabpanel-docs" : "formula-tabpanel-plastic"} aria-label={infoTab === 1 ? t.tabColorDocs : t.tabPlasticParts} sx={{ py: 3, textAlign: "center" }}>
-                  <Typography variant="caption" sx={{ color: "text.disabled" }}>{t.emptyState}</Typography>
-                </Box>
-              )}
-            </Box>
-          </Box>
-
-        </Box>
-      </Dialog>
+                {(infoTab === 1 || infoTab === 2) && (
+                  <div className="py-8 text-center">
+                    <p className="text-xs text-gray-400">{t.emptyState}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {toastMsg && <Toast message={toastMsg} onDone={() => setToastMsg(null)} />}
     </>
-  );
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <Stack direction={{ xs: "column", sm: "row" }} spacing={{ xs: 0.25, sm: 1.5 }}>
-      <Typography variant="caption" sx={{ width: { sm: 112 }, flexShrink: 0, color: "text.secondary" }}>{label}</Typography>
-      <Typography variant="body2" sx={{ minWidth: 0, flex: 1, wordBreak: "break-word" }}>{value}</Typography>
-    </Stack>
   );
 }

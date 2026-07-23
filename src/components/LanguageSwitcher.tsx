@@ -2,12 +2,16 @@
 
 import { useLang } from "@/components/LanguageContext";
 import { LANGS, type Lang } from "@/lib/i18n";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Box from "@mui/material/Box";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ChevronDown } from "lucide-react";
 
-// SVG 国旗图标，避免 Windows 将 emoji 国旗退化成字母（GB/CN 等）
+// SVG 国旗图标
 import GB from "country-flag-icons/react/3x2/GB";
 import CN from "country-flag-icons/react/3x2/CN";
 import FR from "country-flag-icons/react/3x2/FR";
@@ -25,27 +29,13 @@ const FLAG_MAP: Record<string, React.FC<{ className?: string }>> = {
   GB, CN, FR, DE, ES, PT, IT, RU, SI, TR, IL, SA,
 };
 
-function FlagIcon({ code, small }: { code: string; small?: boolean }) {
+function FlagIcon({ code }: { code: string }) {
   const Flag = FLAG_MAP[code];
   if (!Flag) return null;
   return (
-    <Box
-      component="span"
-      sx={{
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        height: small ? 14 : 16,
-        lineHeight: 0,
-        "& > svg": {
-          height: small ? 14 : 16,
-          width: "auto",
-          borderRadius: 0,
-        },
-      }}
-    >
+    <span className="inline-flex items-center justify-center leading-none">
       <Flag />
-    </Box>
+    </span>
   );
 }
 
@@ -58,96 +48,27 @@ export default function LanguageSwitcher({
 }) {
   const { lang, setLang } = useLang();
 
-  const textColor = isHome ? "text.secondary" : "rgba(255,255,255,0.7)";
-  const iconColor = isHome ? "text.secondary" : "rgba(255,255,255,0.7)";
-  const borderColor = isHome ? "grey.300" : "rgba(255,255,255,0.3)";
-  const hoverBorderColor = isHome ? "primary.main" : "#ffffff";
-  const hoverBg = isHome
-    ? "rgba(36,135,202,0.04)"
-    : "rgba(255,255,255,0.1)";
-
   return (
-    <Select
-      value={lang}
-      onChange={(e) => setLang(e.target.value as Lang)}
-      size="small"
-      IconComponent={KeyboardArrowDownIcon}
-      renderValue={(value) => {
-        const l = LANGS.find((x) => x.code === value) ?? LANGS[0];
-        return (
-          <Box
-            component="span"
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              fontWeight: 600,
-              fontSize: "0.8125rem",
-              color: textColor,
-              lineHeight: 1,
-              transition: transitionStyle,
-            }}
-          >
-            {l.code.toUpperCase()}
-          </Box>
-        );
-      }}
-      sx={{
-        bgcolor: "transparent",
-        color: textColor,
-        border: 1,
-        borderColor: borderColor,
-        borderRadius: 2,
-        height: 36,
-        transition: transitionStyle,
-        "& .MuiSelect-select": {
-          display: "flex",
-          alignItems: "center",
-          py: 0,
-          pr: "32px !important",
-          pl: 1.5,
-        },
-        "& .MuiSelect-icon": {
-          right: 6,
-          fontSize: "1.1rem",
-          top: "50%",
-          transform: "translateY(-50%)",
-          color: iconColor,
+    <Select value={lang} onValueChange={(v) => setLang((v as Lang) || "en")}>
+      <SelectTrigger
+        className="h-9 w-auto min-w-0 gap-1 rounded-lg border px-3 text-[13px] font-semibold transition-all duration-[1.5s] ease-in-out"
+        style={{
+          borderColor: isHome ? "rgb(209,213,219)" : "rgba(255,255,255,0.3)",
+          color: isHome ? "#6b7280" : "rgba(255,255,255,0.7)",
+          backgroundColor: "transparent",
           transition: transitionStyle,
-        },
-        "& fieldset": { borderColor: borderColor },
-        "&:hover": {
-          bgcolor: hoverBg,
-          borderColor: hoverBorderColor,
-          "& .MuiSelect-icon": { color: hoverBorderColor },
-        },
-        "&.Mui-focused fieldset": { borderColor: hoverBorderColor, borderWidth: 1 },
-      }}
-      MenuProps={{
-        slotProps: {
-          paper: { sx: { mt: 0.5, maxHeight: 320, minWidth: 200 } },
-        },
-      }}
-    >
-      {LANGS.map((l) => (
-        <MenuItem
-          key={l.code}
-          value={l.code}
-          sx={{
-            fontSize: "0.875rem",
-            gap: 1.5,
-            "&.Mui-selected": {
-              bgcolor: "rgba(36,135,202,0.08)",
-              color: "primary.main",
-              fontWeight: 600,
-            },
-          }}
-        >
-          <FlagIcon code={l.flag} />
-          <Box component="span" sx={{ flex: 1 }}>
-            {l.name}
-          </Box>
-        </MenuItem>
-      ))}
+        }}
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className="max-h-80 min-w-[200px]">
+        {LANGS.map((l) => (
+          <SelectItem key={l.code} value={l.code} className="gap-3 text-sm">
+            <FlagIcon code={l.flag} />
+            <span className="flex-1">{l.name}</span>
+          </SelectItem>
+        ))}
+      </SelectContent>
     </Select>
   );
 }

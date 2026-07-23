@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useAnimationControls, Variants } from "framer-motion";
+import { motion, useAnimationControls, Variants, type Easing } from "framer-motion";
 
 interface SplitTextProps {
   text: string;
@@ -12,7 +12,7 @@ interface SplitTextProps {
   duration?: number;
   from?: { opacity?: number; y?: number; x?: number; scale?: number };
   to?: { opacity?: number; y?: number; x?: number; scale?: number };
-  ease?: string | number[];
+  ease?: Easing;
 }
 
 export default function SplitText(props: SplitTextProps) {
@@ -28,15 +28,12 @@ export default function SplitText(props: SplitTextProps) {
     ease = "easeOut",
   } = props;
 
-  // 用 animationKey 每次递增来强制重新播放动画
   const [animationKey, setAnimationKey] = useState(0);
   const hasAutoPlayed = useRef(false);
 
-  // 页面加载后自动播一次
   useEffect(() => {
     if (!hasAutoPlayed.current) {
       hasAutoPlayed.current = true;
-      // 延迟一帧确保 DOM 已挂载
       const timer = setTimeout(() => setAnimationKey(1), 100);
       return () => clearTimeout(timer);
     }
@@ -62,7 +59,7 @@ export default function SplitText(props: SplitTextProps) {
     hidden: from,
     visible: {
       ...to,
-      transition: { duration, ease: ease as any },
+      transition: { duration, ease },
     },
   };
 
@@ -75,10 +72,12 @@ export default function SplitText(props: SplitTextProps) {
       case "div": return motion.div;
       default: return motion.h1;
     }
-  })() as React.ComponentType<any>;
+  })();
+
+  const TagCompTyped = TagComp as React.ComponentType<Record<string, unknown>>;
 
   return (
-    <TagComp
+    <TagCompTyped
       key={animationKey}
       variants={containerVariants}
       initial="hidden"
@@ -103,6 +102,6 @@ export default function SplitText(props: SplitTextProps) {
           )}
         </span>
       ))}
-    </TagComp>
+    </TagCompTyped>
   );
 }

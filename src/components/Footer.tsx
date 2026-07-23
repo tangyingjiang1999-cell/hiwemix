@@ -2,29 +2,22 @@
 
 import { usePathname } from "next/navigation";
 import Image from "next/image";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import LanguageIcon from "@mui/icons-material/Language";
-import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import InstagramIcon from "@mui/icons-material/Instagram";
+import { Globe, MessageCircle, Share2, Camera } from "lucide-react";
 
 export default function Footer({ isLightBackground = false }: { isLightBackground?: boolean }) {
   const pathname = usePathname();
   const isHome = pathname === "/";
 
-  const footerBg = isHome ? "transparent" : "#ffffff";
-  const footerPosition = isHome ? "absolute" : "relative";
   const iconColor = isLightBackground
-    ? "primary.main"
+    ? "#2487ca"
     : isHome
       ? "rgba(255,255,255,0.7)"
-      : "primary.main";
+      : "#2487ca";
   const iconHoverColor = isLightBackground
-    ? "primary.dark"
+    ? "#1d6fb0"
     : isHome
       ? "#ffffff"
-      : "primary.dark";
+      : "#1d6fb0";
   const logoFilter = isLightBackground
     ? "none"
     : isHome
@@ -32,91 +25,74 @@ export default function Footer({ isLightBackground = false }: { isLightBackgroun
       : "none";
 
   return (
-    <Box
-      component="footer"
-      sx={{
-        bgcolor: footerBg,
-        position: footerPosition,
-        bottom: isHome ? 0 : undefined,
-        left: isHome ? 0 : undefined,
-        right: isHome ? 0 : undefined,
-        zIndex: 10,
-        py: { xs: 2, md: 1.5 },
-        borderTop: isHome ? "none" : "1px solid",
-        borderColor: isHome ? "transparent" : "divider",
-        transition: "all 1.5s ease-in-out",
+    <footer
+      className="relative z-10 border-t py-3 md:py-2 mt-[50px] transition-all duration-[1.5s] ease-in-out"
+      style={{
+        backgroundColor: isHome ? "transparent" : "#ffffff",
+        borderColor: isHome ? "transparent" : "var(--color-hairline)",
       }}
     >
-      {/* Logo + 社交图标 居中排列 */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: { xs: 3, md: 4 },
-        }}
-      >
+      <div className="flex items-center justify-center gap-8 md:gap-10">
         <Image
           src="/hiwe.png"
           alt="HIWE"
           width={1206}
           height={334}
-          style={{
-            height: 16,
-            width: "auto",
-            objectFit: "contain",
-            filter: logoFilter,
-            transition: "filter 1.5s ease-in-out",
-          }}
+          className="h-4 w-auto object-contain transition-all duration-[1.5s] ease-in-out"
+          style={{ filter: logoFilter }}
         />
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          <IconButton
-            component="a"
+        <div className="flex items-center gap-1">
+          <a
             href="https://www.hiwe.com"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Website"
-            size="small"
-            sx={{ color: iconColor, minWidth: 36, minHeight: 36, transition: "color 1.5s ease-in-out", "&:hover": { color: iconHoverColor } }}
+            className="inline-flex size-9 items-center justify-center rounded-full transition-colors duration-[1.5s] ease-in-out"
+            style={{ color: iconColor, "--hover-color": iconHoverColor } as React.CSSProperties}
+            onMouseEnter={(e) => (e.currentTarget.style.color = iconHoverColor)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = iconColor)}
           >
-            <LanguageIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            component="a"
+            <Globe className="size-5" />
+          </a>
+          <a
             href="https://api.whatsapp.com/send?phone=8615819205996"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="WhatsApp"
-            size="small"
-            sx={{ color: iconColor, minWidth: 36, minHeight: 36, transition: "color 1.5s ease-in-out", "&:hover": { color: iconHoverColor } }}
+            className="inline-flex size-9 items-center justify-center rounded-full transition-colors duration-[1.5s] ease-in-out"
+            style={{ color: iconColor }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = iconHoverColor)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = iconColor)}
           >
-            <WhatsAppIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            component="a"
+            <MessageCircle className="size-5" />
+          </a>
+          <a
             href="https://www.facebook.com/profile.php?id=61550592422623"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Facebook"
-            size="small"
-            sx={{ color: iconColor, minWidth: 36, minHeight: 36, transition: "color 1.5s ease-in-out", "&:hover": { color: iconHoverColor } }}
+            className="inline-flex size-9 items-center justify-center rounded-full transition-colors duration-[1.5s] ease-in-out"
+            style={{ color: iconColor }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = iconHoverColor)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = iconColor)}
           >
-            <FacebookIcon fontSize="small" />
-          </IconButton>
-          <IconButton
-            component="a"
+            <Share2 className="size-5" />
+          </a>
+          <a
             href="https://www.instagram.com/haiwenduan?igsh=eGd2c2Fkbnplazl1"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Instagram"
-            size="small"
-            sx={{ color: iconColor, minWidth: 36, minHeight: 36, transition: "color 1.5s ease-in-out", "&:hover": { color: iconHoverColor } }}
+            className="inline-flex size-9 items-center justify-center rounded-full transition-colors duration-[1.5s] ease-in-out"
+            style={{ color: iconColor }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = iconHoverColor)}
+            onMouseLeave={(e) => (e.currentTarget.style.color = iconColor)}
           >
-            <InstagramIcon fontSize="small" />
-          </IconButton>
-        </Box>
-      </Box>
-    </Box>
+            <Camera className="size-5" />
+          </a>
+        </div>
+      </div>
+    </footer>
   );
 }

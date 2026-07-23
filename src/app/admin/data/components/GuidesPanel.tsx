@@ -3,35 +3,39 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { Guide, GuideCategory } from "@/types";
 import { generateGuideId, generateGuideCategoryId } from "@/lib/id-generator";
-import { FONT, HEADER_BG, CELL_FONT_SIZE, COLUMN_BG, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx, actionButtonSx, deleteButtonSx } from "@/components/admin-table-styles";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
-import Stack from "@mui/material/Stack";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import CustomPagination from "@/components/ui/CustomPagination";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Edit, Trash2, Plus, X } from "lucide-react";
 
 interface GuideRow extends Guide { categoryName: string; }
 
 export default function GuidesPanel() {
   const [guides, setGuides] = useState<Guide[]>([]);
   const [categories, setCategories] = useState<GuideCategory[]>([]);
-  const [, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [filterCat, setFilterCat] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [showCatModal, setShowCatModal] = useState(false);
@@ -40,15 +44,15 @@ export default function GuidesPanel() {
   const [error, setError] = useState("");
   const [catForm, setCatForm] = useState({ id: "", name: "", nameZh: "" });
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const ROWS_PER_PAGE = 10;
   const guideIdEdited = useRef(false);
   const catIdEdited = useRef(false);
 
   useEffect(() => { if (!editing && !guideIdEdited.current && form.title) setForm((prev) => ({ ...prev, id: generateGuideId(form.title) })); }, [form.title, editing]);
   useEffect(() => { if (!catIdEdited.current && catForm.name) setCatForm((prev) => ({ ...prev, id: generateGuideCategoryId(catForm.name) })); }, [catForm.name]);
 
-  const fetchGuides = useCallback(async () => { try { const r = await fetch("/api/admin/guides"); if (r.ok) setGuides(await r.json()); } catch { /* network error */ } setLoading(false); }, []);
-  const fetchCategories = useCallback(async () => { try { const r = await fetch("/api/admin/guide-categories"); if (r.ok) setCategories(await r.json()); } catch { /* network error */ } }, []);
+  const fetchGuides = useCallback(async () => { try { const r = await fetch("/api/admin/guides"); if (r.ok) setGuides(await r.json()); } catch {} setLoading(false); }, []);
+  const fetchCategories = useCallback(async () => { try { const r = await fetch("/api/admin/guide-categories"); if (r.ok) setCategories(await r.json()); } catch {} }, []);
   useEffect(() => { fetchGuides(); fetchCategories(); }, [fetchGuides, fetchCategories]);
 
   function openCreate() { setEditing(null); setForm({ id: "", categoryId: categories[0]?.id || "", title: "", titleZh: "", content: "", contentZh: "" }); setError(""); guideIdEdited.current = false; setShowModal(true); }
@@ -86,120 +90,129 @@ export default function GuidesPanel() {
   const catMap = new Map(categories.map((c) => [c.id, c.nameZh]));
   const filtered: GuideRow[] = (filterCat ? guides.filter((g) => g.categoryId === filterCat) : guides).map((g) => ({ ...g, categoryName: catMap.get(g.categoryId) ?? g.categoryId }));
 
-  useEffect(() => {
-    setPage(0);
-  }, [guides, filterCat]);
+  useEffect(() => { setPage(0); }, [guides, filterCat]);
 
-  const pageRows = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE));
+  const pageRows = filtered.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE);
 
   return (
-    <Box>
-      <Stack direction="row" spacing={1.5} sx={{ mb: 1.5, alignItems: "center" }}>
-        <TextField select value={filterCat} onChange={(e) => setFilterCat(e.target.value)} size="small" sx={{ minWidth: 160 }}>
-          <MenuItem value="">全部分类</MenuItem>
-          {categories.map((c) => <MenuItem key={c.id} value={c.id}>{c.nameZh}</MenuItem>)}
-        </TextField>
-        <Button onClick={() => setShowCatModal(true)} variant="outlined" size="small">管理分类</Button>
-        <Box sx={{ flex: 1 }} />
-        <Button onClick={openCreate} variant="contained" size="small">+ 新增指南</Button>
-      </Stack>
+    <div>
+      <div className="flex items-center gap-3 mb-4">
+        <Select value={filterCat} onValueChange={(v) => setFilterCat(v || "")}>
+          <SelectTrigger className="h-9 min-w-[160px] rounded-lg text-[13px]"><SelectValue placeholder="全部分类" /></SelectTrigger>
+          <SelectContent className="z-[130] max-h-[200px]">{categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.nameZh}</SelectItem>)}</SelectContent>
+        </Select>
+        <Button onClick={() => setShowCatModal(true)} variant="outline" size="sm" className="rounded-lg text-[13px]">管理分类</Button>
+        <div className="flex-1" />
+        <Button onClick={openCreate} className="rounded-lg bg-[#2487ca] text-[13px] hover:bg-[#1d6fb0]"><Plus className="size-4" /> 新增指南</Button>
+      </div>
 
-      <TableContainer component={Paper} variant="outlined" sx={tableContainerSx}>
-        <Table sx={tableSx}>
-          <TableHead>
-            <TableRow sx={{ bgcolor: HEADER_BG }}>
-              <TableCell sx={{ ...headerCellSx, width: 120 }}>ID</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: 200 }}>中文标题</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: 200 }}>英文标题</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: 120 }}>分类</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: 100 }}></TableCell>
+      <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50/80">
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">ID</TableHead>
+              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">中文标题</TableHead>
+              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">英文标题</TableHead>
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">分类</TableHead>
+              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">操作</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
-            {pageRows.map((guide, rowIndex) => (
-              <TableRow key={guide.id} sx={getRowSx(rowIndex)}>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary", fontWeight: 500 }}>
-                    {guide.id}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.primary" }}>
-                    {guide.titleZh}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary" }}>
-                    {guide.title}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary" }}>
-                    {guide.categoryName}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
-                  <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center" }}>
-                    <IconButton onClick={() => openEdit(guide)} size="small" sx={actionButtonSx}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(guide)} size="small" sx={deleteButtonSx}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
+            {pageRows.map((guide) => (
+              <TableRow key={guide.id} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
+                <TableCell className="py-3 text-center text-[13px] text-gray-500 font-medium">{guide.id}</TableCell>
+                <TableCell className="py-3 text-center text-[13px] text-gray-900 truncate">{guide.titleZh}</TableCell>
+                <TableCell className="py-3 text-center text-[13px] text-gray-500 truncate">{guide.title}</TableCell>
+                <TableCell className="py-3 text-center text-[13px] text-gray-500">{guide.categoryName}</TableCell>
+                <TableCell className="py-3 text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <button onClick={() => openEdit(guide)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-primary/10 hover:text-primary"><Edit className="size-4" /></button>
+                    <button onClick={() => handleDelete(guide)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-red-50 hover:text-red-500"><Trash2 className="size-4" /></button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <CustomPagination
-          totalCount={filtered.length}
-          page={page}
-          pageSize={rowsPerPage}
-          onPageChange={setPage}
-          unitName="guides"
-        />
-      </TableContainer>
+        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+          <p className="text-sm font-semibold text-primary">Found {filtered.length} guides</p>
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] text-gray-500">{page + 1} / {totalPages}</span>
+            <Button size="icon" variant="ghost" disabled={page === 0} onClick={() => setPage(page - 1)} className="size-8 rounded-lg">‹</Button>
+            <Button size="icon" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="size-8 rounded-lg">›</Button>
+          </div>
+        </div>
+      </div>
 
-      <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="md" fullWidth>
-        <DialogTitle>{editing ? "编辑指南" : "新增指南"}</DialogTitle>
-        <DialogContent><Stack spacing={2} sx={{ pt: 0.5 }}>
-          <TextField label="ID" value={form.id} onChange={(e) => { guideIdEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} size="small" fullWidth />
-          <TextField select label="分类" value={form.categoryId} onChange={(e) => setForm({ ...form, categoryId: e.target.value })} size="small" fullWidth>
-            <MenuItem value="">请选择</MenuItem>
-            {categories.map((c) => <MenuItem key={c.id} value={c.id}>{c.nameZh}</MenuItem>)}
-          </TextField>
-          <Stack direction="row" spacing={2}>
-            <TextField label="英文标题" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} size="small" fullWidth />
-            <TextField label="中文标题" value={form.titleZh} onChange={(e) => setForm({ ...form, titleZh: e.target.value })} size="small" fullWidth />
-          </Stack>
-          <TextField label="英文正文" value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} size="small" multiline rows={5} fullWidth />
-          <TextField label="中文正文" value={form.contentZh} onChange={(e) => setForm({ ...form, contentZh: e.target.value })} size="small" multiline rows={5} fullWidth />
-          {error && <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{error}</Box>}
-        </Stack></DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}><Button onClick={() => setShowModal(false)} variant="outlined">取消</Button><Button onClick={handleSave} variant="contained">保存</Button></DialogActions>
-      </Dialog>
-
-      <Dialog open={showCatModal} onClose={() => setShowCatModal(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>管理分类</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1, maxHeight: 200, overflow: "auto", mb: 2 }}>
-            {categories.map((cat) => (
-              <Stack key={cat.id} direction="row" sx={{ justifyContent: "space-between", alignItems: "center", p: 1, border: 1, borderColor: "grey.200", borderRadius: 2 }}>
-                <Box sx={{ fontSize: "0.8125rem" }}><Box component="span" sx={{ fontWeight: 500 }}>{cat.nameZh}</Box> <Box component="span" sx={{ color: "text.disabled" }}>({cat.name})</Box></Box>
-                <Button onClick={() => handleDeleteCategory(cat)} size="small" color="error">删除</Button>
-              </Stack>
-            ))}
-          </Box>
-          <Stack direction="row" spacing={1}>
-            <TextField value={catForm.id} onChange={(e) => { catIdEdited.current = true; setCatForm({ ...catForm, id: e.target.value }); }} placeholder="auto" size="small" sx={{ width: 80 }} />
-            <TextField value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })} placeholder="英文名" size="small" fullWidth />
-            <TextField value={catForm.nameZh} onChange={(e) => setCatForm({ ...catForm, nameZh: e.target.value })} placeholder="中文名" size="small" fullWidth />
-          </Stack>
-          <Button onClick={handleSaveCategory} variant="contained" size="small" fullWidth sx={{ mt: 1.5 }}>添加分类</Button>
+      {/* Guide create/edit dialog */}
+      <Dialog open={showModal} onOpenChange={(v) => { if (!v) setShowModal(false); }}>
+        <DialogContent className="max-w-2xl bg-white !max-w-[650px]">
+          <DialogHeader><DialogTitle>{editing ? "编辑指南" : "新增指南"}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 py-2">
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">ID</Label>
+              <Input value={form.id} onChange={(e) => { guideIdEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} className="h-9 rounded-lg" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">分类</Label>
+              <Select value={form.categoryId} onValueChange={(v) => setForm({ ...form, categoryId: v || "" })}>
+                <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue placeholder="请选择" /></SelectTrigger>
+                <SelectContent className="z-[130] max-h-[200px]">{categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.nameZh}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-sm font-medium text-gray-700">英文标题</Label>
+                <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="h-9 rounded-lg" />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-sm font-medium text-gray-700">中文标题</Label>
+                <Input value={form.titleZh} onChange={(e) => setForm({ ...form, titleZh: e.target.value })} className="h-9 rounded-lg" />
+              </div>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">英文正文</Label>
+              <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className="min-h-[120px] w-full rounded-lg border border-gray-200 p-3 text-sm outline-none focus:border-primary" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">中文正文</Label>
+              <textarea value={form.contentZh} onChange={(e) => setForm({ ...form, contentZh: e.target.value })} className="min-h-[120px] w-full rounded-lg border border-gray-200 p-3 text-sm outline-none focus:border-primary" />
+            </div>
+            {error && <p className="text-[13px] font-medium text-red-600">{error}</p>}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowModal(false)} className="rounded-lg">取消</Button>
+            <Button onClick={handleSave} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存</Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions><Button onClick={() => setShowCatModal(false)} variant="outlined">关闭</Button></DialogActions>
       </Dialog>
-    </Box>
+
+      {/* Category management dialog */}
+      <Dialog open={showCatModal} onOpenChange={(v) => { if (!v) setShowCatModal(false); }}>
+        <DialogContent className="max-w-sm bg-white">
+          <DialogHeader><DialogTitle>管理分类</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-3 py-2">
+            <div className="flex flex-col gap-2 max-h-[200px] overflow-auto">
+              {categories.map((cat) => (
+                <div key={cat.id} className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2">
+                  <span className="text-[13px]"><span className="font-medium">{cat.nameZh}</span> <span className="text-gray-400">({cat.name})</span></span>
+                  <Button onClick={() => handleDeleteCategory(cat)} variant="ghost" size="sm" className="h-7 text-red-500 hover:bg-red-50">删除</Button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <Input value={catForm.id} onChange={(e) => { catIdEdited.current = true; setCatForm({ ...catForm, id: e.target.value }); }} placeholder="auto" className="h-9 w-20 rounded-lg text-center" />
+              <Input value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })} placeholder="英文名" className="h-9 flex-1 rounded-lg" />
+              <Input value={catForm.nameZh} onChange={(e) => setCatForm({ ...catForm, nameZh: e.target.value })} placeholder="中文名" className="h-9 flex-1 rounded-lg" />
+            </div>
+            <Button onClick={handleSaveCategory} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">添加分类</Button>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCatModal(false)} className="rounded-lg">关闭</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

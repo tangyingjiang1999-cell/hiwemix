@@ -4,20 +4,17 @@ import { useState, useEffect } from "react";
 import { useLang } from "@/components/LanguageContext";
 import { colorSwatchStyle } from "@/lib/utils";
 import type { FormulaTableRow } from "@/types";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Skeleton from "@mui/material/Skeleton";
-import CustomPagination from "@/components/ui/CustomPagination";
-import SearchOffIcon from "@mui/icons-material/SearchOff";
-import ZoomInIcon from "@mui/icons-material/ZoomIn";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { SearchSlash, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface SearchResultsProps {
   rows: FormulaTableRow[];
@@ -26,47 +23,73 @@ export interface SearchResultsProps {
   onOpenFormula: (row: FormulaTableRow) => void;
 }
 
-const FONT = 'var(--font-inter), var(--font-noto), "Helvetica Neue", Arial, sans-serif';
-const HEADER_FONT_SIZE = "0.8125rem";
-const CELL_FONT_SIZE = "0.9375rem";
-const CAPTION_FONT_SIZE = "0.875rem";
-
-// 列宽定义，确保间距均匀
-const COLUMN_WIDTHS = {
-  colorType: 105,
-  manufacturer: 125,
-  code: 100,
-  colorName: 150,
-  carModel: 150,
-  years: 120,
-  formulaVariants: 120,
-  version: 100,
-  action: 60,
-};
-
-// 列背景色 - 偶数列加淡灰背景以区分列边界
-const COLUMN_BG = {
-  odd: "transparent",           // 奇数列：透明（跟随行色）
-  even: "rgba(0, 0, 0, 0.025)", // 偶数列：2.5% 黑色透明度
-};
-
 function SkeletonRows() {
   return (
     <TableBody>
       {[0, 1, 2, 3, 4].map((i) => (
         <TableRow key={i}>
-          <TableCell><Skeleton variant="rounded" width={40} height={20} /></TableCell>
-          <TableCell><Skeleton variant="text" /></TableCell>
-          <TableCell><Skeleton variant="text" /></TableCell>
-          <TableCell><Skeleton variant="text" width={80} height={24} /></TableCell>
-          <TableCell><Skeleton variant="text" width="60%" /></TableCell>
-          <TableCell><Skeleton variant="text" /></TableCell>
-          <TableCell><Skeleton variant="text" width={40} /></TableCell>
-          <TableCell><Skeleton variant="text" width={60} /></TableCell>
-          <TableCell><Skeleton variant="circular" width={28} height={28} /></TableCell>
+          <TableCell><Skeleton className="h-5 w-10 rounded" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+          <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+          <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-20" /></TableCell>
+          <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-10" /></TableCell>
+          <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-16" /></TableCell>
+          <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-10" /></TableCell>
+          <TableCell><Skeleton className="size-7 rounded-full" /></TableCell>
         </TableRow>
       ))}
     </TableBody>
+  );
+}
+
+// ===== 内联分页器组件 =====
+function CustomPagination({
+  totalCount,
+  page,
+  pageSize,
+  onPageChange,
+  unitName = "formulas",
+}: {
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  onPageChange: (newPage: number) => void;
+  unitName?: string;
+}) {
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+
+  return (
+    <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+      <p className="text-sm font-semibold text-primary" aria-live="polite">
+        Found {totalCount} {unitName}
+      </p>
+      <div className="flex items-center gap-2">
+        <span className="text-[13px] text-gray-500">
+          {page + 1} / {totalPages}
+        </span>
+        <Button
+          size="icon"
+          variant="ghost"
+          disabled={page === 0}
+          onClick={() => onPageChange(page - 1)}
+          aria-label="Previous page"
+          className="size-8 rounded-lg text-gray-500 hover:text-primary hover:bg-primary/10 disabled:text-gray-300"
+        >
+          <ChevronLeft className="size-4" />
+        </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          disabled={page >= totalPages - 1}
+          onClick={() => onPageChange(page + 1)}
+          aria-label="Next page"
+          className="size-8 rounded-lg text-gray-500 hover:text-primary hover:bg-primary/10 disabled:text-gray-300"
+        >
+          <ChevronRight className="size-4" />
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -78,7 +101,7 @@ export default function SearchResults({
 }: SearchResultsProps) {
   const { t } = useLang();
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage] = useState(10);
 
   useEffect(() => {
     setPage(0);
@@ -86,164 +109,99 @@ export default function SearchResults({
 
   if (isLoading) {
     return (
-      <Box sx={{ p: 3 }}>
-        <Typography variant="body2" sx={{ color: "text.secondary", fontFamily: FONT, fontSize: CAPTION_FONT_SIZE, mb: 1 }}>
-          <Skeleton variant="text" width={180} />
-        </Typography>
-        <TableContainer component={Paper} variant="outlined" sx={{ mt: 1 }}>
-          <Table size="small">
-            <SkeletonRows />
-          </Table>
-        </TableContainer>
-      </Box>
+      <div className="p-3">
+        <p className="mb-1 text-sm text-gray-500">
+          <Skeleton className="h-4 w-44" />
+        </p>
+        <Table>
+          <SkeletonRows />
+        </Table>
+      </div>
     );
   }
 
   if (!hasSearched) {
     return (
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: 300 }}>
-        <Typography variant="caption" sx={{ color: "text.secondary" }}>
-          {t.searchHint}
-        </Typography>
-      </Box>
+      <div className="flex min-h-[300px] flex-col items-center justify-center">
+        <p className="text-xs text-gray-500">{t.searchHint}</p>
+      </div>
     );
   }
 
   if (rows.length === 0) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: 300,
-          p: 3,
-        }}
-        role="status"
-      >
-        <SearchOffIcon
-          aria-hidden="true"
-          sx={{ fontSize: 56, color: "grey.500", mb: 2 }}
-        />
-        <Typography
-          sx={{
-            fontFamily: FONT,
-            fontSize: "1rem",
-            fontWeight: 600,
-            color: "grey.800",
-            textShadow: "none",
-          }}
-        >
-          {t.noResults}
-        </Typography>
-        <Typography
-          sx={{
-            fontFamily: FONT,
-            fontSize: "0.875rem",
-            fontWeight: 400,
-            color: "text.secondary",
-            mt: 0.5,
-            textShadow: "none",
-          }}
-        >
-          {t.noResultsHint}
-        </Typography>
-      </Box>
+      <div className="flex min-h-[300px] flex-col items-center justify-center p-3" role="status">
+        <SearchSlash aria-hidden="true" className="mb-2 size-14 text-gray-400" />
+        <p className="text-base font-semibold text-gray-800">{t.noResults}</p>
+        <p className="mt-1 text-sm text-gray-500">{t.noResultsHint}</p>
+      </div>
     );
   }
 
   const pageRows = rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
-    <Box sx={{ mx: { xs: -1, sm: 0 } }}>
-      <TableContainer component={Paper} variant="outlined" className="table-responsive-scroll" sx={{ borderRadius: 0, border: "1px solid", borderColor: "grey.200", borderTop: "2px solid", borderTopColor: "primary.main" }}>
-        <Table sx={{ tableLayout: { xs: "auto", md: "fixed" }, width: "100%", minWidth: { xs: 560, md: "100%" } }}>
+    <div className="mx-0 sm:-mx-1">
+      <div className="overflow-x-auto rounded-none border border-gray-200 border-t-2 border-t-primary">
+        <Table>
           <caption className="sr-only">Formula search results table</caption>
-          <TableHead>
-            <TableRow sx={{ bgcolor: "primary.main" }}>
-              <TableCell scope="col" sx={{ width: { md: COLUMN_WIDTHS.colorType }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.colorType}</TableCell>
-              <TableCell scope="col" sx={{ width: { md: COLUMN_WIDTHS.manufacturer }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.manufacturerLabel}</TableCell>
-              <TableCell scope="col" sx={{ width: { md: COLUMN_WIDTHS.code }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.codeLabel}</TableCell>
-              <TableCell scope="col" sx={{ width: { md: COLUMN_WIDTHS.colorName }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.colorName}</TableCell>
-              <TableCell scope="col" sx={{ display: { xs: "none", md: "table-cell" }, width: { md: COLUMN_WIDTHS.carModel }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.carModelLabel}</TableCell>
-              <TableCell scope="col" sx={{ display: { xs: "none", md: "table-cell" }, width: { md: COLUMN_WIDTHS.years }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.yearsLabel}</TableCell>
-              <TableCell scope="col" sx={{ display: { xs: "none", md: "table-cell" }, width: { md: COLUMN_WIDTHS.formulaVariants }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>Process</TableCell>
-              <TableCell scope="col" sx={{ display: { xs: "none", md: "table-cell" }, width: { md: COLUMN_WIDTHS.version }, fontWeight: 700, color: "primary.contrastText", fontFamily: FONT, fontSize: HEADER_FONT_SIZE, borderBottom: "none", py: 1, textAlign: "center" }}>{t.versionLabel}</TableCell>
-              <TableCell scope="col" sx={{ width: { md: COLUMN_WIDTHS.action }, borderBottom: "none", py: 1 }} aria-label="Actions"></TableCell>
+          <TableHeader>
+            <TableRow className="bg-primary hover:bg-primary">
+              <TableHead className="w-[105px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none">Color Type</TableHead>
+              <TableHead className="w-[125px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none">{t.manufacturerLabel}</TableHead>
+              <TableHead className="w-[100px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none">{t.codeLabel}</TableHead>
+              <TableHead className="w-[150px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none">{t.colorName}</TableHead>
+              <TableHead className="hidden w-[150px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none md:table-cell">{t.carModelLabel}</TableHead>
+              <TableHead className="hidden w-[120px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none md:table-cell">{t.yearsLabel}</TableHead>
+              <TableHead className="hidden w-[120px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none md:table-cell">Process</TableHead>
+              <TableHead className="hidden w-[100px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none md:table-cell">{t.versionLabel}</TableHead>
+              <TableHead className="w-[60px] py-2.5 border-none" aria-label="Actions"></TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
             {pageRows.map((row, index) => (
               <TableRow
                 key={`${row.formula.id}-${index}`}
-                sx={{
-                  borderBottom: "1px solid #e5e7eb",
-                  bgcolor: index % 2 === 0 ? "background.paper" : "grey.100",
-                  "&:last-child td": { borderBottom: "none" },
-                  "&:hover": { bgcolor: "#f5f5f5" },
-                  transition: "background-color 0.15s ease",
-                }}
+                className="cursor-pointer transition-colors hover:bg-blue-50/40 border-b border-gray-100 last:border-b-0"
+                onClick={() => onOpenFormula(row)}
               >
-                {/* col 0: colorType (odd) */}
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, display: "flex", justifyContent: "center", alignItems: "center" }}>
-                  <Box
-                    sx={{
-                      width: 83,
-                      height: 37,
-                      borderRadius: 0,
-                      border: 1,
-                      borderColor: "grey.200",
-                    }}
+                <TableCell className="py-3.5 text-center">
+                  <div
+                    className="mx-auto w-[83px] h-[37px] border border-gray-200"
                     style={colorSwatchStyle(row.color.hex_preview)}
                   />
                 </TableCell>
-                {/* col 1: manufacturer (even) */}
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
-                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, fontWeight: 500, color: "#1a1a1a" }}>{row.makeName}</Typography>
+                <TableCell className="py-3.5 text-center">
+                  <span className="text-[15px] font-medium text-gray-900 truncate block">{row.makeName}</span>
                 </TableCell>
-                {/* col 2: code (odd) */}
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151", fontWeight: 500 }}>
-                    {row.color.color_code}
-                  </Typography>
+                <TableCell className="py-3.5 text-center">
+                  <span className="text-[15px] font-medium text-gray-700">{row.color.color_code}</span>
                 </TableCell>
-                {/* col 3: colorName (even) */}
-                <TableCell sx={{ py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
-                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#1a1a1a" }}>{row.color.color_name}</Typography>
+                <TableCell className="py-3.5 text-center">
+                  <span className="text-[15px] text-gray-900 truncate block">{row.color.color_name}</span>
                 </TableCell>
-                {/* col 4: carModel (odd) — hidden on mobile */}
-                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
-                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
-                    {row.color.car_model || "—"}
-                  </Typography>
+                <TableCell className="hidden py-3.5 text-center md:table-cell">
+                  <span className="text-[15px] text-gray-700 truncate block">{row.color.car_model || "—"}</span>
                 </TableCell>
-                {/* col 5: years (even) — hidden on mobile */}
-                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
-                  <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#9ca3af" }}>
-                    {row.year ?? "—"}
-                  </Typography>
+                <TableCell className="hidden py-3.5 text-center md:table-cell">
+                  <span className="text-[15px] text-gray-400">{row.year ?? "—"}</span>
                 </TableCell>
-                {/* col 6: Process (odd) — 配方类型，隐藏在移动端 */}
-                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, py: 1.4, bgcolor: COLUMN_BG.odd, textAlign: "center" }}>
-                  <Typography variant="body2" noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151" }}>
-                    {row.formula.formula_type}
-                  </Typography>
+                <TableCell className="hidden py-3.5 text-center md:table-cell">
+                  <span className="text-[15px] text-gray-700 truncate block">{row.formula.formula_type}</span>
                 </TableCell>
-                {/* col 7: version (even) — hidden on mobile */}
-                <TableCell sx={{ display: { xs: "none", md: "table-cell" }, py: 1.4, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
-                  <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "#374151", fontWeight: 500 }}>{row.formula.version}</Typography>
+                <TableCell className="hidden py-3.5 text-center md:table-cell">
+                  <span className="text-[15px] font-medium text-gray-700">{row.formula.version}</span>
                 </TableCell>
-                {/* col 8: action (odd) */}
-                <TableCell align="center" sx={{ py: 1.4, bgcolor: COLUMN_BG.odd }}>
-                  <IconButton
-                    onClick={() => onOpenFormula(row)}
-                    size="small"
+                <TableCell align="center" className="py-3.5">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={(e) => { e.stopPropagation(); onOpenFormula(row); }}
                     aria-label="View formula"
-                    sx={{ color: "#9ca3af", "&:hover": { bgcolor: "rgba(36,135,202,0.08)", color: "primary.main" } }}
+                    className="size-8 rounded-md text-gray-400 hover:bg-primary/10 hover:text-primary"
                   >
-                    <ZoomInIcon fontSize="small" />
-                  </IconButton>
+                    <ZoomIn className="size-4" />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -256,7 +214,7 @@ export default function SearchResults({
           onPageChange={setPage}
           unitName="formulas"
         />
-      </TableContainer>
-    </Box>
+      </div>
+    </div>
   );
 }

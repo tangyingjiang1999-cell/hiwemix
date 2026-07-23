@@ -4,12 +4,17 @@ import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { COLOR_TYPE_OPTIONS } from "@/lib/constants";
 import { useLang } from "@/components/LanguageContext";
 import type { CarMake, SearchParams, AppSettings } from "@/types";
-import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
-import Button from "@mui/material/Button";
-import SearchIcon from "@mui/icons-material/Search";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, RotateCcw } from "lucide-react";
 
 export interface SearchPanelProps {
   onSearch: (params: SearchParams) => void;
@@ -88,148 +93,108 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
     setYear("");
   }
 
-  // 共用的输入框样式
-  const inputSx = {
-    "& .MuiOutlinedInput-root": {
-      bgcolor: "transparent",
-    },
-  };
-
   return (
-    <Box component="form" role="search" aria-label={t.search} onSubmit={(e) => handleSubmit(e)} onFocus={onFocusCapture} onBlur={onBlurCapture}>
+    <form
+      role="search"
+      aria-label={t.search}
+      onSubmit={(e) => handleSubmit(e)}
+      onFocus={onFocusCapture}
+      onBlur={onBlurCapture}
+    >
       {/* 2×3 网格布局 */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr", md: "1fr 1fr 1fr" },
-          gap: 2,
-          width: "100%",
-        }}
-      >
-        {/* 第一行：Make | Color Code | Color Type */}
-        <TextField
-          select
-          label={t.make}
-          value={makeId}
-          onChange={(e) => setMakeId(e.target.value)}
-          size="small"
-          fullWidth
-          sx={inputSx}
-          slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }}
-        >
-          <MenuItem value="">All</MenuItem>
-          {carMakes.map((m) => (
-            <MenuItem key={m.id} value={m.id}>
-              {m.name}
-            </MenuItem>
-          ))}
-        </TextField>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
+        {/* Row 1: Make | Color Code | Color Type */}
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t.make}</Label>
+          <Select value={makeId} onValueChange={(v) => setMakeId(v || "")}>
+            <SelectTrigger className="h-9 w-full rounded-lg">
+              <SelectValue placeholder="All" />
+            </SelectTrigger>
+            <SelectContent className="max-h-[200px]">
+              <SelectItem value="all">All</SelectItem>
+              {carMakes.map((m) => (
+                <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        <TextField
-          label={t.colorCode}
-          value={colorCode}
-          onChange={(e) => setColorCode(e.target.value.replace(/\s/g, "").toUpperCase())}
-          placeholder={t.colorCodePlaceholder}
-          size="small"
-          fullWidth
-          sx={inputSx}
-          slotProps={{ htmlInput: { maxLength: 20 } }}
-        />
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t.colorCode}</Label>
+          <Input
+            value={colorCode}
+            onChange={(e) => setColorCode(e.target.value.replace(/\s/g, "").toUpperCase())}
+            placeholder={t.colorCodePlaceholder}
+            className="h-9 rounded-lg"
+            maxLength={20}
+          />
+        </div>
 
-        <TextField
-          select
-          label={t.colorType}
-          value={colorType}
-          onChange={(e) => setColorType(e.target.value)}
-          size="small"
-          fullWidth
-          sx={inputSx}
-          slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }}
-        >
-          {colorTypeOptions.map((opt) => (
-            <MenuItem key={opt.value} value={opt.value}>
-              {opt.label}
-            </MenuItem>
-          ))}
-        </TextField>
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t.colorType}</Label>
+          <Select value={colorType} onValueChange={(v) => setColorType(v || "")}>
+            <SelectTrigger className="h-9 w-full rounded-lg">
+              <SelectValue placeholder={t.colorTypeAll} />
+            </SelectTrigger>
+            <SelectContent className="max-h-[200px]">
+              {colorTypeOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-        {/* 第二行：Color Name | Year | Search + Reset */}
-        <TextField
-          label={t.colorName}
-          value={colorName}
-          onChange={(e) => setColorName(e.target.value)}
-          placeholder={t.colorNamePlaceholder}
-          size="small"
-          fullWidth
-          sx={inputSx}
-        />
+        {/* Row 2: Color Name | Year | Search + Reset buttons */}
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t.colorName}</Label>
+          <Input
+            value={colorName}
+            onChange={(e) => setColorName(e.target.value)}
+            placeholder={t.colorNamePlaceholder}
+            className="h-9 rounded-lg"
+          />
+        </div>
 
-        <TextField
-          label={t.year}
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          placeholder={t.yearPlaceholder}
-          size="small"
-          fullWidth
-          sx={inputSx}
-          slotProps={{ htmlInput: { maxLength: 9 } }}
-        />
+        <div className="flex flex-col gap-1.5">
+          <Label className="text-sm font-medium text-gray-700">{t.year}</Label>
+          <Input
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            placeholder={t.yearPlaceholder}
+            className="h-9 rounded-lg"
+            maxLength={9}
+          />
+        </div>
 
         {/* 按钮组，放在网格最后一个单元格 */}
-        <Box sx={{ display: "flex", gap: 1 }}>
+        <div className="flex items-end gap-2">
           <Button
             type="submit"
             disabled={isLoading}
-            variant="outlined"
-            startIcon={<SearchIcon />}
-            sx={{
-              fontWeight: 600,
-              fontSize: "0.8125rem",
-              py: 0.75,
-              minHeight: 36,
-              flex: 1,
-              bgcolor: "transparent",
-              borderColor: "primary.main",
-              color: "primary.main",
-              "&:hover": {
-                bgcolor: "rgba(36,135,202,0.08)",
-                borderColor: "primary.main",
-              },
-            }}
+            variant="default"
+            className="h-9 flex-1 rounded-xl bg-[#2487ca] text-[13px] font-semibold hover:bg-[#1d6fb0]"
           >
+            <Search className="size-4" />
             {isLoading ? t.searching : t.search}
           </Button>
           <Button
             type="button"
             onClick={handleReset}
             disabled={isLoading}
-            variant="outlined"
-            startIcon={<RestartAltIcon />}
-            sx={{
-              fontWeight: 600,
-              fontSize: "0.8125rem",
-              py: 0.75,
-              minHeight: 36,
-              flex: 1,
-              bgcolor: "transparent",
-              borderColor: "primary.main",
-              color: "primary.main",
-              "&:hover": {
-                bgcolor: "rgba(36,135,202,0.08)",
-                borderColor: "primary.main",
-              },
-            }}
+            variant="outline"
+            className="h-9 flex-1 rounded-xl text-[13px] font-semibold"
           >
+            <RotateCcw className="size-4" />
             {t.reset}
           </Button>
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       {isCodeTooLong && (
-        <Box role="alert" sx={{ mt: 1, fontSize: "0.75rem", fontWeight: 500, color: "warning.main" }}>
+        <div role="alert" className="mt-2 text-xs font-medium text-yellow-600">
           {t.codeTooLong}
-        </Box>
+        </div>
       )}
-    </Box>
+    </form>
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+import { X } from "lucide-react";
 
 interface ToastProps {
   message: string;
@@ -10,47 +9,34 @@ interface ToastProps {
   duration?: number;
 }
 
-export default function Toast({
-  message,
-  onDone,
-  duration = 2000,
-}: ToastProps) {
-  const [open, setOpen] = useState(false);
+export default function Toast({ message, onDone, duration = 2000 }: ToastProps) {
+  const [visible, setVisible] = useState(false);
+  const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
-    const id = requestAnimationFrame(() => setOpen(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
+    const showTimer = requestAnimationFrame(() => setVisible(true));
+    const hideTimer = setTimeout(() => {
+      setExiting(true);
+      setTimeout(onDone, 300);
+    }, duration);
+    return () => {
+      cancelAnimationFrame(showTimer);
+      clearTimeout(hideTimer);
+    };
+  }, [duration, onDone]);
 
-  function handleClose(_: unknown, reason?: string) {
-    if (reason === "clickaway") return;
-    setOpen(false);
-  }
+  if (!message && !visible) return null;
 
   return (
-    <Snackbar
-      open={open}
-      onClose={handleClose}
-      autoHideDuration={duration}
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      slotProps={{ transition: { onExited: onDone } }}
-    >
-      <Alert
-        severity="success"
-        role="status"
-        variant="filled"
-        sx={{
-          bgcolor: "primary.main",
-          color: "primary.contrastText",
-          fontSize: "0.8125rem",
-          fontWeight: 500,
-          borderRadius: 0,
-          "& .MuiAlert-icon": { color: "primary.contrastText" },
-        }}
+    <div className="fixed bottom-6 left-1/2 z-[2000] -translate-x-1/2">
+      <div
+        className={`flex items-center gap-2 rounded-xl bg-[#2487ca] px-4 py-2.5 text-[13px] font-medium text-white shadow-lg transition-all duration-300 ${
+          visible && !exiting ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+        }`}
       >
-        {message}
-      </Alert>
-    </Snackbar>
+        <span>{message}</span>
+      </div>
+    </div>
   );
 }
 

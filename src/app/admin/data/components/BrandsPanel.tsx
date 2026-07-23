@@ -3,29 +3,32 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { CarMake, Region } from "@/types";
 import { generateBrandId } from "@/lib/id-generator";
-import { FONT, HEADER_BG, CELL_FONT_SIZE, COLUMN_BG, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx, actionButtonSx, deleteButtonSx } from "@/components/admin-table-styles";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import CustomPagination from "@/components/ui/CustomPagination";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
-import Chip from "@mui/material/Chip";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Edit, Trash2, Plus, X } from "lucide-react";
 
 export default function BrandsPanel() {
   const [brands, setBrands] = useState<CarMake[]>([]);
@@ -39,18 +42,16 @@ export default function BrandsPanel() {
   const [regionError, setRegionError] = useState("");
   const [regionToDelete, setRegionToDelete] = useState<string | null>(null);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const ROWS_PER_PAGE = 10;
   const idManuallyEdited = useRef(false);
 
-  // Fetch brands
   const fetchBrands = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/brands");
       if (res.ok) setBrands(await res.json());
-    } catch { /* network error */ }
+    } catch {}
   }, []);
 
-  // Fetch regions
   const defaultRegionSet = useRef(false);
   const fetchRegions = useCallback(async () => {
     try {
@@ -60,10 +61,10 @@ export default function BrandsPanel() {
         setRegions(data);
         if (!defaultRegionSet.current && data.length > 0) {
           defaultRegionSet.current = true;
-          setBrandForm((prev) => prev.region ? prev : { ...prev, region: data[0].code });
+          setBrandForm((prev) => (prev.region ? prev : { ...prev, region: data[0].code }));
         }
       }
-    } catch { /* network error */ }
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -71,11 +72,8 @@ export default function BrandsPanel() {
     fetchRegions();
   }, [fetchBrands, fetchRegions]);
 
-  useEffect(() => {
-    setPage(0);
-  }, [brands]);
+  useEffect(() => { setPage(0); }, [brands]);
 
-  // Auto-generate brand ID from name
   useEffect(() => {
     if (!editing && !idManuallyEdited.current && brandForm.name) {
       setBrandForm((prev) => ({ ...prev, id: generateBrandId(brandForm.name) }));
@@ -140,206 +138,164 @@ export default function BrandsPanel() {
     } catch { alert("网络错误，请重试"); }
   }
 
-  const pageRows = brands.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const totalPages = Math.max(1, Math.ceil(brands.length / ROWS_PER_PAGE));
+  const pageRows = brands.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE);
 
   return (
-    <Box>
-      {/* Header with buttons */}
-      <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1, mb: 1.5 }}>
-        <Button onClick={openCreateRegion} variant="outlined" size="small" startIcon={<AddIcon />}>
-          新增产地
+    <div>
+      {/* Header buttons */}
+      <div className="flex justify-end gap-2 mb-4">
+        <Button onClick={openCreateRegion} variant="outline" size="sm" className="rounded-lg text-[13px]">
+          <Plus className="size-4" /> 新增产地
         </Button>
-        <Button onClick={openCreateBrand} variant="contained" size="small">
+        <Button onClick={openCreateBrand} size="sm" className="rounded-lg bg-[#2487ca] text-[13px] hover:bg-[#1d6fb0]">
           新增品牌
         </Button>
-      </Box>
+      </div>
 
-      {/* Brands table */}
-      <TableContainer component={Paper} variant="outlined" sx={tableContainerSx}>
-        <Table sx={tableSx}>
-          <TableHead>
-            <TableRow sx={{ bgcolor: HEADER_BG }}>
-              <TableCell sx={{ ...headerCellSx, width: 120 }}>ID</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: 200 }}>名称</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: 150 }}>产地</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: 100 }}></TableCell>
+      {/* Table */}
+      <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50/80">
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">ID</TableHead>
+              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">名称</TableHead>
+              <TableHead className="w-[150px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">产地</TableHead>
+              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">操作</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
-            {pageRows.map((brand, rowIndex) => (
-              <TableRow key={brand.id} sx={getRowSx(rowIndex)}>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary", fontWeight: 500 }}>
-                    {brand.id}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.primary" }}>
-                    {brand.name}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary" }}>
-                    {brand.region}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
-                  <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center" }}>
-                    <IconButton onClick={() => openEditBrand(brand)} size="small" sx={actionButtonSx}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton onClick={() => handleDeleteBrand(brand)} size="small" sx={deleteButtonSx}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
+            {pageRows.map((brand, i) => (
+              <TableRow key={brand.id} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
+                <TableCell className="py-3 text-center text-[13px] text-gray-500">{brand.id}</TableCell>
+                <TableCell className="py-3 text-center text-[13px] text-gray-900 truncate max-w-[180px]">{brand.name}</TableCell>
+                <TableCell className="py-3 text-center text-[13px] text-gray-500">{brand.region}</TableCell>
+                <TableCell className="py-3 text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <button
+                      onClick={() => openEditBrand(brand)}
+                      className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-primary/10 hover:text-primary"
+                    >
+                      <Edit className="size-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteBrand(brand)}
+                      className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <CustomPagination
-          totalCount={brands.length}
-          page={page}
-          pageSize={rowsPerPage}
-          onPageChange={setPage}
-          unitName="brands"
-        />
-      </TableContainer>
+        {/* Pagination */}
+        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+          <p className="text-sm font-semibold text-primary">Found {brands.length} brands</p>
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] text-gray-500">{page + 1} / {totalPages}</span>
+            <Button size="icon" variant="ghost" disabled={page === 0} onClick={() => setPage(page - 1)} className="size-8 rounded-lg">‹</Button>
+            <Button size="icon" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="size-8 rounded-lg">›</Button>
+          </div>
+        </div>
+      </div>
 
       {/* Regions list */}
-      <Box sx={{ mt: 2, p: 1.5, border: "1px solid", borderColor: "divider", borderRadius: 2 }}>
-        <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-          已有产地：
-        </Typography>
-        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+      <div className="mt-4 rounded-xl border border-gray-200 p-4">
+        <p className="mb-2 text-sm font-semibold text-gray-700">已有产地：</p>
+        <div className="flex flex-wrap gap-2">
           {regions.map((region) => (
-            <Chip
+            <span
               key={region.code}
-              label={region.code}
-              onDelete={() => setRegionToDelete(region.code)}
-              size="small"
-              variant="outlined"
-              sx={{
-                borderRadius: 2,
-                fontSize: "0.8125rem",
-                borderColor: "divider",
-                bgcolor: "grey.50",
-                "& .MuiChip-deleteIcon": {
-                  color: "text.disabled",
-                  fontSize: 16,
-                  "&:hover": { color: "error.main" },
-                },
-              }}
-            />
-          ))}
-        </Box>
-      </Box>
-
-      {/* Region delete confirmation dialog */}
-      <Dialog open={!!regionToDelete} onClose={() => setRegionToDelete(null)} maxWidth="xs" fullWidth>
-        <DialogTitle>确认删除</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2">
-            确定删除产地「{regionToDelete}」吗？此操作不可撤销。
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setRegionToDelete(null)} variant="outlined">取消</Button>
-          <Button
-            onClick={() => {
-              if (regionToDelete) {
-                handleDeleteRegion(regionToDelete);
-                setRegionToDelete(null);
-              }
-            }}
-            variant="contained"
-            color="error"
-          >
-            删除
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Brand creation/edit dialog */}
-      <Dialog open={showBrandModal} onClose={() => setShowBrandModal(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>{editing ? "编辑品牌" : "新增品牌"}</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
-            <TextField
-              label="ID（自动生成）"
-              value={brandForm.id}
-              onChange={(e) => {
-                idManuallyEdited.current = true;
-                setBrandForm({ ...brandForm, id: e.target.value });
-              }}
-              disabled={!!editing}
-              size="small"
-              fullWidth
-            />
-            <TextField
-              label="名称"
-              value={brandForm.name}
-              onChange={(e) => setBrandForm({ ...brandForm, name: e.target.value })}
-              size="small"
-              fullWidth
-            />
-            <TextField
-              select
-              label="产地"
-              value={brandForm.region}
-              onChange={(e) => setBrandForm({ ...brandForm, region: e.target.value })}
-              size="small"
-              fullWidth
+              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-[13px] text-gray-600"
             >
-              {regions.map((r) => (
-                <MenuItem key={r.code} value={r.code}>
-                  {r.code}
-                </MenuItem>
-              ))}
-            </TextField>
-            {brandError && (
-              <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{brandError}</Box>
-            )}
-          </Box>
+              {region.code}
+              <button
+                onClick={() => setRegionToDelete(region.code)}
+                className="inline-flex size-4 items-center justify-center rounded-full text-gray-400 hover:text-red-500"
+              >
+                <X className="size-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Region delete confirmation */}
+      <Dialog open={!!regionToDelete} onOpenChange={() => setRegionToDelete(null)}>
+        <DialogContent className="max-w-sm bg-white">
+          <DialogHeader><DialogTitle>确认删除</DialogTitle></DialogHeader>
+          <p className="text-sm text-gray-600">确定删除产地「{regionToDelete}」吗？此操作不可撤销。</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRegionToDelete(null)} className="rounded-lg">取消</Button>
+            <Button
+              onClick={() => { if (regionToDelete) { handleDeleteRegion(regionToDelete); setRegionToDelete(null); } }}
+              className="rounded-lg bg-red-600 hover:bg-red-700"
+            >删除</Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setShowBrandModal(false)} variant="outlined">
-            取消
-          </Button>
-          <Button onClick={handleSaveBrand} variant="contained">
-            保存
-          </Button>
-        </DialogActions>
       </Dialog>
 
-      {/* Region creation dialog */}
-      <Dialog open={showRegionModal} onClose={() => setShowRegionModal(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>新增产地</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
-            <TextField
-              label="产地代码"
-              value={regionForm.code}
-              onChange={(e) => setRegionForm({ ...regionForm, code: e.target.value.toUpperCase() })}
-              size="small"
-              fullWidth
-              placeholder="例如：SEA"
-              slotProps={{ htmlInput: { maxLength: 10 } }}
-            />
-            {regionError && (
-              <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{regionError}</Box>
-            )}
-          </Box>
+      {/* Brand create/edit dialog */}
+      <Dialog open={showBrandModal} onOpenChange={(v) => { if (!v) setShowBrandModal(false); }}>
+        <DialogContent className="max-w-sm bg-white">
+          <DialogHeader><DialogTitle>{editing ? "编辑品牌" : "新增品牌"}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 py-2">
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">ID（自动生成）</Label>
+              <Input
+                value={brandForm.id}
+                onChange={(e) => { idManuallyEdited.current = true; setBrandForm({ ...brandForm, id: e.target.value }); }}
+                disabled={!!editing}
+                className="h-9 rounded-lg"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">名称</Label>
+              <Input value={brandForm.name} onChange={(e) => setBrandForm({ ...brandForm, name: e.target.value })} className="h-9 rounded-lg" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">产地</Label>
+              <Select value={brandForm.region} onValueChange={(v) => setBrandForm({ ...brandForm, region: v || "" })}>
+                <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue /></SelectTrigger>
+                <SelectContent className="z-[130] max-h-[200px]">
+                  {regions.map((r) => (<SelectItem key={r.code} value={r.code}>{r.code}</SelectItem>))}
+                </SelectContent>
+              </Select>
+            </div>
+            {brandError && <p className="text-[13px] font-medium text-red-600">{brandError}</p>}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowBrandModal(false)} className="rounded-lg">取消</Button>
+            <Button onClick={handleSaveBrand} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存</Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setShowRegionModal(false)} variant="outlined">
-            取消
-          </Button>
-          <Button onClick={handleSaveRegion} variant="contained">
-            保存
-          </Button>
-        </DialogActions>
       </Dialog>
-    </Box>
+
+      {/* Region create dialog */}
+      <Dialog open={showRegionModal} onOpenChange={(v) => { if (!v) setShowRegionModal(false); }}>
+        <DialogContent className="max-w-sm bg-white">
+          <DialogHeader><DialogTitle>新增产地</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 py-2">
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">产地代码</Label>
+              <Input
+                value={regionForm.code}
+                onChange={(e) => setRegionForm({ ...regionForm, code: e.target.value.toUpperCase() })}
+                className="h-9 rounded-lg"
+                placeholder="例如：SEA"
+                maxLength={10}
+              />
+            </div>
+            {regionError && <p className="text-[13px] font-medium text-red-600">{regionError}</p>}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRegionModal(false)} className="rounded-lg">取消</Button>
+            <Button onClick={handleSaveRegion} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

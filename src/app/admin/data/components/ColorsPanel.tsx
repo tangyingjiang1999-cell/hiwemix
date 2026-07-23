@@ -4,94 +4,40 @@ import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import type { CarMake, Color, ColorVariant } from "@/types";
 import { colorSwatchStyle } from "@/lib/utils";
 import { generateUniqueColorId } from "@/lib/id-generator";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  FONT, CELL_FONT_SIZE, COLUMN_BG, HEADER_BG,
-  tableContainerSx, tableSx, cellSx, headerCellSx,
-  getRowSx, actionButtonSx, deleteButtonSx, SEARCH_INPUT_SX,
-  CELL_TEXT_PRIMARY_SX, CELL_TEXT_SECONDARY_SX,
-} from "@/components/admin-table-styles";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import CustomPagination from "@/components/ui/CustomPagination";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import MenuItem from "@mui/material/MenuItem";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Stack from "@mui/material/Stack";
-import Chip from "@mui/material/Chip";
-import CardContent from "@mui/material/CardContent";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Search, Edit, Trash2, Plus, X } from "lucide-react";
 
 const COLOR_TYPES = ["solid", "metallic", "pearl", "matte", "candy", "special"] as const;
-
-const CARD_STYLE = {
-  borderRadius: 2,
-  border: "1px solid",
-  borderColor: "divider",
-  overflow: "hidden",
-};
-
-const CARD_TITLE_STYLE = {
-  fontSize: "0.875rem",
-  fontWeight: 600,
-  color: "text.primary",
-  mb: 2,
-  pb: 1.5,
-  borderBottom: "1px solid",
-  borderBottomColor: "divider",
-};
-
-const COLUMN_WIDTHS = {
-  preview: 60,
-  colorCode: 120,
-  colorName: 150,
-  carModel: 120,
-  brand: 120,
-  colorType: 80,
-  yearCount: 80,
-  actions: 100,
-};
-
-interface ExpandedColorRow {
-  /** 颜色 ID（所有子行共享） */
-  colorId: string;
-  /** 在颜色组中的位置（0-based），0 = 第一行（渲染合并单元格） */
-  groupIndex: number;
-  /** 该颜色组的总行数，用作 rowSpan 值 */
-  groupSize: number;
-  /** 该子行的年份，或 undefined（无年份） */
-  year: number | undefined;
-  // ---- 以下为显示字段（仅 groupIndex === 0 时渲染） ----
-  color_code: string;
-  color_name: string;
-  color_type: Color["color_type"];
-  hex_preview: string;
-  car_model?: string;
-  brandName: string;
-  yearCount: number;
-  /** 原始 Color 对象引用（用于编辑/删除操作） */
-  originalColor: Color;
-}
 
 export default function ColorsPanel() {
   const [colors, setColors] = useState<Color[]>([]);
   const [brands, setBrands] = useState<CarMake[]>([]);
   const [allVariants, setAllVariants] = useState<ColorVariant[]>([]);
-  const [, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Color | null>(null);
   const [form, setForm] = useState({ id: "", make_id: "", color_code: "", color_name: "", color_type: "solid" as Color["color_type"], hex_preview: "#FFFFFF", car_model: "" });
@@ -99,24 +45,20 @@ export default function ColorsPanel() {
   const [years, setYears] = useState<number[]>([]);
   const [error, setError] = useState("");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
+  const [yearInput, setYearInput] = useState("");
   const idManuallyEdited = useRef(false);
-  const yearInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!editing && !idManuallyEdited.current && form.make_id && form.color_code) {
-      // 纳入 color_type 并避开已有 ID，保证任意字段不同都能生成独立记录
       const existingIds = colors.map((c) => c.id);
       setForm((prev) => ({ ...prev, id: generateUniqueColorId(form.make_id, form.color_code, form.color_type, existingIds) }));
     }
   }, [form.make_id, form.color_code, form.color_type, editing, colors]);
 
   const fetchColors = useCallback(async () => {
-    try {
-      const res = await fetch("/api/admin/colors");
-      if (res.ok) setColors(await res.json());
-    } catch { /* network error */ }
+    try { const res = await fetch("/api/admin/colors"); if (res.ok) setColors(await res.json()); } catch {}
     setLoading(false);
   }, []);
   useEffect(() => {
@@ -127,9 +69,7 @@ export default function ColorsPanel() {
     return () => ctrl.abort();
   }, [fetchColors]);
 
-  useEffect(() => {
-    setPage(0);
-  }, [colors]);
+  useEffect(() => { setPage(0); }, [colors, searchQuery]);
 
   function openCreate() {
     setEditing(null); setForm({ id: "", make_id: "", color_code: "", color_name: "", color_type: "solid", hex_preview: "#FFFFFF", car_model: "" });
@@ -142,18 +82,13 @@ export default function ColorsPanel() {
   async function handleSave() {
     setError("");
     if (!form.id || !form.make_id || !form.color_code || !form.color_name) { setError("所有字段不能为空"); return; }
-    // 新增时：若已存在相同 品牌+颜色代码 的记录，二次确认是否作为独立记录新增
     if (!editing) {
       const code = form.color_code.trim().toUpperCase();
       const dup = colors.filter((c) => c.make_id === form.make_id && c.color_code.trim().toUpperCase() === code);
       if (dup.length > 0) {
         const brandName = brandMap.get(form.make_id) ?? form.make_id;
         const existing = dup.map((c) => `· ${c.color_name}（${c.color_type}）`).join("\n");
-        const ok = confirm(
-          `已存在 ${dup.length} 条相同代码「${form.color_code}」的颜色（${brandName}）：\n${existing}\n\n` +
-          `是否将当前录入作为独立记录新增？`
-        );
-        if (!ok) return;
+        if (!confirm(`已存在 ${dup.length} 条相同代码「${form.color_code}」的颜色（${brandName}）：\n${existing}\n\n是否将当前录入作为独立记录新增？`)) return;
       }
     }
     try {
@@ -174,47 +109,18 @@ export default function ColorsPanel() {
 
   const brandMap = useMemo(() => new Map(brands.map((b) => [b.id, b.name])), [brands]);
 
-  // 将 colors 转换为展开后的行数组
-  const allExpandedRows: ExpandedColorRow[] = useMemo(() => colors.flatMap((c) => {
+  const allExpandedRows = useMemo(() => colors.flatMap((c): {
+    colorId: string; groupIndex: number; groupSize: number;
+    year: number | undefined; brandName: string; yearCount: number; originalColor: Color;
+    color_code: string; color_name: string; color_type: Color["color_type"];
+    hex_preview: string; car_model?: string;
+  }[] => {
     const brandName = brandMap.get(c.make_id) ?? c.make_id;
     const sortedYears = [...(c.years ?? [])].sort((a, b) => a - b);
-
-    if (sortedYears.length === 0) {
-      // 没有年份：单行，year = undefined
-      return [{
-        colorId: c.id,
-        groupIndex: 0,
-        groupSize: 1,
-        year: undefined,
-        color_code: c.color_code,
-        color_name: c.color_name,
-        color_type: c.color_type,
-        hex_preview: c.hex_preview,
-        car_model: c.car_model,
-        brandName,
-        yearCount: 0,
-        originalColor: c,
-      }];
-    }
-
-    // 有年份：每个年份一行
-    return sortedYears.map((year, i): ExpandedColorRow => ({
-      colorId: c.id,
-      groupIndex: i,
-      groupSize: sortedYears.length,
-      year,
-      color_code: c.color_code,
-      color_name: c.color_name,
-      color_type: c.color_type,
-      hex_preview: c.hex_preview,
-      car_model: c.car_model,
-      brandName,
-      yearCount: sortedYears.length,
-      originalColor: c,
-    }));
+    if (sortedYears.length === 0) return [{ colorId: c.id, groupIndex: 0, groupSize: 1, year: undefined, ...c, brandName, yearCount: 0, originalColor: c }];
+    return sortedYears.map((year, i) => ({ colorId: c.id, groupIndex: i, groupSize: sortedYears.length, year, ...c, brandName, yearCount: sortedYears.length, originalColor: c }));
   }), [colors, brandMap]);
 
-  // 按搜索关键词过滤（先过滤，再分页）
   const filteredRows = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     if (!q) return allExpandedRows;
@@ -229,317 +135,202 @@ export default function ColorsPanel() {
     });
   }, [allExpandedRows, searchQuery]);
 
-  // 搜索时回到第一页
-  useEffect(() => { setPage(0); }, [searchQuery]);
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage));
+  const pageRows = filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-  // 分页展开后的行
-  const pageRows = filteredRows.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+  if (loading) return <p className="text-center py-4 text-sm text-gray-500">加载中...</p>;
 
   return (
-    <Box>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", alignItems: "center", mb: 1.5, gap: 1.5 }}>
-        <TextField
-          size="small"
-          placeholder="搜索颜色、车型、品牌..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <Box component="span" sx={{ display: "flex", alignItems: "center", mr: 0.75, color: "text.disabled" }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="m21 21-4.35-4.35" />
-                  </svg>
-                </Box>
-              ),
-            },
-          }}
-          sx={SEARCH_INPUT_SX}
-        />
-        <Button onClick={openCreate} variant="contained" size="small">+ 新增颜色</Button>
-      </Box>
+    <div>
+      <div className="flex justify-end items-center mb-4 gap-3">
+        <div className="relative flex-1 max-w-xs">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+          <Input placeholder="搜索颜色、车型、品牌..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="h-9 rounded-lg pl-9 text-[13px]" />
+        </div>
+        <Button onClick={openCreate} className="rounded-lg bg-[#2487ca] text-[13px] hover:bg-[#1d6fb0]"><Plus className="size-4" /> 新增颜色</Button>
+      </div>
 
-      <TableContainer
-        component={Paper}
-        variant="outlined"
-        sx={tableContainerSx}
-      >
-        <Table sx={tableSx}>
-          <TableHead>
-            <TableRow sx={{ bgcolor: HEADER_BG }}>
-              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.preview }}>预览</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.brand }}>品牌</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.colorCode }}>颜色代码</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.colorName }}>颜色名称</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.carModel }}>车型</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.colorType }}>类型</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.yearCount }}>年份</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: COLUMN_WIDTHS.actions }}>操作</TableCell>
+      <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50/80">
+              <TableHead className="w-[60px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">预览</TableHead>
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">品牌</TableHead>
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">颜色代码</TableHead>
+              <TableHead className="w-[150px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">颜色名称</TableHead>
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">车型</TableHead>
+              <TableHead className="w-[80px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">类型</TableHead>
+              <TableHead className="w-[80px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">年份</TableHead>
+              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">操作</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
-            {pageRows.map((row, _index) => (
-              <TableRow
-                key={`${row.colorId}-${row.year ?? 'none'}`}
-                sx={getRowSx(_index)}
-              >
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd, display: "flex", justifyContent: "center", alignItems: "center" }}>
-                  <Box
-                    sx={{ width: 40, height: 24, borderRadius: 2, border: 1, borderColor: "grey.200" }}
-                    style={colorSwatchStyle(row.hex_preview)}
-                  />
+            {pageRows.map((row) => (
+              <TableRow key={`${row.colorId}-${row.year ?? 'none'}`} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
+                <TableCell className="py-3 text-center">
+                  <div className="mx-auto w-10 h-6 rounded border border-gray-200" style={colorSwatchStyle(row.hex_preview)} />
                 </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography variant="body2" noWrap sx={{ ...CELL_TEXT_PRIMARY_SX, fontWeight: 500 }}>
-                    {row.brandName}
-                  </Typography>
+                <TableCell className="py-3 text-center">
+                  <span className="block truncate text-[13px] font-medium text-gray-900">{row.brandName}</span>
                 </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography sx={{ ...CELL_TEXT_SECONDARY_SX, fontWeight: 500 }}>
-                    {row.color_code}
-                  </Typography>
+                <TableCell className="py-3 text-center">
+                  <span className="text-[13px] font-medium text-gray-500">{row.color_code}</span>
                 </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography variant="body2" noWrap sx={CELL_TEXT_PRIMARY_SX}>
-                    {row.color_name}
-                  </Typography>
+                <TableCell className="py-3 text-center">
+                  <span className="block truncate text-[13px] text-gray-900">{row.color_name}</span>
                 </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography variant="body2" noWrap sx={CELL_TEXT_SECONDARY_SX}>
-                    {row.car_model || "—"}
-                  </Typography>
+                <TableCell className="py-3 text-center">
+                  <span className="block truncate text-[13px] text-gray-500">{row.car_model || "—"}</span>
                 </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography variant="body2" sx={CELL_TEXT_SECONDARY_SX}>
-                    {row.color_type}
-                  </Typography>
+                <TableCell className="py-3 text-center">
+                  <span className="text-[13px] text-gray-500">{row.color_type}</span>
                 </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography variant="body2" sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.disabled" }}>
-                    {row.year ?? ""}
-                  </Typography>
+                <TableCell className="py-3 text-center">
+                  <span className="text-[13px] text-gray-400">{row.year ?? ""}</span>
                 </TableCell>
-                <TableCell align="center" sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center" }}>
-                    <IconButton onClick={() => openEdit(row.originalColor)} size="small" sx={actionButtonSx}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(row.originalColor)} size="small" sx={deleteButtonSx}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
+                <TableCell className="py-3 text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <button onClick={() => openEdit(row.originalColor)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-primary/10 hover:text-primary"><Edit className="size-4" /></button>
+                    <button onClick={() => handleDelete(row.originalColor)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-red-50 hover:text-red-500"><Trash2 className="size-4" /></button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <CustomPagination
-          totalCount={filteredRows.length}
-          page={page}
-          pageSize={rowsPerPage}
-          onPageChange={setPage}
-          unitName="colors"
-        />
-      </TableContainer>
+        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+          <p className="text-sm font-semibold text-primary">Found {filteredRows.length} colors</p>
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] text-gray-500">{page + 1} / {totalPages}</span>
+            <Button size="icon" variant="ghost" disabled={page === 0} onClick={() => setPage(page - 1)} className="size-8 rounded-lg">‹</Button>
+            <Button size="icon" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="size-8 rounded-lg">›</Button>
+          </div>
+        </div>
+      </div>
 
-      <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="md" fullWidth>
-        <DialogTitle sx={{ borderBottom: "1px solid", borderColor: "divider", pb: 2, mb: 0 }}>
-          {editing ? "编辑颜色" : "新增颜色"}
-        </DialogTitle>
-        <DialogContent sx={{ pt: 2.5, pb: 1 }}>
-          <Stack spacing={3}>
-            {/* 卡片1：基本信息 */}
-            <Paper variant="outlined" sx={CARD_STYLE}>
-              <CardContent sx={{ p: 2.5 }}>
-                <Typography sx={CARD_TITLE_STYLE}>基本信息</Typography>
-                <Stack spacing={2}>
-                  <TextField
-                    label="ID"
-                    value={form.id}
-                    onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }}
-                    disabled={!!editing}
-                    size="small"
-                    fullWidth
-                  />
-                  <TextField
-                    select
-                    label="品牌"
-                    value={form.make_id}
-                    onChange={(e) => setForm({ ...form, make_id: e.target.value })}
-                    size="small"
-                    fullWidth
-                  >
-                    <MenuItem value="">请选择品牌</MenuItem>
-                    {brands.map((b) => <MenuItem key={b.id} value={b.id}>{b.name}</MenuItem>)}
-                  </TextField>
-                  <Stack direction="row" spacing={2}>
-                    <TextField
-                      label="颜色代码"
-                      value={form.color_code}
-                      onChange={(e) => setForm({ ...form, color_code: e.target.value })}
-                      size="small"
-                      fullWidth
-                    />
-                    <TextField
-                      label="颜色名称"
-                      value={form.color_name}
-                      onChange={(e) => setForm({ ...form, color_name: e.target.value })}
-                      size="small"
-                      fullWidth
-                    />
-                  </Stack>
-                  <Stack direction="row" spacing={2}>
-                    <TextField
-                      select
-                      label="类型"
-                      value={form.color_type}
-                      onChange={(e) => setForm({ ...form, color_type: e.target.value as Color["color_type"] })}
-                      size="small"
-                      fullWidth
-                    >
-                      {COLOR_TYPES.map((t) => <MenuItem key={t} value={t}>{t}</MenuItem>)}
-                    </TextField>
-                    <TextField
-                      label="预览色"
-                      type="color"
-                      value={form.hex_preview}
-                      onChange={(e) => setForm({ ...form, hex_preview: e.target.value })}
-                      size="small"
-                      fullWidth
-                      sx={{ "& input": { height: 32, p: 0.5 } }}
-                    />
-                  </Stack>
-                  <TextField
-                    label="车型"
-                    value={form.car_model}
-                    onChange={(e) => setForm({ ...form, car_model: e.target.value })}
-                    placeholder="例如 Camry / Corolla"
-                    size="small"
-                    fullWidth
-                  />
-                </Stack>
-              </CardContent>
-            </Paper>
+      {/* Create/Edit Dialog */}
+      <Dialog open={showModal} onOpenChange={(v) => { if (!v) setShowModal(false); }}>
+        <DialogContent className="max-w-2xl bg-white !max-w-[650px]">
+          <DialogHeader><DialogTitle>{editing ? "编辑颜色" : "新增颜色"}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-5 py-2 max-h-[70vh] overflow-y-auto">
+            {/* 基本信息卡片 */}
+            <div className="rounded-xl border border-gray-200 p-5">
+              <h3 className="mb-4 text-sm font-semibold text-gray-700 border-b border-gray-100 pb-3">基本信息</h3>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-sm font-medium text-gray-700">ID</Label>
+                  <Input value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} className="h-9 rounded-lg" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-sm font-medium text-gray-700">品牌</Label>
+                  <Select value={form.make_id} onValueChange={(v) => setForm({ ...form, make_id: v || "" })}>
+                    <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue placeholder="请选择品牌" /></SelectTrigger>
+                    <SelectContent className="z-[130] max-h-[200px]">{brands.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="text-sm font-medium text-gray-700">颜色代码</Label>
+                    <Input value={form.color_code} onChange={(e) => setForm({ ...form, color_code: e.target.value })} className="h-9 rounded-lg" />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="text-sm font-medium text-gray-700">颜色名称</Label>
+                    <Input value={form.color_name} onChange={(e) => setForm({ ...form, color_name: e.target.value })} className="h-9 rounded-lg" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="text-sm font-medium text-gray-700">类型</Label>
+                    <Select value={form.color_type} onValueChange={(v) => setForm({ ...form, color_type: (v || "solid") as Color["color_type"] })}>
+                      <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue /></SelectTrigger>
+                      <SelectContent className="z-[130] max-h-[200px]">{COLOR_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <Label className="text-sm font-medium text-gray-700">预览色</Label>
+                    <Input type="color" value={form.hex_preview} onChange={(e) => setForm({ ...form, hex_preview: e.target.value })} className="h-9 rounded-lg p-1" />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label className="text-sm font-medium text-gray-700">车型</Label>
+                  <Input value={form.car_model} onChange={(e) => setForm({ ...form, car_model: e.target.value })} placeholder="例如 Camry / Corolla" className="h-9 rounded-lg" />
+                </div>
+              </div>
+            </div>
 
-            {/* 卡片2：适用年份 */}
-            <Paper variant="outlined" sx={CARD_STYLE}>
-              <CardContent sx={{ p: 2.5 }}>
-                <Typography sx={CARD_TITLE_STYLE}>适用年份</Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 2 }}>
-                  {years.map((year) => (
-                    <Chip
-                      key={year}
-                      label={year}
-                      onDelete={() => setYears(years.filter((y) => y !== year))}
-                      size="small"
-                      color="primary"
-                      variant="outlined"
-                    />
-                  ))}
-                  {years.length === 0 && (
-                    <Typography variant="body2" color="text.secondary">
-                      暂无年份
-                    </Typography>
-                  )}
-                </Box>
-                <Stack direction="row" spacing={1} useFlexGap>
-                  <TextField
-                    label="添加年份"
-                    type="number"
-                    size="small"
-                    sx={{ width: 120 }}
-                    slotProps={{ htmlInput: { min: 1900, max: 2100, ref: yearInputRef } }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        const target = e.target as HTMLInputElement;
-                        const val = parseInt(target.value, 10);
-                        if (val >= 1900 && val <= 2100 && !years.includes(val)) {
-                          setYears([...years, val].sort((a, b) => a - b));
-                          target.value = "";
-                        }
+            {/* 适用年份卡片 */}
+            <div className="rounded-xl border border-gray-200 p-5">
+              <h3 className="mb-4 text-sm font-semibold text-gray-700 border-b border-gray-100 pb-3">适用年份</h3>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {years.map((year) => (
+                  <span key={year} className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1 text-[13px] text-blue-700">
+                    {year}
+                    <button onClick={() => setYears(years.filter((y) => y !== year))} className="size-4 text-blue-400 hover:text-blue-600"><X className="size-3" /></button>
+                  </span>
+                ))}
+                {years.length === 0 && <p className="text-[13px] text-gray-400">暂无年份</p>}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  placeholder="年份 (1900-2100)"
+                  className="h-9 w-32 rounded-lg"
+                  min={1900}
+                  max={2100}
+                  value={yearInput}
+                  onChange={(e) => setYearInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const val = parseInt((e.target as HTMLInputElement).value, 10);
+                      if (val >= 1900 && val <= 2100 && !years.includes(val)) {
+                        setYears([...years, val].sort((a, b) => a - b));
+                        setYearInput("");
                       }
-                    }}
-                  />
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => {
-                      const input = yearInputRef.current;
-                      if (input) {
-                        const val = parseInt(input.value, 10);
-                        if (val >= 1900 && val <= 2100 && !years.includes(val)) {
-                          setYears([...years, val].sort((a, b) => a - b));
-                          input.value = "";
-                        }
-                      }
-                    }}
-                  >
-                    添加
-                  </Button>
-                </Stack>
-                <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-                  按 Enter 或点击「添加」按钮添加年份
-                </Typography>
-              </CardContent>
-            </Paper>
-
-            {/* 卡片3：关联变体 */}
-            <Paper variant="outlined" sx={CARD_STYLE}>
-              <CardContent sx={{ p: 2.5 }}>
-                <Typography sx={CARD_TITLE_STYLE}>关联变体</Typography>
-                <Box
-                  sx={{
-                    maxHeight: 200,
-                    overflow: "auto",
-                    border: 1,
-                    borderColor: "divider",
-                    borderRadius: 2,
-                    p: 1.5,
+                    }
                   }}
-                >
-                  {allVariants.length === 0 ? (
-                    <Typography variant="body2" color="text.secondary">
-                      暂无变体
-                    </Typography>
-                  ) : (
-                    <Stack spacing={0.5}>
-                      {allVariants.map((v) => (
-                        <FormControlLabel
-                          key={v.id}
-                          control={
-                            <Checkbox
-                              checked={variantIds.includes(v.id)}
-                              onChange={() => toggleVariant(v.id)}
-                              size="small"
-                            />
-                          }
-                          label={
-                            <Typography variant="body2">
-                              {v.name} <Typography variant="caption" color="text.secondary">({v.year_range})</Typography>
-                            </Typography>
-                          }
-                        />
-                      ))}
-                    </Stack>
-                  )}
-                </Box>
-              </CardContent>
-            </Paper>
+                />
+                <Button variant="outline" size="sm" className="rounded-lg text-[13px]" onClick={() => {
+                  const val = parseInt(yearInput, 10);
+                  if (val >= 1900 && val <= 2100 && !years.includes(val)) {
+                    setYears([...years, val].sort((a, b) => a - b));
+                    setYearInput("");
+                  }
+                }}>添加</Button>
+              </div>
+            </div>
 
-            {error && (
-              <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{error}</Box>
-            )}
-          </Stack>
+            {/* 关联变体卡片 */}
+            <div className="rounded-xl border border-gray-200 p-5">
+              <h3 className="mb-4 text-sm font-semibold text-gray-700 border-b border-gray-100 pb-3">关联变体</h3>
+              <div className="max-h-[200px] overflow-auto rounded-lg border border-gray-200 p-3">
+                {allVariants.length === 0 ? (
+                  <p className="text-[13px] text-gray-400">暂无变体</p>
+                ) : (
+                  <div className="flex flex-col gap-1">
+                    {allVariants.map((v) => (
+                      <label key={v.id} className="flex items-center gap-2 cursor-pointer py-0.5">
+                        <input
+                          type="checkbox"
+                          checked={variantIds.includes(v.id)}
+                          onChange={() => toggleVariant(v.id)}
+                          className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <span className="text-[13px] text-gray-700">{v.name} <span className="text-gray-400">({v.year_range})</span></span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {error && <p className="text-[13px] font-medium text-red-600">{error}</p>}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowModal(false)} className="rounded-lg">取消</Button>
+            <Button onClick={handleSave} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存</Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions sx={{ borderTop: "1px solid", borderColor: "divider", pt: 2, pb: 2.5, px: 3 }}>
-          <Button onClick={() => setShowModal(false)} variant="outlined">取消</Button>
-          <Button onClick={handleSave} variant="contained">保存</Button>
-        </DialogActions>
       </Dialog>
-    </Box>
+    </div>
   );
 }

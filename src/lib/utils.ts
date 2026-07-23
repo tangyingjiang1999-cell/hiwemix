@@ -1,22 +1,8 @@
-type ClassValue = string | number | boolean | undefined | null | { [key: string]: boolean | undefined | null } | ClassValue[];
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-/** 简单 Tailwind 类名拼接工具，替代 clsx */
-export function cn(...inputs: ClassValue[]): string {
-  const classes: string[] = [];
-  for (const input of inputs) {
-    if (!input) continue;
-    if (typeof input === "string" || typeof input === "number") {
-      classes.push(String(input));
-    } else if (Array.isArray(input)) {
-      const nested = cn(...input);
-      if (nested) classes.push(nested);
-    } else if (typeof input === "object") {
-      for (const key in input) {
-        if (input[key]) classes.push(key);
-      }
-    }
-  }
-  return classes.join(" ");
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
 }
 
 /** 生成金属漆光泽渐变效果的样式对象 */

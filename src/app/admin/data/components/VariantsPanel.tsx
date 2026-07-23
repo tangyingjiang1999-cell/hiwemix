@@ -3,26 +3,25 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { ColorVariant } from "@/types";
 import { generateVariantId } from "@/lib/id-generator";
-import { FONT, HEADER_BG, CELL_FONT_SIZE, COLUMN_BG, tableContainerSx, tableSx, cellSx, headerCellSx, getRowSx, actionButtonSx, deleteButtonSx } from "@/components/admin-table-styles";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
-import TextField from "@mui/material/TextField";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import TableCell from "@mui/material/TableCell";
-import CustomPagination from "@/components/ui/CustomPagination";
-import Paper from "@mui/material/Paper";
-import Typography from "@mui/material/Typography";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Edit, Trash2, Plus } from "lucide-react";
 
 export default function VariantsPanel() {
   const [variants, setVariants] = useState<ColorVariant[]>([]);
@@ -32,16 +31,13 @@ export default function VariantsPanel() {
   const [originalId, setOriginalId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const ROWS_PER_PAGE = 10;
   const idManuallyEdited = useRef(false);
 
   useEffect(() => { if (!editing && !idManuallyEdited.current && form.name) setForm((prev) => ({ ...prev, id: generateVariantId(form.name) })); }, [form.name, editing]);
-  const fetchVariants = useCallback(async () => { try { const r = await fetch("/api/admin/variants"); if (r.ok) setVariants(await r.json()); } catch { /* network error */ } }, []);
+  const fetchVariants = useCallback(async () => { try { const r = await fetch("/api/admin/variants"); if (r.ok) setVariants(await r.json()); } catch {} }, []);
   useEffect(() => { fetchVariants(); }, [fetchVariants]);
-
-  useEffect(() => {
-    setPage(0);
-  }, [variants]);
+  useEffect(() => { setPage(0); }, [variants]);
 
   function openCreate() { setEditing(null); setForm({ id: "", name: "" }); setError(""); idManuallyEdited.current = false; setOriginalId(null); setShowModal(true); }
   function openEdit(v: ColorVariant) { setEditing(v); setForm({ id: v.id, name: v.name }); setError(""); setOriginalId(v.id); setShowModal(true); }
@@ -50,7 +46,6 @@ export default function VariantsPanel() {
     try {
       const m = editing ? "PUT" : "POST";
       const body: Record<string, string> = { ...form, year_range: "" };
-      // 编辑时发送原始 ID，以便后端定位旧记录
       if (editing && originalId) body.originalId = originalId;
       const r = await fetch("/api/admin/variants", { method: m, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       if (r.ok) { setShowModal(false); fetchVariants(); } else { const d = await r.json(); setError(d.error || "保存失败"); }
@@ -64,67 +59,70 @@ export default function VariantsPanel() {
     } catch { alert("网络错误，请重试"); }
   }
 
-  const pageRows = variants.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const totalPages = Math.max(1, Math.ceil(variants.length / ROWS_PER_PAGE));
+  const pageRows = variants.slice(page * ROWS_PER_PAGE, page * ROWS_PER_PAGE + ROWS_PER_PAGE);
 
   return (
-    <Box>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1.5 }}>
-        <Button onClick={openCreate} variant="contained" size="small">+ 新增配方类型</Button>
-      </Box>
+    <div>
+      <div className="flex justify-end mb-4">
+        <Button onClick={openCreate} className="rounded-lg bg-[#2487ca] text-[13px] hover:bg-[#1d6fb0]"><Plus className="size-4" /> 新增配方类型</Button>
+      </div>
 
-      <TableContainer component={Paper} variant="outlined" sx={tableContainerSx}>
-        <Table sx={tableSx}>
-          <TableHead>
-            <TableRow sx={{ bgcolor: HEADER_BG }}>
-              <TableCell sx={{ ...headerCellSx, width: 120 }}>ID</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: 200 }}>名称</TableCell>
-              <TableCell sx={{ ...headerCellSx, width: 100 }}></TableCell>
+      <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-50/80">
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">ID</TableHead>
+              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">名称</TableHead>
+              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">操作</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
-            {pageRows.map((variant, rowIndex) => (
-              <TableRow key={variant.id} sx={getRowSx(rowIndex)}>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.odd }}>
-                  <Typography sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.secondary", fontWeight: 500 }}>
-                    {variant.id}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even }}>
-                  <Typography noWrap sx={{ fontFamily: FONT, fontSize: CELL_FONT_SIZE, color: "text.primary" }}>
-                    {variant.name}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ ...cellSx, bgcolor: COLUMN_BG.even, textAlign: "center" }}>
-                  <Box sx={{ display: "flex", gap: 0.5, justifyContent: "center" }}>
-                    <IconButton onClick={() => openEdit(variant)} size="small" sx={actionButtonSx}>
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton onClick={() => handleDelete(variant)} size="small" sx={deleteButtonSx}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </Box>
+            {pageRows.map((v) => (
+              <TableRow key={v.id} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
+                <TableCell className="py-3 text-center text-[13px] text-gray-500 font-medium">{v.id}</TableCell>
+                <TableCell className="py-3 text-center text-[13px] text-gray-900 truncate">{v.name}</TableCell>
+                <TableCell className="py-3 text-center">
+                  <div className="flex items-center justify-center gap-1">
+                    <button onClick={() => openEdit(v)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-primary/10 hover:text-primary"><Edit className="size-4" /></button>
+                    <button onClick={() => handleDelete(v)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-red-50 hover:text-red-500"><Trash2 className="size-4" /></button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <CustomPagination
-          totalCount={variants.length}
-          page={page}
-          pageSize={rowsPerPage}
-          onPageChange={setPage}
-          unitName="variants"
-        />
-      </TableContainer>
-      <Dialog open={showModal} onClose={() => setShowModal(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>{editing ? "编辑配方类型" : "新增配方类型"}</DialogTitle>
-        <DialogContent><Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 0.5 }}>
-          <TextField label="ID" value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} size="small" fullWidth helperText={editing ? "修改 ID 将自动更新所有引用" : ""} />
-          <TextField label="名称" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} size="small" fullWidth />
-          {error && <Box sx={{ color: "error.main", fontSize: "0.8125rem" }}>{error}</Box>}
-        </Box></DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}><Button onClick={() => setShowModal(false)} variant="outlined">取消</Button><Button onClick={handleSave} variant="contained">保存</Button></DialogActions>
+        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+          <p className="text-sm font-semibold text-primary">Found {variants.length} variants</p>
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] text-gray-500">{page + 1} / {totalPages}</span>
+            <Button size="icon" variant="ghost" disabled={page === 0} onClick={() => setPage(page - 1)} className="size-8 rounded-lg">‹</Button>
+            <Button size="icon" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="size-8 rounded-lg">›</Button>
+          </div>
+        </div>
+      </div>
+
+      <Dialog open={showModal} onOpenChange={(v) => { if (!v) setShowModal(false); }}>
+        <DialogContent className="max-w-sm bg-white">
+          <DialogHeader><DialogTitle>{editing ? "编辑配方类型" : "新增配方类型"}</DialogTitle></DialogHeader>
+          <div className="flex flex-col gap-4 py-2">
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">ID</Label>
+              <Input value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} className="h-9 rounded-lg" />
+              {editing && <p className="text-[11px] text-gray-400">修改 ID 将自动更新所有引用</p>}
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm font-medium text-gray-700">名称</Label>
+              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="h-9 rounded-lg" />
+            </div>
+            {error && <p className="text-[13px] font-medium text-red-600">{error}</p>}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowModal(false)} className="rounded-lg">取消</Button>
+            <Button onClick={handleSave} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存</Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
-    </Box>
+    </div>
   );
 }
