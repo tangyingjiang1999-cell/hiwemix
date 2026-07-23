@@ -200,8 +200,8 @@ function AddMaterialDialog({
         <AddIcon sx={{ color: "primary.main" }} />
         新增材料
       </DialogTitle>
-      <DialogContent sx={{ pt: 3, pb: 1 }}>
-        <Stack spacing={2.5}>
+      <DialogContent sx={{ pt: 4, pb: 1, px: { xs: 2, sm: 3 } }}>
+        <Stack spacing={2.5} sx={{ mt: 1 }}>
 
           {/* 分类选择 */}
           <TextField
@@ -211,6 +211,16 @@ function AddMaterialDialog({
             onChange={(e) => setForm({ ...form, category: e.target.value as TonerCategory })}
             size="small"
             fullWidth
+            slotProps={{
+              select: {
+                MenuProps: {
+                  disableScrollLock: true,
+                  anchorOrigin: { vertical: "bottom", horizontal: "left" },
+                  transformOrigin: { vertical: "top", horizontal: "left" },
+                  slotProps: { paper: { sx: { maxHeight: 200 } } },
+                },
+              },
+            }}
           >
             <MenuItem value="">请选择分类</MenuItem>
             {TONER_CATEGORIES.map((cat) => (
@@ -586,10 +596,10 @@ function ManagementModal({
         <DialogTitle sx={{ borderBottom: "1px solid #e5e7eb", pb: 2, mb: 0 }}>
           编辑色母 — {editingItem?.code}
         </DialogTitle>
-        <DialogContent sx={{ pt: 4, pb: 1 }}>
-          <Stack spacing={2}>
+        <DialogContent sx={{ pt: 4, pb: 1, px: { xs: 2, sm: 3 } }}>
+          <Stack spacing={2} sx={{ mt: 1 }}>
             {/* 色母代码仅做标识，不可编辑 */}
-            <Box sx={{ mt: 1 }}>
+            <Box>
               <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: "block", fontWeight: 500 }}>
                 色母代码
               </Typography>
@@ -618,6 +628,16 @@ function ManagementModal({
               onChange={(e) => setForm({ ...form, category: e.target.value as TonerCategory })}
               size="small"
               fullWidth
+              slotProps={{
+                select: {
+                  MenuProps: {
+                    disableScrollLock: true,
+                    anchorOrigin: { vertical: "bottom", horizontal: "left" },
+                    transformOrigin: { vertical: "top", horizontal: "left" },
+                    slotProps: { paper: { sx: { maxHeight: 200 } } },
+                  },
+                },
+              }}
             >
               {TONER_CATEGORIES.map((cat) => (
                 <MenuItem key={cat.key} value={cat.key}>{cat.label}</MenuItem>
