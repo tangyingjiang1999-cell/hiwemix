@@ -102,15 +102,15 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
       onBlur={onBlurCapture}
     >
       {/* 2×3 网格布局 */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
+      <div className="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2 md:grid-cols-3 w-full">
         {/* Row 1: Make | Color Code | Color Type */}
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t.make}</Label>
+        <div className="flex flex-col gap-2">
+          <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6b7280]">{t.make}</Label>
           <Select value={makeId} onValueChange={(v) => setMakeId(v || "")}>
-            <SelectTrigger className="h-9 w-full rounded-lg">
+            <SelectTrigger className="h-11 w-full rounded-lg border-[#e2e5ea] text-[15px] data-[state=open]:border-[#2487ca] data-[state=open]:ring-2 data-[state=open]:ring-[#2487ca]/15">
               <SelectValue placeholder="All" />
             </SelectTrigger>
-            <SelectContent className="max-h-[200px]">
+            <SelectContent className="max-h-[220px]">
               <SelectItem value="all">All</SelectItem>
               {carMakes.map((m) => (
                 <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
@@ -119,24 +119,24 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
           </Select>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t.colorCode}</Label>
+        <div className="flex flex-col gap-2">
+          <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6b7280]">{t.colorCode}</Label>
           <Input
             value={colorCode}
             onChange={(e) => setColorCode(e.target.value.replace(/\s/g, "").toUpperCase())}
             placeholder={t.colorCodePlaceholder}
-            className="h-9 rounded-lg"
+            className="h-11 rounded-lg border-[#e2e5ea] text-[15px] focus-visible:border-[#2487ca] focus-visible:ring-2 focus-visible:ring-[#2487ca]/15"
             maxLength={20}
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t.colorType}</Label>
+        <div className="flex flex-col gap-2">
+          <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6b7280]">{t.colorType}</Label>
           <Select value={colorType} onValueChange={(v) => setColorType(v || "")}>
-            <SelectTrigger className="h-9 w-full rounded-lg">
+            <SelectTrigger className="h-11 w-full rounded-lg border-[#e2e5ea] text-[15px] data-[state=open]:border-[#2487ca] data-[state=open]:ring-2 data-[state=open]:ring-[#2487ca]/15">
               <SelectValue placeholder={t.colorTypeAll} />
             </SelectTrigger>
-            <SelectContent className="max-h-[200px]">
+            <SelectContent className="max-h-[220px]">
               {colorTypeOptions.map((opt) => (
                 <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
               ))}
@@ -145,34 +145,34 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
         </div>
 
         {/* Row 2: Color Name | Year | Search + Reset buttons */}
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t.colorName}</Label>
+        <div className="flex flex-col gap-2">
+          <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6b7280]">{t.colorName}</Label>
           <Input
             value={colorName}
             onChange={(e) => setColorName(e.target.value)}
             placeholder={t.colorNamePlaceholder}
-            className="h-9 rounded-lg"
+            className="h-11 rounded-lg border-[#e2e5ea] text-[15px] focus-visible:border-[#2487ca] focus-visible:ring-2 focus-visible:ring-[#2487ca]/15"
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t.year}</Label>
+        <div className="flex flex-col gap-2">
+          <Label className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#6b7280]">{t.year}</Label>
           <Input
             value={year}
             onChange={(e) => setYear(e.target.value)}
             placeholder={t.yearPlaceholder}
-            className="h-9 rounded-lg"
+            className="h-11 rounded-lg border-[#e2e5ea] text-[15px] focus-visible:border-[#2487ca] focus-visible:ring-2 focus-visible:ring-[#2487ca]/15"
             maxLength={9}
           />
         </div>
 
         {/* 按钮组，放在网格最后一个单元格 */}
-        <div className="flex items-end gap-2">
+        <div className="flex items-end gap-3">
           <Button
             type="submit"
             disabled={isLoading}
             variant="default"
-            className="h-9 flex-1 rounded-xl bg-[#2487ca] text-[13px] font-semibold hover:bg-[#1d6fb0]"
+            className="h-11 flex-1 rounded-lg bg-[#2487ca] text-sm font-semibold shadow-sm transition-colors hover:bg-[#1d6fb0]"
           >
             <Search className="size-4" />
             {isLoading ? t.searching : t.search}
@@ -182,7 +182,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
             onClick={handleReset}
             disabled={isLoading}
             variant="outline"
-            className="h-9 flex-1 rounded-xl text-[13px] font-semibold"
+            className="h-11 rounded-lg border-[#e2e5ea] px-4 text-sm font-semibold text-[#4d4d4d] hover:bg-[#f4f5f7]"
           >
             <RotateCcw className="size-4" />
             {t.reset}
@@ -191,7 +191,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
       </div>
 
       {isCodeTooLong && (
-        <div role="alert" className="mt-2 text-xs font-medium text-yellow-600">
+        <div role="alert" className="mt-3 text-xs font-medium text-[#b45309]">
           {t.codeTooLong}
         </div>
       )}
