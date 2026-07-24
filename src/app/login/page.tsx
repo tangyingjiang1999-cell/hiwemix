@@ -95,16 +95,10 @@ export default function LoginPage() {
 
         {/* 主标题 */}
         <div className="relative z-10 text-left">
-          <h1
-            className="text-[70px] font-extrabold uppercase leading-[1.1] tracking-[2px] text-white xl:text-[82px]"
-            style={{ fontFamily: "var(--font-outfit), sans-serif" }}
-          >
+          <h1 className="text-[70px] font-extrabold uppercase leading-[1.1] tracking-[2px] text-white xl:text-[82px] font-heading">
             Welcome to
           </h1>
-          <h1
-            className="text-[70px] font-extrabold uppercase leading-[1.1] tracking-[2px] text-white xl:text-[82px]"
-            style={{ fontFamily: "var(--font-outfit), sans-serif" }}
-          >
+          <h1 className="text-[70px] font-extrabold uppercase leading-[1.1] tracking-[2px] text-white xl:text-[82px] font-heading">
             HIWEMIX
           </h1>
         </div>
@@ -161,7 +155,7 @@ export default function LoginPage() {
               setConfirmPassword("");
             }}
             aria-label={t.backToLogin}
-            className="absolute left-3 top-6 inline-flex items-center justify-center text-black transition-colors hover:text-gray-600 lg:left-9 lg:top-[50px]"
+            className="absolute left-3 top-6 inline-flex items-center justify-center text-black transition-colors hover:text-muted-foreground lg:left-9 lg:top-[50px]"
           >
             <ArrowLeft className="size-6 lg:size-7" />
           </button>
@@ -180,14 +174,14 @@ export default function LoginPage() {
           </div>
 
           {/* 表单卡片 — Dub.co 极简风格 */}
-          <Card className="border-gray-200/60 shadow-sm">
+          <Card className="border-border/60 shadow-sm">
             <CardContent className="pt-6">
               <form onSubmit={handleSubmit} aria-label={isRegister ? t.registerButton : t.loginButton} className="flex flex-col gap-4">
                 {/* Username */}
                 <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="username" className="text-sm font-medium text-gray-700">Username</Label>
+                  <Label htmlFor="username" className="text-sm font-medium text-foreground/80">Username</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+                    <User className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       id="username"
                       type="text"
@@ -206,9 +200,9 @@ export default function LoginPage() {
 
                 {/* Password */}
                 <div className="flex flex-col gap-1.5">
-                  <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
+                  <Label htmlFor="password" className="text-sm font-medium text-foreground/80">Password</Label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
@@ -226,7 +220,7 @@ export default function LoginPage() {
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
                       aria-label={showPassword ? "Hide password" : "Show password"}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-muted-foreground"
                     >
                       {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                     </button>
@@ -236,9 +230,9 @@ export default function LoginPage() {
                 {/* Confirm Password (注册模式) */}
                 {isRegister && (
                   <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirm password</Label>
+                    <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground/80">Confirm password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+                      <Lock className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
                         id="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
@@ -253,7 +247,7 @@ export default function LoginPage() {
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         tabIndex={-1}
                         aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 transition-colors hover:text-gray-600"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-muted-foreground"
                       >
                         {showConfirmPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                       </button>
@@ -265,7 +259,7 @@ export default function LoginPage() {
                 {error && (
                   <div
                     role="alert"
-                    className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700"
+                    className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-2xs text-destructive"
                   >
                     {error}
                   </div>
@@ -280,7 +274,7 @@ export default function LoginPage() {
                     "h-10 w-full rounded-xl text-sm font-semibold transition-all hover:scale-[1.02] hover:opacity-90",
                     isRegister
                       ? "bg-purple-600 hover:bg-purple-700"
-                      : "bg-[#2487ca] hover:bg-[#1d6fb0]"
+                      : "bg-primary hover:bg-primary/80"
                   )}
                 >
                   {loading ? (
@@ -293,7 +287,7 @@ export default function LoginPage() {
                 </Button>
 
                 {/* 模式切换链接 */}
-                <p className="text-center text-sm text-gray-500">
+                <p className="text-center text-sm text-muted-foreground">
                   {isRegister ? (
                     <button
                       type="button"
@@ -304,7 +298,7 @@ export default function LoginPage() {
                       }}
                       className={cn(
                         "font-medium transition-colors hover:underline",
-                        isRegister ? "text-purple-600 hover:text-purple-700" : "text-[#2487ca] hover:text-[#1d6fb0]"
+                        isRegister ? "text-purple-600 hover:text-purple-700" : "text-primary hover:text-primary/80"
                       )}
                     >
                       {t.registerLoginLink}
@@ -316,7 +310,7 @@ export default function LoginPage() {
                         setIsRegister(true);
                         setError("");
                       }}
-                      className="font-medium text-[#2487ca] transition-colors hover:text-[#1d6fb0] hover:underline"
+                      className="font-medium text-primary transition-colors hover:text-primary/80 hover:underline"
                     >
                       {t.loginRegisterLink}
                     </button>

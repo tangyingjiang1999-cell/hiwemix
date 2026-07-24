@@ -66,8 +66,8 @@ function parseHexInput(raw: string, fallback: string): string {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-6">
-      <span className="w-28 flex-shrink-0 text-[13px] text-gray-500 md:text-base">{label}</span>
-      <span className="min-w-0 flex-1 break-words text-[14px] md:text-xl">{value}</span>
+      <span className="w-28 flex-shrink-0 text-2xs text-muted-foreground md:text-base">{label}</span>
+      <span className="min-w-0 flex-1 break-words text-sm md:text-xl">{value}</span>
     </div>
   );
 }
@@ -142,14 +142,14 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
       <Sheet open onOpenChange={(v) => { if (!v) handleClose(); }}>
         <SheetContent side="right" className="!fixed !inset-0 !w-screen !max-w-full !translate-x-0 !rounded-none p-0 gap-0 overflow-y-auto bg-white">
           {/* Header Bar */}
-          <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-gray-200 bg-white px-3 py-2 sm:px-4 sm:py-3">
+          <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-white px-3 py-2 sm:px-4 sm:py-3">
             <div
-              className="size-9 flex-shrink-0 border border-gray-200 sm:size-12"
+              className="size-9 flex-shrink-0 border border-border sm:size-12"
               style={colorSwatchStyle(previewColor)}
             />
             <div className="min-w-0 flex-1">
-              <h2 className="truncate text-[15px] font-semibold text-gray-900 md:text-base">{color.color_name}</h2>
-              <p className="text-xs text-gray-500">{color.color_code}</p>
+              <h2 className="truncate text-sm font-semibold text-foreground md:text-base font-heading">{color.color_name}</h2>
+              <p className="text-xs text-muted-foreground">{color.color_code}</p>
             </div>
 
             {/* Print + Copy buttons (移动端图标-only) */}
@@ -157,14 +157,14 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
               <Printer className="size-4" />
               {t.print}
             </Button>
-            <Button onClick={handlePrint} size="icon" variant="ghost" className="inline-flex sm:hidden size-9 rounded-lg text-gray-700">
+            <Button onClick={handlePrint} size="icon" variant="ghost" className="inline-flex sm:hidden size-9 rounded-lg text-foreground/80">
               <Printer className="size-4" />
             </Button>
-            <Button onClick={handleCopy} variant="default" size="sm" className="hidden rounded-lg bg-[#2487ca] sm:inline-flex">
+            <Button onClick={handleCopy} variant="default" size="sm" className="hidden rounded-lg bg-primary sm:inline-flex">
               <Copy className="size-4" />
               {t.copy}
             </Button>
-            <Button onClick={handleCopy} size="icon" className="inline-flex sm:hidden size-9 rounded-lg bg-[#2487ca] text-white">
+            <Button onClick={handleCopy} size="icon" className="inline-flex sm:hidden size-9 rounded-lg bg-primary text-white">
               <Copy className="size-4" />
             </Button>
 
@@ -176,12 +176,12 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
           {/* Body: 两栏布局 */}
           <div className="flex flex-col md:flex-row flex-1">
             {/* 左侧：配方详情 (~62.5%) */}
-            <div className="flex-1 overflow-auto border-b border-gray-200 p-4 sm:p-5 md:flex-[62.5%] md:border-b-0 md:border-r">
+            <div className="flex-1 overflow-auto border-b border-border p-4 sm:p-5 md:flex-[62.5%] md:border-b-0 md:border-r">
               {activeFormula && displayedFormula && (
                 <div>
                   {/* Version + Chips */}
                   <div className="mb-4 flex flex-wrap items-center gap-2">
-                    <span className="text-[13px] font-semibold text-gray-900 md:text-lg">
+                    <span className="text-2xs font-semibold text-foreground md:text-lg">
                       {t.version} {activeFormula.version}
                     </span>
                     <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${
@@ -210,7 +210,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                       <p className="mt-1 text-xs text-amber-600">{activeFormula.notes}</p>
                     </div>
                   )}
-                  <p className="mt-3 text-xs text-gray-400">
+                  <p className="mt-3 text-xs text-muted-foreground">
                     {t.updatedLabel} {activeFormula.updated_at}
                   </p>
                 </div>
@@ -221,11 +221,11 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
             <div className="flex-shrink-0 overflow-auto md:flex-[37.5%]">
               {/* 颜色预览 */}
               <div className="p-4 sm:p-5">
-                <span className="text-xs font-semibold uppercase tracking-wider text-gray-900 md:text-[17px]">
+                <span className="text-xs font-semibold uppercase tracking-wider text-foreground md:text-base">
                   {t.colorPreview}
                 </span>
                 <div
-                  className="mt-3 h-[60px] border border-gray-200 sm:h-[120px]"
+                  className="mt-3 h-[60px] border border-border sm:h-[120px]"
                   style={colorSwatchStyle(previewColor)}
                 />
               </div>
@@ -233,7 +233,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
               <Separator />
 
               {/* Tab Switcher */}
-              <div className="flex border-b border-gray-200">
+              <div className="flex border-b border-border">
                 {[t.tabColorInfo, t.tabColorDocs, t.tabPlasticParts].map((label, idx) => (
                   <button
                     key={label}
@@ -241,7 +241,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                     className={`flex-1 py-2.5 text-center text-xs font-medium transition-colors md:text-sm ${
                       infoTab === idx
                         ? "border-b-2 border-primary text-primary"
-                        : "text-gray-500 hover:text-gray-700"
+                        : "text-muted-foreground hover:text-foreground/80"
                     }`}
                   >
                     {label}
@@ -265,7 +265,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                 )}
                 {(infoTab === 1 || infoTab === 2) && (
                   <div className="py-8 text-center">
-                    <p className="text-xs text-gray-400">{t.emptyState}</p>
+                    <p className="text-xs text-muted-foreground">{t.emptyState}</p>
                   </div>
                 )}
               </div>

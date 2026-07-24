@@ -60,12 +60,12 @@ function CustomPagination({
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   return (
-    <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+    <div className="flex items-center justify-between border-t border-border px-4 py-3">
       <p className="text-sm font-semibold text-primary" aria-live="polite">
         Found {totalCount} {unitName}
       </p>
       <div className="flex items-center gap-2">
-        <span className="text-[13px] text-gray-500">
+        <span className="text-2xs text-muted-foreground">
           {page + 1} / {totalPages}
         </span>
         <Button
@@ -74,7 +74,7 @@ function CustomPagination({
           disabled={page === 0}
           onClick={() => onPageChange(page - 1)}
           aria-label="Previous page"
-          className="size-8 rounded-lg text-gray-500 hover:text-primary hover:bg-primary/10 disabled:text-gray-300"
+          className="size-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:text-muted-foreground/50"
         >
           <ChevronLeft className="size-4" />
         </Button>
@@ -84,7 +84,7 @@ function CustomPagination({
           disabled={page >= totalPages - 1}
           onClick={() => onPageChange(page + 1)}
           aria-label="Next page"
-          className="size-8 rounded-lg text-gray-500 hover:text-primary hover:bg-primary/10 disabled:text-gray-300"
+          className="size-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:text-muted-foreground/50"
         >
           <ChevronRight className="size-4" />
         </Button>
@@ -110,9 +110,9 @@ export default function SearchResults({
   if (isLoading) {
     return (
       <div className="p-3">
-        <p className="mb-1 text-sm text-gray-500">
+        <div className="mb-1">
           <Skeleton className="h-4 w-44" />
-        </p>
+        </div>
         <Table>
           <SkeletonRows />
         </Table>
@@ -123,7 +123,7 @@ export default function SearchResults({
   if (!hasSearched) {
     return (
       <div className="flex min-h-[300px] flex-col items-center justify-center">
-        <p className="text-xs text-gray-500">{t.searchHint}</p>
+        <p className="text-xs text-muted-foreground">{t.searchHint}</p>
       </div>
     );
   }
@@ -131,9 +131,9 @@ export default function SearchResults({
   if (rows.length === 0) {
     return (
       <div className="flex min-h-[300px] flex-col items-center justify-center p-3" role="status">
-        <SearchSlash aria-hidden="true" className="mb-2 size-14 text-gray-400" />
-        <p className="text-base font-semibold text-gray-800">{t.noResults}</p>
-        <p className="mt-1 text-sm text-gray-500">{t.noResultsHint}</p>
+        <SearchSlash aria-hidden="true" className="mb-2 size-14 text-muted-foreground" />
+        <p className="text-base font-semibold text-foreground">{t.noResults}</p>
+        <p className="mt-1 text-2xs font-medium text-muted-foreground">{t.noResultsHint}</p>
       </div>
     );
   }
@@ -142,19 +142,19 @@ export default function SearchResults({
 
   return (
     <div className="mx-0 sm:-mx-1">
-      <div className="overflow-x-auto rounded-none border border-gray-200 border-t-2 border-t-primary">
+      <div className="overflow-x-auto rounded-none border border-border border-t-2 border-t-primary">
         <Table>
           <caption className="sr-only">Formula search results table</caption>
           <TableHeader>
             <TableRow className="bg-primary hover:bg-primary">
-              <TableHead className="w-[105px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none">Color Type</TableHead>
-              <TableHead className="w-[125px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none">{t.manufacturerLabel}</TableHead>
-              <TableHead className="w-[100px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none">{t.codeLabel}</TableHead>
-              <TableHead className="w-[150px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none">{t.colorName}</TableHead>
-              <TableHead className="hidden w-[150px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none md:table-cell">{t.carModelLabel}</TableHead>
-              <TableHead className="hidden w-[120px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none md:table-cell">{t.yearsLabel}</TableHead>
-              <TableHead className="hidden w-[120px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none md:table-cell">Process</TableHead>
-              <TableHead className="hidden w-[100px] py-2.5 text-center text-[13px] font-bold text-primary-foreground border-none md:table-cell">{t.versionLabel}</TableHead>
+              <TableHead className="w-[105px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none">Color Type</TableHead>
+              <TableHead className="w-[125px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none">{t.manufacturerLabel}</TableHead>
+              <TableHead className="w-[100px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none">{t.codeLabel}</TableHead>
+              <TableHead className="w-[150px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none">{t.colorName}</TableHead>
+              <TableHead className="hidden w-[150px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none md:table-cell">{t.carModelLabel}</TableHead>
+              <TableHead className="hidden w-[120px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none md:table-cell">{t.yearsLabel}</TableHead>
+              <TableHead className="hidden w-[120px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none md:table-cell">Process</TableHead>
+              <TableHead className="hidden w-[100px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none md:table-cell">{t.versionLabel}</TableHead>
               <TableHead className="w-[60px] py-2.5 border-none" aria-label="Actions"></TableHead>
             </TableRow>
           </TableHeader>
@@ -162,35 +162,35 @@ export default function SearchResults({
             {pageRows.map((row, index) => (
               <TableRow
                 key={`${row.formula.id}-${index}`}
-                className="cursor-pointer transition-colors hover:bg-blue-50/40 border-b border-gray-100 last:border-b-0"
+                className="cursor-pointer transition-colors hover:bg-blue-50/40 border-b border-border/50 last:border-b-0"
                 onClick={() => onOpenFormula(row)}
               >
                 <TableCell className="py-3.5 text-center">
                   <div
-                    className="mx-auto w-[83px] h-[37px] border border-gray-200"
+                    className="mx-auto w-[83px] h-[37px] border border-border"
                     style={colorSwatchStyle(row.color.hex_preview)}
                   />
                 </TableCell>
                 <TableCell className="py-3.5 text-center">
-                  <span className="text-[15px] font-medium text-gray-900 truncate block">{row.makeName}</span>
+                  <span className="text-2xs font-medium text-foreground truncate block">{row.makeName}</span>
                 </TableCell>
                 <TableCell className="py-3.5 text-center">
-                  <span className="text-[15px] font-medium text-gray-700">{row.color.color_code}</span>
+                  <span className="text-2xs font-medium text-foreground/80">{row.color.color_code}</span>
                 </TableCell>
                 <TableCell className="py-3.5 text-center">
-                  <span className="text-[15px] text-gray-900 truncate block">{row.color.color_name}</span>
+                  <span className="text-2xs font-medium text-foreground truncate block">{row.color.color_name}</span>
                 </TableCell>
                 <TableCell className="hidden py-3.5 text-center md:table-cell">
-                  <span className="text-[15px] text-gray-700 truncate block">{row.color.car_model || "—"}</span>
+                  <span className="text-2xs font-medium text-foreground/80 truncate block">{row.color.car_model || "—"}</span>
                 </TableCell>
                 <TableCell className="hidden py-3.5 text-center md:table-cell">
-                  <span className="text-[15px] text-gray-400">{row.year ?? "—"}</span>
+                  <span className="text-sm text-muted-foreground">{row.year ?? "—"}</span>
                 </TableCell>
                 <TableCell className="hidden py-3.5 text-center md:table-cell">
-                  <span className="text-[15px] text-gray-700 truncate block">{row.formula.formula_type}</span>
+                  <span className="text-2xs font-medium text-foreground/80 truncate block">{row.formula.formula_type}</span>
                 </TableCell>
                 <TableCell className="hidden py-3.5 text-center md:table-cell">
-                  <span className="text-[15px] font-medium text-gray-700">{row.formula.version}</span>
+                  <span className="text-2xs font-medium text-foreground/80">{row.formula.version}</span>
                 </TableCell>
                 <TableCell align="center" className="py-3.5">
                   <Button
@@ -198,7 +198,7 @@ export default function SearchResults({
                     variant="ghost"
                     onClick={(e) => { e.stopPropagation(); onOpenFormula(row); }}
                     aria-label="View formula"
-                    className="size-8 rounded-md text-gray-400 hover:bg-primary/10 hover:text-primary"
+                    className="size-8 rounded-md text-muted-foreground hover:bg-primary/10 hover:text-primary"
                   >
                     <ZoomIn className="size-4" />
                   </Button>

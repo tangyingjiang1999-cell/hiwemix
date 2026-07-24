@@ -99,46 +99,46 @@ export default function GuidesPanel() {
     <div>
       <div className="flex items-center gap-3 mb-4">
         <Select value={filterCat} onValueChange={(v) => setFilterCat(v || "")}>
-          <SelectTrigger className="h-9 min-w-[160px] rounded-lg text-[13px]"><SelectValue placeholder="全部分类" /></SelectTrigger>
+          <SelectTrigger className="h-9 min-w-[160px] rounded-lg text-2xs"><SelectValue placeholder="全部分类" /></SelectTrigger>
           <SelectContent className="z-[130] max-h-[200px]">{categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.nameZh}</SelectItem>)}</SelectContent>
         </Select>
-        <Button onClick={() => setShowCatModal(true)} variant="outline" size="sm" className="rounded-lg text-[13px]">管理分类</Button>
+        <Button onClick={() => setShowCatModal(true)} variant="outline" size="sm" className="rounded-lg text-2xs">管理分类</Button>
         <div className="flex-1" />
-        <Button onClick={openCreate} className="rounded-lg bg-[#2487ca] text-[13px] hover:bg-[#1d6fb0]"><Plus className="size-4" /> 新增指南</Button>
+        <Button onClick={openCreate} className="rounded-lg bg-primary text-2xs hover:bg-primary/80"><Plus className="size-4" /> 新增指南</Button>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200">
+      <div className="overflow-x-auto rounded-lg border border-border">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50/80">
-              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">ID</TableHead>
-              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">中文标题</TableHead>
-              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">英文标题</TableHead>
-              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">分类</TableHead>
-              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">操作</TableHead>
+            <TableRow className="bg-muted/80">
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">ID</TableHead>
+              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">中文标题</TableHead>
+              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">英文标题</TableHead>
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">分类</TableHead>
+              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">操作</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pageRows.map((guide) => (
-              <TableRow key={guide.id} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
-                <TableCell className="py-3 text-center text-[13px] text-gray-500 font-medium">{guide.id}</TableCell>
-                <TableCell className="py-3 text-center text-[13px] text-gray-900 truncate">{guide.titleZh}</TableCell>
-                <TableCell className="py-3 text-center text-[13px] text-gray-500 truncate">{guide.title}</TableCell>
-                <TableCell className="py-3 text-center text-[13px] text-gray-500">{guide.categoryName}</TableCell>
+              <TableRow key={guide.id} className="border-b border-border/50 last:border-b-0 hover:bg-muted/50">
+                <TableCell className="py-3 text-center text-2xs text-muted-foreground font-medium">{guide.id}</TableCell>
+                <TableCell className="py-3 text-center text-2xs text-foreground truncate">{guide.titleZh}</TableCell>
+                <TableCell className="py-3 text-center text-2xs text-muted-foreground truncate">{guide.title}</TableCell>
+                <TableCell className="py-3 text-center text-2xs text-muted-foreground">{guide.categoryName}</TableCell>
                 <TableCell className="py-3 text-center">
                   <div className="flex items-center justify-center gap-1">
-                    <button onClick={() => openEdit(guide)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-primary/10 hover:text-primary"><Edit className="size-4" /></button>
-                    <button onClick={() => handleDelete(guide)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-red-50 hover:text-red-500"><Trash2 className="size-4" /></button>
+                    <button onClick={() => openEdit(guide)} className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-primary/10 hover:text-primary"><Edit className="size-4" /></button>
+                    <button onClick={() => handleDelete(guide)} className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"><Trash2 className="size-4" /></button>
                   </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between border-t border-border px-4 py-3">
           <p className="text-sm font-semibold text-primary">Found {filtered.length} guides</p>
           <div className="flex items-center gap-2">
-            <span className="text-[13px] text-gray-500">{page + 1} / {totalPages}</span>
+            <span className="text-2xs text-muted-foreground">{page + 1} / {totalPages}</span>
             <Button size="icon" variant="ghost" disabled={page === 0} onClick={() => setPage(page - 1)} className="size-8 rounded-lg">‹</Button>
             <Button size="icon" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="size-8 rounded-lg">›</Button>
           </div>
@@ -151,11 +151,11 @@ export default function GuidesPanel() {
           <DialogHeader><DialogTitle>{editing ? "编辑指南" : "新增指南"}</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">ID</Label>
+              <Label className="text-sm font-medium text-foreground/80">ID</Label>
               <Input value={form.id} onChange={(e) => { guideIdEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} className="h-9 rounded-lg" />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">分类</Label>
+              <Label className="text-sm font-medium text-foreground/80">分类</Label>
               <Select value={form.categoryId} onValueChange={(v) => setForm({ ...form, categoryId: v || "" })}>
                 <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue placeholder="请选择" /></SelectTrigger>
                 <SelectContent className="z-[130] max-h-[200px]">{categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.nameZh}</SelectItem>)}</SelectContent>
@@ -163,27 +163,27 @@ export default function GuidesPanel() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
-                <Label className="text-sm font-medium text-gray-700">英文标题</Label>
+                <Label className="text-sm font-medium text-foreground/80">英文标题</Label>
                 <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className="h-9 rounded-lg" />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label className="text-sm font-medium text-gray-700">中文标题</Label>
+                <Label className="text-sm font-medium text-foreground/80">中文标题</Label>
                 <Input value={form.titleZh} onChange={(e) => setForm({ ...form, titleZh: e.target.value })} className="h-9 rounded-lg" />
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">英文正文</Label>
-              <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className="min-h-[120px] w-full rounded-lg border border-gray-200 p-3 text-sm outline-none focus:border-primary" />
+              <Label className="text-sm font-medium text-foreground/80">英文正文</Label>
+              <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} className="min-h-[120px] w-full rounded-lg border border-border p-3 text-sm outline-none focus:border-primary" />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">中文正文</Label>
-              <textarea value={form.contentZh} onChange={(e) => setForm({ ...form, contentZh: e.target.value })} className="min-h-[120px] w-full rounded-lg border border-gray-200 p-3 text-sm outline-none focus:border-primary" />
+              <Label className="text-sm font-medium text-foreground/80">中文正文</Label>
+              <textarea value={form.contentZh} onChange={(e) => setForm({ ...form, contentZh: e.target.value })} className="min-h-[120px] w-full rounded-lg border border-border p-3 text-sm outline-none focus:border-primary" />
             </div>
-            {error && <p className="text-[13px] font-medium text-red-600">{error}</p>}
+            {error && <p className="text-2xs font-medium text-destructive">{error}</p>}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowModal(false)} className="rounded-lg">取消</Button>
-            <Button onClick={handleSave} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存</Button>
+            <Button variant="outline" onClick={() => setShowModal(false)} className="rounded-lg text-2xs">取消</Button>
+            <Button onClick={handleSave} className="rounded-lg bg-primary hover:bg-primary/80">保存</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -195,9 +195,9 @@ export default function GuidesPanel() {
           <div className="flex flex-col gap-3 py-2">
             <div className="flex flex-col gap-2 max-h-[200px] overflow-auto">
               {categories.map((cat) => (
-                <div key={cat.id} className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2">
-                  <span className="text-[13px]"><span className="font-medium">{cat.nameZh}</span> <span className="text-gray-400">({cat.name})</span></span>
-                  <Button onClick={() => handleDeleteCategory(cat)} variant="ghost" size="sm" className="h-7 text-red-500 hover:bg-red-50">删除</Button>
+                <div key={cat.id} className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                  <span className="text-2xs"><span className="font-medium">{cat.nameZh}</span> <span className="text-muted-foreground">({cat.name})</span></span>
+                  <Button onClick={() => handleDeleteCategory(cat)} variant="ghost" size="sm" className="h-7 text-destructive hover:bg-destructive/10">删除</Button>
                 </div>
               ))}
             </div>
@@ -206,7 +206,7 @@ export default function GuidesPanel() {
               <Input value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })} placeholder="英文名" className="h-9 flex-1 rounded-lg" />
               <Input value={catForm.nameZh} onChange={(e) => setCatForm({ ...catForm, nameZh: e.target.value })} placeholder="中文名" className="h-9 flex-1 rounded-lg" />
             </div>
-            <Button onClick={handleSaveCategory} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">添加分类</Button>
+            <Button onClick={handleSaveCategory} className="rounded-lg bg-primary hover:bg-primary/80">添加分类</Button>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowCatModal(false)} className="rounded-lg">关闭</Button>

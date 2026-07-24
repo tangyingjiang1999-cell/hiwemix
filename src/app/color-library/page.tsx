@@ -98,7 +98,7 @@ function TonerCard({ code, tradeName, hex }: { code: string; tradeName: string; 
 
   return (
     <div
-      className="group cursor-pointer overflow-hidden rounded-xl border border-gray-200/60 bg-white shadow-sm transition-all duration-200 hover:scale-[1.01] hover:border-primary hover:shadow-md"
+      className="group cursor-pointer overflow-hidden rounded-xl border border-border/60 bg-white shadow-sm transition-all duration-200 hover:scale-[1.01] hover:border-primary hover:shadow-md"
     >
       {/* 漆面色块预览 */}
       <div
@@ -112,10 +112,10 @@ function TonerCard({ code, tradeName, hex }: { code: string; tradeName: string; 
       />
       {/* 产品信息 */}
       <div className="px-3 py-3 md:px-4 md:py-4">
-        <p className="text-xs font-bold leading-tight text-gray-900 break-all md:text-[15px]">
+        <p className="text-xs font-semibold leading-tight text-foreground break-all md:text-sm">
           {code}
         </p>
-        <p className="mt-1 truncate text-[10px] font-medium text-gray-400 md:text-xs">
+        <p className="mt-1 truncate text-[10px] font-medium text-muted-foreground md:text-xs">
           {tradeName}
         </p>
       </div>
@@ -197,7 +197,7 @@ function AddMaterialDialog({
         <div className="flex flex-col gap-5 py-2">
           {/* 所属分类 */}
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium text-gray-700">所属分类</Label>
+            <Label className="text-sm font-medium text-foreground/80">所属分类</Label>
             <Select
               value={form.category}
               onValueChange={(v) => setForm({ ...form, category: (v as TonerCategory) || "" })}
@@ -215,18 +215,18 @@ function AddMaterialDialog({
 
           {/* 产品代码（自动生成，可手动修改） */}
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium text-gray-700">产品代码</Label>
+            <Label className="text-sm font-medium text-foreground/80">产品代码</Label>
             <Input
               value={form.code}
               onChange={(e) => setForm({ ...form, code: e.target.value })}
               className="h-9 rounded-lg"
             />
-            <p className="text-[11px] text-gray-400">选择分类后自动生成，也可手动修改</p>
+            <p className="text-[11px] text-muted-foreground">选择分类后自动生成，也可手动修改</p>
           </div>
 
           {/* 英文名称 */}
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium text-gray-700">英文名称</Label>
+            <Label className="text-sm font-medium text-foreground/80">英文名称</Label>
             <Input
               value={form.tradeName}
               onChange={(e) => setForm({ ...form, tradeName: e.target.value })}
@@ -237,7 +237,7 @@ function AddMaterialDialog({
 
           {/* 中文名称 */}
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium text-gray-700">中文名称</Label>
+            <Label className="text-sm font-medium text-foreground/80">中文名称</Label>
             <Input
               value={form.nameZh}
               onChange={(e) => setForm({ ...form, nameZh: e.target.value })}
@@ -248,12 +248,12 @@ function AddMaterialDialog({
 
           {/* 极简 HEX 拾色器 */}
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium text-gray-700">预览色</Label>
-            <div className="flex items-center gap-3 rounded-lg border border-gray-200 p-3">
+            <Label className="text-sm font-medium text-foreground/80">预览色</Label>
+            <div className="flex items-center gap-3 rounded-lg border border-border p-3">
               {/* 色块 — 点击打开原生拾色器 */}
               <div className="relative flex-shrink-0">
                 <div
-                  className="size-10 cursor-pointer rounded-md border-2 border-gray-300 transition-shadow hover:shadow-[0_0_0_4px_rgba(36,135,202,0.15)]"
+                  className="size-10 cursor-pointer rounded-md border-2 border-input transition-shadow hover:shadow-[0_0_0_4px_rgba(36,135,202,0.15)]"
                   style={{ backgroundColor: form.hex || "#808080" }}
                 />
                 <input
@@ -281,13 +281,13 @@ function AddMaterialDialog({
 
           {/* 错误提示 */}
           {error && (
-            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] font-medium text-red-700">{error}</p>
+            <p className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-2xs font-medium text-destructive">{error}</p>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={onClose} className="rounded-lg">取消</Button>
-          <Button onClick={handleSave} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存提交</Button>
+          <Button onClick={handleSave} className="rounded-lg bg-primary hover:bg-primary/80">保存提交</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -413,23 +413,23 @@ function ManagementModal({
           {/* 搜索 + 添加按钮 */}
           <div className="flex flex-col items-start justify-between gap-2 pt-2 sm:flex-row sm:items-center">
             <div className="relative w-full sm:w-72">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="搜索色母代码、名称、分类..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-9 rounded-lg border-2 border-[#3b82f6] pl-9 text-[13px] focus-visible:border-[#2563eb] focus-visible:ring-[#2563eb]/20"
+                className="h-9 rounded-lg border-2 border-[#3b82f6] pl-9 text-2xs focus-visible:border-[#2563eb] focus-visible:ring-[#2563eb]/20"
               />
             </div>
             <div className="flex items-center gap-3">
-              <span className="whitespace-nowrap text-xs text-gray-500">
+              <span className="whitespace-nowrap text-xs text-muted-foreground">
                 共 {filteredRows.length} 条记录
               </span>
               <Button
                 size="sm"
                 variant="default"
                 onClick={() => setAddOpen(true)}
-                className="h-9 rounded-lg bg-[#2487ca] text-[13px] font-semibold hover:bg-[#1d6fb0]"
+                className="h-9 rounded-lg bg-primary text-2xs font-semibold hover:bg-primary/80"
               >
                 <Plus className="size-4" />
                 添加材料
@@ -440,54 +440,54 @@ function ManagementModal({
 
         {/* 可滚动表格区域 */}
         <div className="flex-1 overflow-y-auto min-h-0">
-          <div className="w-full overflow-x-auto rounded-lg border border-gray-200">
-            <table className="w-full border-collapse text-[13px]">
-              <thead className="sticky top-0 z-10 bg-gray-50">
-                <tr className="border-b-2 border-gray-200">
-                  <th className="w-12 px-3 py-2.5 text-center text-xs font-semibold text-gray-500">颜色</th>
-                  <th className="w-28 px-3 py-2.5 text-center text-xs font-semibold text-gray-500">产品代码</th>
-                  <th className="px-3 py-2.5 text-center text-xs font-semibold text-gray-500">英文名称</th>
-                  <th className="px-3 py-2.5 text-center text-xs font-semibold text-gray-500">中文名称</th>
-                  <th className="w-32 px-3 py-2.5 text-center text-xs font-semibold text-gray-500">所属分类</th>
-                  <th className="w-20 px-3 py-2.5 text-right text-xs font-semibold text-gray-500">操作</th>
+          <div className="w-full overflow-x-auto rounded-lg border border-border">
+            <table className="w-full border-collapse text-2xs">
+              <thead className="sticky top-0 z-10 bg-muted">
+                <tr className="border-b-2 border-border">
+                  <th className="w-12 px-3 py-2.5 text-center text-xs font-semibold text-muted-foreground">颜色</th>
+                  <th className="w-28 px-3 py-2.5 text-center text-xs font-semibold text-muted-foreground">产品代码</th>
+                  <th className="px-3 py-2.5 text-center text-xs font-semibold text-muted-foreground">英文名称</th>
+                  <th className="px-3 py-2.5 text-center text-xs font-semibold text-muted-foreground">中文名称</th>
+                  <th className="w-32 px-3 py-2.5 text-center text-xs font-semibold text-muted-foreground">所属分类</th>
+                  <th className="w-20 px-3 py-2.5 text-right text-xs font-semibold text-muted-foreground">操作</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredRows.map((row) => (
                   <tr
                     key={row.original.code}
-                    className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/80"
+                    className="border-b border-border/50 last:border-b-0 hover:bg-muted/80"
                   >
                     <td className="px-3 py-3 text-center">
                       <div
-                        className="mx-auto h-5 w-9 border border-gray-200"
+                        className="mx-auto h-5 w-9 border border-border"
                         style={{ backgroundColor: row.original.hex }}
                       />
                     </td>
                     <td className="px-3 py-3 text-center">
-                      <span className="text-[13px] font-semibold text-gray-900">{row.original.code}</span>
+                      <span className="text-2xs font-semibold text-foreground">{row.original.code}</span>
                     </td>
                     <td className="px-3 py-3 text-center">
-                      <span className="block truncate text-[13px] text-gray-700">{row.original.tradeName}</span>
+                      <span className="block truncate text-2xs text-foreground/80">{row.original.tradeName}</span>
                     </td>
                     <td className="px-3 py-3 text-center">
-                      <span className="block truncate text-[13px] text-gray-700">{row.original.nameZh}</span>
+                      <span className="block truncate text-2xs text-foreground/80">{row.original.nameZh}</span>
                     </td>
                     <td className="px-3 py-3 text-center">
-                      <span className="text-xs text-gray-500">{row.displayCategory}</span>
+                      <span className="text-xs text-muted-foreground">{row.displayCategory}</span>
                     </td>
                     <td className="px-3 py-3 text-right">
                       <div className="flex items-center justify-center gap-1">
                         <button
                           onClick={() => openEdit(row.original)}
-                          className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-primary/10 hover:text-primary"
+                          className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
                           aria-label="编辑"
                         >
                           <Edit className="size-4" />
                         </button>
                         <button
                           onClick={() => handleDelete(row.original)}
-                          className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                          className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                           aria-label="删除"
                         >
                           <Trash2 className="size-4" />
@@ -498,7 +498,7 @@ function ManagementModal({
                 ))}
                 {filteredRows.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-3 py-12 text-center text-sm text-gray-400">暂无匹配数据</td>
+                    <td colSpan={6} className="px-3 py-12 text-center text-sm text-muted-foreground">暂无匹配数据</td>
                   </tr>
                 )}
               </tbody>
@@ -521,12 +521,12 @@ function ManagementModal({
 
           <div className="flex flex-col gap-5 py-2">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">色母代码</Label>
-              <p className="text-base font-bold text-gray-900">{editingItem?.code}</p>
+              <Label className="text-sm font-medium text-foreground/80">色母代码</Label>
+              <p className="text-sm font-semibold text-foreground">{editingItem?.code}</p>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">英文商品名</Label>
+              <Label className="text-sm font-medium text-foreground/80">英文商品名</Label>
               <Input
                 value={editForm.tradeName}
                 onChange={(e) => setEditForm({ ...editForm, tradeName: e.target.value })}
@@ -535,7 +535,7 @@ function ManagementModal({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">中文品名</Label>
+              <Label className="text-sm font-medium text-foreground/80">中文品名</Label>
               <Input
                 value={editForm.nameZh}
                 onChange={(e) => setEditForm({ ...editForm, nameZh: e.target.value })}
@@ -544,7 +544,7 @@ function ManagementModal({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">所属分类</Label>
+              <Label className="text-sm font-medium text-foreground/80">所属分类</Label>
               <Select
                 value={editForm.category}
                 onValueChange={(v) => setEditForm({ ...editForm, category: (v as TonerCategory) || "" })}
@@ -561,11 +561,11 @@ function ManagementModal({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">预览色 HEX</Label>
-              <div className="flex items-center gap-3 rounded-lg border border-gray-200 p-3">
+              <Label className="text-sm font-medium text-foreground/80">预览色 HEX</Label>
+              <div className="flex items-center gap-3 rounded-lg border border-border p-3">
                 <div className="relative flex-shrink-0">
                   <div
-                    className="size-10 cursor-pointer rounded-md border-2 border-gray-300"
+                    className="size-10 cursor-pointer rounded-md border-2 border-input"
                     style={{ backgroundColor: editForm.hex }}
                   />
                   <input
@@ -591,13 +591,13 @@ function ManagementModal({
             </div>
 
             {editError && (
-              <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] font-medium text-red-700">{editError}</p>
+              <p className="rounded-lg border border-destructive/20 bg-destructive/10 px-3 py-2 text-2xs font-medium text-destructive">{editError}</p>
             )}
           </div>
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingItem(null)} className="rounded-lg">取消</Button>
-            <Button onClick={handleEditSave} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存</Button>
+            <Button onClick={handleEditSave} className="rounded-lg bg-primary hover:bg-primary/80">保存</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -722,20 +722,20 @@ export default function TonerPage() {
       <div className="h-16" />
 
       {/* 分类 Tabs + 搜索栏 */}
-      <div className="sticky top-16 z-30 border-b border-gray-200 bg-white px-6 py-3 sm:px-8 md:px-[60px]">
+      <div className="sticky top-16 z-30 border-b border-border bg-white px-6 py-3 sm:px-8 md:px-[60px]">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           {/* 左侧：分类 Tabs */}
           <div className="-mx-2 overflow-x-auto px-2 scrollbar-hide sm:-mx-0 sm:px-0">
             <Tabs value={activeTab} onValueChange={(v) => setActiveCategory((v as TonerCategory) || "2K_BASECOAT")}>
-              <TabsList variant="default" className="h-9 bg-gray-100/80">
+              <TabsList variant="default" className="h-9 bg-muted/80">
                 {TONER_CATEGORIES.filter((cat) => cat.key !== "SUPPLEMENTARY" || isAdmin).map((cat) => (
                   <TabsTrigger
                     key={cat.key}
                     value={cat.key}
-                    className="h-7 gap-1.5 px-3 text-[13px]"
+                    className="h-7 gap-1.5 px-3 text-2xs"
                   >
                     {cat.label}
-                    <Badge variant="secondary" className="h-4 min-w-4 rounded-full bg-gray-200 px-1 text-[10px] leading-none text-gray-600">
+                    <Badge variant="secondary" className="h-4 min-w-4 rounded-full bg-muted px-1 text-[10px] leading-none text-muted-foreground">
                       {toners.filter((t) => t.category === cat.key).length}
                     </Badge>
                   </TabsTrigger>
@@ -747,12 +747,12 @@ export default function TonerPage() {
           {/* 右侧：搜索框 + 管理按钮 */}
           <div className="flex items-center gap-2">
             <div className="relative w-full md:w-64">
-              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search code or name..."
-                className="h-9 rounded-lg pl-9 text-[13px]"
+                className="h-9 rounded-lg pl-9 text-2xs"
               />
             </div>
             {isAdmin && (
@@ -760,7 +760,7 @@ export default function TonerPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => setManageOpen(true)}
-                className="h-9 shrink-0 rounded-lg border-[#3b82f6] text-[13px] font-medium text-[#3b82f6] hover:bg-[#3b82f6]/5 hover:text-[#2563eb]"
+                className="h-9 shrink-0 rounded-lg border-[#3b82f6] text-2xs font-medium text-[#3b82f6] hover:bg-[#3b82f6]/5 hover:text-[#2563eb]"
               >
                 <Settings className="size-4" />
                 管理材料
@@ -773,12 +773,12 @@ export default function TonerPage() {
       {/* 色母卡片网格 */}
       <div className="flex-1 px-6 py-4 sm:px-8 md:px-[60px] md:py-6">
         {dbLoading ? (
-          <div className="flex flex-col items-center py-20 text-gray-400">
+          <div className="flex flex-col items-center py-20 text-muted-foreground">
             <Loader2 className="size-6 animate-spin" />
             <span className="mt-3 text-sm">加载中...</span>
           </div>
         ) : filteredToners.length === 0 ? (
-          <div className="flex flex-col items-center py-20 text-gray-400">
+          <div className="flex flex-col items-center py-20 text-muted-foreground">
             <span className="text-sm">No toners found</span>
             <span className="mt-1 text-xs">Try a different search or category</span>
           </div>

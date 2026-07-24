@@ -65,37 +65,37 @@ export default function VariantsPanel() {
   return (
     <div>
       <div className="flex justify-end mb-4">
-        <Button onClick={openCreate} className="rounded-lg bg-[#2487ca] text-[13px] hover:bg-[#1d6fb0]"><Plus className="size-4" /> 新增配方类型</Button>
+        <Button onClick={openCreate} className="rounded-lg bg-primary text-2xs hover:bg-primary/80"><Plus className="size-4" /> 新增配方类型</Button>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200">
+      <div className="overflow-x-auto rounded-lg border border-border">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50/80">
-              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">ID</TableHead>
-              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">名称</TableHead>
-              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">操作</TableHead>
+            <TableRow className="bg-muted/80">
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">ID</TableHead>
+              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">名称</TableHead>
+              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">操作</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pageRows.map((v) => (
-              <TableRow key={v.id} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
-                <TableCell className="py-3 text-center text-[13px] text-gray-500 font-medium">{v.id}</TableCell>
-                <TableCell className="py-3 text-center text-[13px] text-gray-900 truncate">{v.name}</TableCell>
+              <TableRow key={v.id} className="border-b border-border/50 last:border-b-0 hover:bg-muted/50">
+                <TableCell className="py-3 text-center text-2xs text-muted-foreground font-medium">{v.id}</TableCell>
+                <TableCell className="py-3 text-center text-2xs text-foreground truncate">{v.name}</TableCell>
                 <TableCell className="py-3 text-center">
                   <div className="flex items-center justify-center gap-1">
-                    <button onClick={() => openEdit(v)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-primary/10 hover:text-primary"><Edit className="size-4" /></button>
-                    <button onClick={() => handleDelete(v)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-red-50 hover:text-red-500"><Trash2 className="size-4" /></button>
+                    <button onClick={() => openEdit(v)} className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-primary/10 hover:text-primary"><Edit className="size-4" /></button>
+                    <button onClick={() => handleDelete(v)} className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"><Trash2 className="size-4" /></button>
                   </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between border-t border-border px-4 py-3">
           <p className="text-sm font-semibold text-primary">Found {variants.length} variants</p>
           <div className="flex items-center gap-2">
-            <span className="text-[13px] text-gray-500">{page + 1} / {totalPages}</span>
+            <span className="text-2xs text-muted-foreground">{page + 1} / {totalPages}</span>
             <Button size="icon" variant="ghost" disabled={page === 0} onClick={() => setPage(page - 1)} className="size-8 rounded-lg">‹</Button>
             <Button size="icon" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="size-8 rounded-lg">›</Button>
           </div>
@@ -107,19 +107,19 @@ export default function VariantsPanel() {
           <DialogHeader><DialogTitle>{editing ? "编辑配方类型" : "新增配方类型"}</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">ID</Label>
+              <Label className="text-sm font-medium text-foreground/80">ID</Label>
               <Input value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} className="h-9 rounded-lg" />
-              {editing && <p className="text-[11px] text-gray-400">修改 ID 将自动更新所有引用</p>}
+              {editing && <p className="text-[11px] text-muted-foreground">修改 ID 将自动更新所有引用</p>}
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">名称</Label>
+              <Label className="text-sm font-medium text-foreground/80">名称</Label>
               <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="h-9 rounded-lg" />
             </div>
-            {error && <p className="text-[13px] font-medium text-red-600">{error}</p>}
+            {error && <p className="text-2xs font-medium text-destructive">{error}</p>}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowModal(false)} className="rounded-lg">取消</Button>
-            <Button onClick={handleSave} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存</Button>
+            <Button variant="outline" onClick={() => setShowModal(false)} className="rounded-lg text-2xs">取消</Button>
+            <Button onClick={handleSave} className="rounded-lg bg-primary hover:bg-primary/80">保存</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

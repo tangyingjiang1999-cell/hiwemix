@@ -157,7 +157,7 @@ export default function FormulasPanel() {
     return formulas.filter((f) => { if (f.id.toLowerCase().includes(q)) return true; const cc = colors.find((c) => c.id === f.color_id)?.color_code ?? ""; return cc.toLowerCase().includes(q); });
   }, [formulas, formulaSearch, colors]);
 
-  const INPUT_CLASS = "w-full border border-gray-300 rounded-lg px-3 py-2 h-[38px] text-[13px] outline-none transition-colors focus:border-primary focus:ring-[3px] focus:ring-primary/10";
+  const INPUT_CLASS = "w-full border border-input rounded-lg px-3 py-2 h-[38px] text-2xs outline-none transition-colors focus:border-primary focus:ring-[3px] focus:ring-primary/10";
 
   function renderComponentTable(group?: ComponentGroup) {
     const title = group ?? "色母组件";
@@ -165,29 +165,29 @@ export default function FormulasPanel() {
     return (
       <div key={group ?? "regular"} className="mt-4">
         <div className="flex justify-between items-center mb-3">
-          <h3 className="text-[15px] font-semibold text-gray-800">{title}</h3>
-          <Button onClick={() => addComponent(group)} variant="outline" size="sm" className="rounded-lg text-[13px]"><Plus className="size-4" /> 添加色母</Button>
+          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+          <Button onClick={() => addComponent(group)} variant="outline" size="sm" className="rounded-lg text-2xs"><Plus className="size-4" /> 添加色母</Button>
         </div>
 
-        <div className="[&_div[data-slot='table-container']]:overflow-visible rounded-lg border border-gray-200 max-h-none">
+        <div className="[&_div[data-slot='table-container']]:overflow-visible rounded-lg border border-border max-h-none">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-50/80">
-                <TableHead className="w-[22%] py-2 text-xs font-semibold text-gray-500 uppercase">色母编号</TableHead>
-                <TableHead className="w-[28%] py-2 text-xs font-semibold text-gray-500 uppercase">名称</TableHead>
-                <TableHead className="w-[15%] py-2 text-xs font-semibold text-gray-500 uppercase">百分比</TableHead>
-                <TableHead className="w-[25%] py-2 text-xs font-semibold text-gray-500 uppercase">RGB</TableHead>
-                <TableHead className="w-[10%] py-2 text-xs font-semibold text-gray-500 uppercase"></TableHead>
+              <TableRow className="bg-muted/80">
+                <TableHead className="w-[22%] py-2 text-xs font-semibold text-muted-foreground uppercase">色母编号</TableHead>
+                <TableHead className="w-[28%] py-2 text-xs font-semibold text-muted-foreground uppercase">名称</TableHead>
+                <TableHead className="w-[15%] py-2 text-xs font-semibold text-muted-foreground uppercase">百分比</TableHead>
+                <TableHead className="w-[25%] py-2 text-xs font-semibold text-muted-foreground uppercase">RGB</TableHead>
+                <TableHead className="w-[10%] py-2 text-xs font-semibold text-muted-foreground uppercase"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.length === 0 && (
-                <TableRow><TableCell colSpan={5} className="py-12 text-center text-[13px] italic text-gray-400">暂无色母，点击「+ 添加色母」开始</TableCell></TableRow>
+                <TableRow><TableCell colSpan={5} className="py-12 text-center text-2xs italic text-muted-foreground">暂无色母，点击「+ 添加色母」开始</TableCell></TableRow>
               )}
               {filtered.map((c, rowIndex) => {
                 const globalIndex = components.indexOf(c);
                 return (
-                  <TableRow key={c.uid ?? globalIndex} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
+                  <TableRow key={c.uid ?? globalIndex} className="border-b border-border/50 last:border-b-0 hover:bg-muted/50">
                     <TableCell className="py-2 px-2 relative">
                       <input
                         type="text" value={c.toner_code}
@@ -200,7 +200,7 @@ export default function FormulasPanel() {
                         const hits = matchingToners(tonerQuery, tonerPool);
                         if (hits.length === 0) return null;
                         return (
-                          <div className="absolute left-2 right-2 top-full z-50 mt-1 max-h-40 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+                          <div className="absolute left-2 right-2 top-full z-50 mt-1 max-h-40 overflow-auto rounded-lg border border-border bg-white shadow-lg">
                             {hits.map((t) => (
                               <button
                                 key={t.code}
@@ -214,9 +214,9 @@ export default function FormulasPanel() {
                                 }}
                                 className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs hover:bg-blue-50"
                               >
-                                <div className="size-4 rounded-full border border-gray-200 flex-shrink-0" style={{ backgroundColor: `#${t.hex.replace(/^#/, "")}` }} />
+                                <div className="size-4 rounded-full border border-border flex-shrink-0" style={{ backgroundColor: `#${t.hex.replace(/^#/, "")}` }} />
                                 <span className="font-medium w-20 flex-shrink-0">{t.code}</span>
-                                <span className="text-gray-500 truncate">{t.nameZh || t.tradeName}</span>
+                                <span className="text-muted-foreground truncate">{t.nameZh || t.tradeName}</span>
                               </button>
                             ))}
                           </div>
@@ -243,7 +243,7 @@ export default function FormulasPanel() {
                       </div>
                     </TableCell>
                     <TableCell className="py-2 px-2 text-center">
-                      <Button onClick={() => removeComponent(globalIndex)} variant="ghost" size="sm" className="h-8 rounded-lg text-red-500 hover:bg-red-50"><Trash2 className="size-4" /></Button>
+                      <Button onClick={() => removeComponent(globalIndex)} variant="ghost" size="sm" className="h-8 rounded-lg text-destructive hover:bg-destructive/10"><Trash2 className="size-4" /></Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -256,7 +256,7 @@ export default function FormulasPanel() {
           const sum = group ? (percentageSums as Record<ComponentGroup, number>)[group] ?? 0 : (percentageSums as { all: number }).all ?? 0;
           const isValid = Math.abs(sum - 100) < 0.01;
           return (
-            <div className={`mt-3 flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-medium ${isValid ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
+            <div className={`mt-3 flex items-center gap-2 rounded-lg px-3 py-2 text-2xs font-medium ${isValid ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-destructive/10 border border-destructive/20 text-destructive'}`}>
               {isValid ? '✓' : '⚠'} 百分比总和：{sum.toFixed(2)}% {!isValid && '（必须等于 100%）'}
             </div>
           );
@@ -271,20 +271,20 @@ export default function FormulasPanel() {
     <div className="flex flex-col gap-4 lg:flex-row min-h-[calc(100vh-140px)]">
       {/* 左栏：配方列表 */}
       <div className="lg:w-64 flex-shrink-0 flex flex-col max-h-[200px] lg:max-h-none">
-        <Button onClick={newFormula} className="rounded-lg bg-[#2487ca] mb-3 hover:bg-[#1d6fb0]"><Plus className="size-4" /> 新增配方</Button>
+        <Button onClick={newFormula} className="rounded-lg bg-primary mb-3 hover:bg-primary/80"><Plus className="size-4" /> 新增配方</Button>
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
-          <Input placeholder="搜索配方代码或名称..." value={formulaSearch} onChange={(e) => setFormulaSearch(e.target.value)} className="h-9 rounded-lg pl-9 text-[13px]" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input placeholder="搜索配方代码或名称..." value={formulaSearch} onChange={(e) => setFormulaSearch(e.target.value)} className="h-9 rounded-lg pl-9 text-2xs" />
         </div>
-        <div className="flex-1 overflow-auto rounded-lg border border-gray-200 min-h-0">
+        <div className="flex-1 overflow-auto rounded-lg border border-border min-h-0">
           {filteredFormulas.map((f) => {
             const isSel = selectedId === f.id;
             return (
               <button key={f.id} onClick={() => selectFormula(f)}
-                className={`w-full text-left px-3 py-3 border-b border-gray-100 text-[13px] transition-colors ${isSel ? 'bg-blue-50/60 font-semibold text-primary' : 'text-gray-700 hover:bg-gray-50'}`}
+                className={`w-full text-left px-3 py-3 border-b border-border/50 text-2xs transition-colors ${isSel ? 'bg-blue-50/60 font-semibold text-primary' : 'text-foreground/80 hover:bg-muted'}`}
               >
-                <span className="block font-bold text-gray-900">{colors.find((c) => c.id === f.color_id)?.color_code || f.color_id}</span>
-                <span className="block text-xs text-gray-400">{f.id}</span>
+                <span className="block font-semibold text-foreground">{colors.find((c) => c.id === f.color_id)?.color_code || f.color_id}</span>
+                <span className="block text-xs text-muted-foreground">{f.id}</span>
               </button>
             );
           })}
@@ -292,26 +292,26 @@ export default function FormulasPanel() {
       </div>
 
       {/* 右栏：配方编辑 */}
-      <div className="flex-1 rounded-xl border border-gray-200 p-5 pb-8 shadow-sm">
+      <div className="flex-1 rounded-xl border border-border p-5 pb-8 shadow-sm">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium text-gray-700">配方 ID</Label>
+            <Label className="text-sm font-medium text-foreground/80">配方 ID</Label>
             <Input value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!selectedId} className="h-9 rounded-lg" />
           </div>
           <div className="relative flex flex-col gap-1.5">
-            <Label className="text-sm font-medium text-gray-700">关联颜色</Label>
+            <Label className="text-sm font-medium text-foreground/80">关联颜色</Label>
             <Input value={colorQuery} onChange={(e) => { setColorQuery(e.target.value); setColorDropdownOpen(true); if (colorBlurRef.current) { clearTimeout(colorBlurRef.current); colorBlurRef.current = null; } }} onFocus={() => { setColorDropdownOpen(true); if (colorBlurRef.current) { clearTimeout(colorBlurRef.current); colorBlurRef.current = null; } }} onBlur={() => { colorBlurRef.current = setTimeout(() => setColorDropdownOpen(false), 150); }} className="h-9 rounded-lg" placeholder="搜索颜色代码、名称、品牌..." />
             {colorDropdownOpen && matchingColors(colorQuery, colors, brands).length > 0 && (
-              <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg">
+              <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-48 overflow-auto rounded-lg border border-border bg-white shadow-lg">
                 {matchingColors(colorQuery, colors, brands).map((c) => {
                   const bName = brandMap.get(c.make_id) ?? c.make_id;
                   return (
                     <button key={c.id} onMouseDown={() => { setForm((prev) => ({ ...prev, color_id: c.id, year: undefined })); setColorQuery(`${c.color_code} - ${c.color_name} (${bName})`); setColorDropdownOpen(false); setAvailableYears(c.years || []); }}
-                      className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs hover:bg-gray-50">
-                      <div className="size-5 rounded border border-gray-200" style={{ backgroundColor: c.hex_preview }} />
+                      className="w-full text-left flex items-center gap-2 px-3 py-2 text-xs hover:bg-muted">
+                      <div className="size-5 rounded border border-border" style={{ backgroundColor: c.hex_preview }} />
                       <span className="font-medium">{c.color_code}</span>
-                      <span className="text-gray-500 truncate">{c.color_name}</span>
-                      <span className="ml-auto text-gray-400">{bName}</span>
+                      <span className="text-muted-foreground truncate">{c.color_name}</span>
+                      <span className="ml-auto text-muted-foreground">{bName}</span>
                     </button>
                   );
                 })}
@@ -319,25 +319,25 @@ export default function FormulasPanel() {
             )}
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium text-gray-700">适用年份</Label>
+            <Label className="text-sm font-medium text-foreground/80">适用年份</Label>
             <Select value={form.year?.toString() || ""} onValueChange={(v) => setForm({ ...form, year: v ? parseInt(v, 10) : undefined })} disabled={!form.color_id}>
               <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue placeholder="所有年份" /></SelectTrigger>
               <SelectContent>{availableYears.map((y) => <SelectItem key={y} value={y.toString()}>{y}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium text-gray-700">版本</Label>
+            <Label className="text-sm font-medium text-foreground/80">版本</Label>
             <Input value={form.version} onChange={(e) => setForm({ ...form, version: e.target.value })} className="h-9 rounded-lg" />
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium text-gray-700">体系</Label>
+            <Label className="text-sm font-medium text-foreground/80">体系</Label>
             <Select value={form.paint_system} onValueChange={(v) => v ? handlePaintSystemChange(v as "1K" | "2K") : null}>
               <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue /></SelectTrigger>
               <SelectContent>{PAINT_SYSTEMS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div className="flex flex-col gap-1.5">
-            <Label className="text-sm font-medium text-gray-700">配方类型</Label>
+            <Label className="text-sm font-medium text-foreground/80">配方类型</Label>
             <Select value={form.formula_type} onValueChange={(v) => v ? handleFormulaTypeChange(v as FormulaType) : null} disabled={form.paint_system === "2K"}>
               <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue /></SelectTrigger>
               <SelectContent>
@@ -347,8 +347,8 @@ export default function FormulasPanel() {
           </div>
         </div>
         <div className="flex flex-col gap-1.5 mt-3">
-          <Label className="text-sm font-medium text-gray-700">施工备注</Label>
-          <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="min-h-[60px] w-full rounded-lg border border-gray-200 p-3 text-sm outline-none focus:border-primary" />
+          <Label className="text-sm font-medium text-foreground/80">施工备注</Label>
+          <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="min-h-[60px] w-full rounded-lg border border-border p-3 text-sm outline-none focus:border-primary" />
         </div>
 
         <div className="mt-2 flex-1 min-h-0 overflow-visible">
@@ -357,12 +357,12 @@ export default function FormulasPanel() {
           ) : renderComponentTable()}
         </div>
 
-        {error && <p className="text-[13px] font-medium text-red-600 mt-3">{error}</p>}
-        {message && <p className="text-[13px] font-medium text-green-600 mt-3">{message}</p>}
+        {error && <p className="text-2xs font-medium text-destructive mt-3">{error}</p>}
+        {message && <p className="text-2xs font-medium text-green-600 mt-3">{message}</p>}
 
-        <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-200 -mx-5 -mb-5 px-5 pb-0">
-          {selectedId && <Button onClick={handleDelete} variant="outline" className="rounded-lg text-[13px] text-red-500 border-red-200 hover:bg-red-50">删除配方</Button>}
-          <Button onClick={handleSave} disabled={!percentageValid} className="rounded-lg bg-[#2487ca] text-[13px] hover:bg-[#1d6fb0] disabled:bg-gray-300 disabled:text-gray-100">保存配方</Button>
+        <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-border -mx-5 -mb-5 px-5 pb-0">
+          {selectedId && <Button onClick={handleDelete} variant="outline" className="rounded-lg text-2xs text-destructive border-destructive/20 hover:bg-destructive/10">删除配方</Button>}
+          <Button onClick={handleSave} disabled={!percentageValid} className="rounded-lg bg-primary text-2xs hover:bg-primary/80 disabled:bg-muted disabled:text-muted-foreground/30">保存配方</Button>
         </div>
       </div>
     </div>

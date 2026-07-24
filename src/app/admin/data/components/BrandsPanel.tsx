@@ -145,42 +145,42 @@ export default function BrandsPanel() {
     <div>
       {/* Header buttons */}
       <div className="flex justify-end gap-2 mb-4">
-        <Button onClick={openCreateRegion} variant="outline" size="sm" className="rounded-lg text-[13px]">
+        <Button onClick={openCreateRegion} variant="outline" size="sm" className="rounded-lg text-2xs">
           <Plus className="size-4" /> 新增产地
         </Button>
-        <Button onClick={openCreateBrand} size="sm" className="rounded-lg bg-[#2487ca] text-[13px] hover:bg-[#1d6fb0]">
+        <Button onClick={openCreateBrand} size="sm" className="rounded-lg bg-primary text-2xs hover:bg-primary/80">
           新增品牌
         </Button>
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-200">
+      <div className="overflow-x-auto rounded-lg border border-border">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50/80">
-              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">ID</TableHead>
-              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">名称</TableHead>
-              <TableHead className="w-[150px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">产地</TableHead>
-              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">操作</TableHead>
+            <TableRow className="bg-muted/80">
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">ID</TableHead>
+              <TableHead className="w-[200px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">名称</TableHead>
+              <TableHead className="w-[150px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">产地</TableHead>
+              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">操作</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pageRows.map((brand, i) => (
-              <TableRow key={brand.id} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
-                <TableCell className="py-3 text-center text-[13px] text-gray-500">{brand.id}</TableCell>
-                <TableCell className="py-3 text-center text-[13px] text-gray-900 truncate max-w-[180px]">{brand.name}</TableCell>
-                <TableCell className="py-3 text-center text-[13px] text-gray-500">{brand.region}</TableCell>
+              <TableRow key={brand.id} className="border-b border-border/50 last:border-b-0 hover:bg-muted/50">
+                <TableCell className="py-3 text-center text-2xs text-muted-foreground">{brand.id}</TableCell>
+                <TableCell className="py-3 text-center text-2xs text-foreground truncate max-w-[180px]">{brand.name}</TableCell>
+                <TableCell className="py-3 text-center text-2xs text-muted-foreground">{brand.region}</TableCell>
                 <TableCell className="py-3 text-center">
                   <div className="flex items-center justify-center gap-1">
                     <button
                       onClick={() => openEditBrand(brand)}
-                      className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-primary/10 hover:text-primary"
+                      className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
                     >
                       <Edit className="size-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteBrand(brand)}
-                      className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                      className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                     >
                       <Trash2 className="size-4" />
                     </button>
@@ -191,10 +191,10 @@ export default function BrandsPanel() {
           </TableBody>
         </Table>
         {/* Pagination */}
-        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between border-t border-border px-4 py-3">
           <p className="text-sm font-semibold text-primary">Found {brands.length} brands</p>
           <div className="flex items-center gap-2">
-            <span className="text-[13px] text-gray-500">{page + 1} / {totalPages}</span>
+            <span className="text-2xs text-muted-foreground">{page + 1} / {totalPages}</span>
             <Button size="icon" variant="ghost" disabled={page === 0} onClick={() => setPage(page - 1)} className="size-8 rounded-lg">‹</Button>
             <Button size="icon" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="size-8 rounded-lg">›</Button>
           </div>
@@ -202,18 +202,18 @@ export default function BrandsPanel() {
       </div>
 
       {/* Regions list */}
-      <div className="mt-4 rounded-xl border border-gray-200 p-4">
-        <p className="mb-2 text-sm font-semibold text-gray-700">已有产地：</p>
+      <div className="mt-4 rounded-xl border border-border p-4">
+        <p className="mb-2 text-sm font-semibold text-foreground/80">已有产地：</p>
         <div className="flex flex-wrap gap-2">
           {regions.map((region) => (
             <span
               key={region.code}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-[13px] text-gray-600"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-muted px-3 py-1 text-2xs text-muted-foreground"
             >
               {region.code}
               <button
                 onClick={() => setRegionToDelete(region.code)}
-                className="inline-flex size-4 items-center justify-center rounded-full text-gray-400 hover:text-red-500"
+                className="inline-flex size-4 items-center justify-center rounded-full text-muted-foreground hover:text-destructive"
               >
                 <X className="size-3" />
               </button>
@@ -226,12 +226,12 @@ export default function BrandsPanel() {
       <Dialog open={!!regionToDelete} onOpenChange={() => setRegionToDelete(null)}>
         <DialogContent className="max-w-sm bg-white">
           <DialogHeader><DialogTitle>确认删除</DialogTitle></DialogHeader>
-          <p className="text-sm text-gray-600">确定删除产地「{regionToDelete}」吗？此操作不可撤销。</p>
+          <p className="text-sm text-muted-foreground">确定删除产地「{regionToDelete}」吗？此操作不可撤销。</p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRegionToDelete(null)} className="rounded-lg">取消</Button>
+            <Button variant="outline" onClick={() => setRegionToDelete(null)} className="rounded-lg text-2xs">取消</Button>
             <Button
               onClick={() => { if (regionToDelete) { handleDeleteRegion(regionToDelete); setRegionToDelete(null); } }}
-              className="rounded-lg bg-red-600 hover:bg-red-700"
+              variant="destructive" className="rounded-lg"
             >删除</Button>
           </DialogFooter>
         </DialogContent>
@@ -243,7 +243,7 @@ export default function BrandsPanel() {
           <DialogHeader><DialogTitle>{editing ? "编辑品牌" : "新增品牌"}</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">ID（自动生成）</Label>
+              <Label className="text-sm font-medium text-foreground/80">ID（自动生成）</Label>
               <Input
                 value={brandForm.id}
                 onChange={(e) => { idManuallyEdited.current = true; setBrandForm({ ...brandForm, id: e.target.value }); }}
@@ -252,11 +252,11 @@ export default function BrandsPanel() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">名称</Label>
+              <Label className="text-sm font-medium text-foreground/80">名称</Label>
               <Input value={brandForm.name} onChange={(e) => setBrandForm({ ...brandForm, name: e.target.value })} className="h-9 rounded-lg" />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">产地</Label>
+              <Label className="text-sm font-medium text-foreground/80">产地</Label>
               <Select value={brandForm.region} onValueChange={(v) => setBrandForm({ ...brandForm, region: v || "" })}>
                 <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue /></SelectTrigger>
                 <SelectContent className="z-[130] max-h-[200px]">
@@ -264,11 +264,11 @@ export default function BrandsPanel() {
                 </SelectContent>
               </Select>
             </div>
-            {brandError && <p className="text-[13px] font-medium text-red-600">{brandError}</p>}
+            {brandError && <p className="text-2xs font-medium text-destructive">{brandError}</p>}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowBrandModal(false)} className="rounded-lg">取消</Button>
-            <Button onClick={handleSaveBrand} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存</Button>
+            <Button variant="outline" onClick={() => setShowBrandModal(false)} className="rounded-lg text-2xs">取消</Button>
+            <Button onClick={handleSaveBrand} className="rounded-lg bg-primary hover:bg-primary/80">保存</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -279,7 +279,7 @@ export default function BrandsPanel() {
           <DialogHeader><DialogTitle>新增产地</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-4 py-2">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-sm font-medium text-gray-700">产地代码</Label>
+              <Label className="text-sm font-medium text-foreground/80">产地代码</Label>
               <Input
                 value={regionForm.code}
                 onChange={(e) => setRegionForm({ ...regionForm, code: e.target.value.toUpperCase() })}
@@ -288,11 +288,11 @@ export default function BrandsPanel() {
                 maxLength={10}
               />
             </div>
-            {regionError && <p className="text-[13px] font-medium text-red-600">{regionError}</p>}
+            {regionError && <p className="text-2xs font-medium text-destructive">{regionError}</p>}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowRegionModal(false)} className="rounded-lg">取消</Button>
-            <Button onClick={handleSaveRegion} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存</Button>
+            <Button variant="outline" onClick={() => setShowRegionModal(false)} className="rounded-lg text-2xs">取消</Button>
+            <Button onClick={handleSaveRegion} className="rounded-lg bg-primary hover:bg-primary/80">保存</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

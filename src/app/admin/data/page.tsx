@@ -35,10 +35,10 @@ function SideNav({ activeTab, onSelect, onClose }: { activeTab: TabKey; onSelect
             <button
               key={tab.key}
               onClick={() => { onSelect(tab.key); onClose?.(); }}
-              className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13px] transition-colors ${
+              className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-left text-2xs transition-colors ${
                 active
                   ? "bg-blue-50/80 font-semibold text-primary"
-                  : "font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  : "font-medium text-muted-foreground hover:bg-muted hover:text-foreground/80"
               }`}
               aria-current={active ? "page" : undefined}
             >
@@ -72,7 +72,7 @@ export default function DataManagementPage() {
   if (loading || !user || user.role !== "admin") {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-sm text-gray-500">加载中...</p>
+        <p className="text-sm text-muted-foreground">加载中...</p>
       </div>
     );
   }
@@ -87,14 +87,14 @@ export default function DataManagementPage() {
       <button
         onClick={() => setMobileNavOpen((v) => !v)}
         aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
-        className="fixed right-4 top-20 z-[1250] inline-flex size-9 items-center justify-center rounded-lg border border-gray-200 bg-white shadow-sm md:hidden"
+        className="fixed right-4 top-20 z-[1250] inline-flex size-9 items-center justify-center rounded-lg border border-border bg-white shadow-sm md:hidden"
       >
         <Menu className="size-5" />
       </button>
 
       <div className="flex pt-16">
         {/* 桌面端侧边栏 */}
-        <aside className="hidden md:block w-[224px] flex-shrink-0 border-r border-gray-200 bg-white h-[calc(100vh-64px)] sticky top-16 overflow-y-auto">
+        <aside className="hidden md:block w-[224px] flex-shrink-0 border-r border-border bg-white h-[calc(100vh-64px)] sticky top-16 overflow-y-auto">
           <SideNav activeTab={activeTab} onSelect={setActiveTab} />
         </aside>
 
@@ -108,10 +108,10 @@ export default function DataManagementPage() {
         {/* 右侧主区 */}
         <main className="flex-1 min-h-[calc(100vh-64px)] px-6 py-6 sm:px-8 md:px-[60px]">
           {/* 面包屑 */}
-          <div className="mb-4 flex items-center gap-2 text-[13px] text-gray-400 md:mb-5">
+          <div className="mb-4 flex items-center gap-2 text-2xs text-muted-foreground md:mb-5">
             <span>Data Management</span>
             <span>/</span>
-            <span className="font-medium text-gray-900">{activeLabel}</span>
+            <span className="font-medium text-foreground">{activeLabel}</span>
           </div>
 
           {activeTab === "brands" && <BrandsPanel />}

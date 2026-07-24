@@ -33,13 +33,6 @@ export default function SiteHeader() {
     ? "all 1.5s ease-in-out"
     : "none";
 
-  const headerBg = isHome ? "transparent" : "#2487ca";
-  const headerPos = isHome ? "absolute" : "fixed";
-  const headerTextColor = isHome ? "#2487ca" : "#ffffff";
-  const headerMutedColor = isHome ? "#6b7280" : "rgba(255,255,255,0.7)";
-  const headerBorderColor = isHome ? "#d1d5db" : "rgba(255,255,255,0.3)";
-  const headerHoverBg = isHome ? "rgba(36,135,202,0.04)" : "rgba(255,255,255,0.1)";
-
   const navItems: { label: string; href: string }[] = [
     { label: t.navFormulaSearch, href: "/" },
     { label: t.navColorLibrary, href: "/color-library" },
@@ -53,26 +46,25 @@ export default function SiteHeader() {
   return (
     <>
       <header
+        data-header-theme={isHome ? "home" : "default"}
         className="top-0 left-0 z-[1100] w-full border-b transition-all duration-[1.5s] ease-in-out"
         style={{
-          position: headerPos,
-          backgroundColor: headerBg,
-          borderBottomColor: isHome ? "transparent" : "rgba(255,255,255,0.15)",
+          position: "var(--header-position)" as React.CSSProperties["position"],
+          backgroundColor: "var(--header-bg)",
+          borderBottomColor: "var(--header-bottom-border)",
           borderBottomWidth: "1px",
           borderBottomStyle: "solid",
+          transition: transitionStyle,
         }}
       >
-        <div
-          className="mx-auto flex h-16 items-center px-6 sm:px-8 md:px-[60px]"
-          style={{ position: "relative" }}
-        >
+        <div className="mx-auto flex h-16 items-center px-6 sm:px-8 md:px-[60px] relative">
           {/* Logo 左侧 */}
           <Link href="/" className="flex shrink-0 z-[1]">
             <img
               src="/hiwemix2-01.png"
               alt="HIWE MIX"
               className="h-5 w-auto object-contain block md:h-8 transition-all duration-[1.5s] ease-in-out"
-              style={{ filter: isHome ? "none" : "brightness(0) invert(1)" }}
+              style={{ filter: "var(--header-logo-filter)" }}
             />
           </Link>
 
@@ -86,18 +78,8 @@ export default function SiteHeader() {
                     key={item.label}
                     href={item.href}
                     aria-current={active ? "page" : undefined}
-                    className="text-[13px] font-semibold transition-colors whitespace-nowrap"
-                    style={{
-                      color: active ? headerTextColor : headerMutedColor,
-                      fontWeight: active ? 700 : 600,
-                      transition: transitionStyle,
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.color = headerTextColor;
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!active) (e.currentTarget as HTMLAnchorElement).style.color = headerMutedColor;
-                    }}
+                    className={`header-nav-link text-2xs transition-colors whitespace-nowrap ${active ? "font-semibold" : ""}`}
+                    style={{ transition: transitionStyle }}
                   >
                     {item.label}
                   </Link>
@@ -115,47 +97,15 @@ export default function SiteHeader() {
                   <div className="hidden md:flex items-center gap-2">
                     <Link
                       href="/admin/data"
-                      className="inline-flex h-9 items-center rounded-lg border px-3 text-[13px] font-semibold transition-all duration-[1.5s] ease-in-out"
-                      style={{
-                        borderColor: headerBorderColor,
-                        color: headerMutedColor,
-                        transition: transitionStyle,
-                      }}
-                      onMouseEnter={(e) => {
-                        const t = e.currentTarget as HTMLAnchorElement;
-                        t.style.borderColor = headerTextColor;
-                        t.style.color = headerTextColor;
-                        t.style.backgroundColor = headerHoverBg;
-                      }}
-                      onMouseLeave={(e) => {
-                        const t = e.currentTarget as HTMLAnchorElement;
-                        t.style.borderColor = headerBorderColor;
-                        t.style.color = headerMutedColor;
-                        t.style.backgroundColor = "transparent";
-                      }}
+                      className="header-action-btn inline-flex h-9 items-center rounded-lg border px-3 text-2xs font-semibold transition-all duration-[1.5s] ease-in-out"
+                      style={{ transition: transitionStyle }}
                     >
                       {t.navAdmin}
                     </Link>
                     <Link
                       href="/admin/users"
-                      className="inline-flex h-9 items-center rounded-lg border px-3 text-[13px] font-semibold transition-all duration-[1.5s] ease-in-out"
-                      style={{
-                        borderColor: headerBorderColor,
-                        color: headerMutedColor,
-                        transition: transitionStyle,
-                      }}
-                      onMouseEnter={(e) => {
-                        const t = e.currentTarget as HTMLAnchorElement;
-                        t.style.borderColor = headerTextColor;
-                        t.style.color = headerTextColor;
-                        t.style.backgroundColor = headerHoverBg;
-                      }}
-                      onMouseLeave={(e) => {
-                        const t = e.currentTarget as HTMLAnchorElement;
-                        t.style.borderColor = headerBorderColor;
-                        t.style.color = headerMutedColor;
-                        t.style.backgroundColor = "transparent";
-                      }}
+                      className="header-action-btn inline-flex h-9 items-center rounded-lg border px-3 text-2xs font-semibold transition-all duration-[1.5s] ease-in-out"
+                      style={{ transition: transitionStyle }}
                     >
                       {authUser.username}
                     </Link>
@@ -163,24 +113,8 @@ export default function SiteHeader() {
                 )}
                 <button
                   onClick={logout}
-                  className="hidden md:inline-flex h-9 items-center rounded-lg border px-3 text-[13px] font-semibold transition-all duration-[1.5s] ease-in-out"
-                  style={{
-                    borderColor: headerBorderColor,
-                    color: headerMutedColor,
-                    transition: transitionStyle,
-                  }}
-                  onMouseEnter={(e) => {
-                    const t = e.currentTarget as HTMLButtonElement;
-                    t.style.borderColor = headerTextColor;
-                    t.style.color = headerTextColor;
-                    t.style.backgroundColor = headerHoverBg;
-                  }}
-                  onMouseLeave={(e) => {
-                    const t = e.currentTarget as HTMLButtonElement;
-                    t.style.borderColor = headerBorderColor;
-                    t.style.color = headerMutedColor;
-                    t.style.backgroundColor = "transparent";
-                  }}
+                  className="header-action-btn hidden md:inline-flex h-9 items-center rounded-lg border px-3 text-2xs font-semibold transition-all duration-[1.5s] ease-in-out"
+                  style={{ transition: transitionStyle }}
                 >
                   {t.logout}
                 </button>
@@ -188,7 +122,7 @@ export default function SiteHeader() {
             ) : (
               <Link
                 href="/login"
-                className="inline-flex h-9 items-center rounded-lg bg-[#2487ca] px-3 text-[13px] font-semibold text-white transition-all duration-[1.5s] ease-in-out"
+                className="inline-flex h-9 items-center rounded-lg bg-primary px-3 text-2xs font-semibold text-white transition-all duration-[1.5s] ease-in-out"
                 style={{ transition: transitionStyle }}
               >
                 {t.login}
@@ -201,7 +135,7 @@ export default function SiteHeader() {
             <button
               onClick={() => setMobileMenuOpen((o) => !o)}
               className="inline-flex size-9 items-center justify-center rounded-lg md:hidden"
-              style={{ color: headerTextColor, transition: transitionStyle }}
+              style={{ color: "var(--header-text)", transition: transitionStyle }}
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {mobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -213,7 +147,7 @@ export default function SiteHeader() {
       {/* 移动端导航 Sheet */}
       <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
         <SheetContent side="right" className="w-[min(80vw,320px)] p-0">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <img
               src="/hiwemix2-01.png"
               alt="HIWE MIX"
@@ -236,10 +170,10 @@ export default function SiteHeader() {
                   key={item.label}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block mx-3 px-3 py-3.5 rounded-xl text-sm font-medium transition-colors ${
+                  className={`block mx-3 px-3 py-3.5 rounded-xl text-sm font-semibold transition-colors ${
                     active
                       ? "bg-blue-50 text-primary font-semibold"
-                      : "text-gray-700 hover:bg-gray-50"
+                      : "text-foreground/80 hover:bg-muted"
                   }`}
                   aria-current={active ? "page" : undefined}
                 >
@@ -255,14 +189,14 @@ export default function SiteHeader() {
               <Link
                 href="/admin/data"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block mx-3 px-3 py-3.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="block mx-3 px-3 py-3.5 rounded-xl text-sm font-semibold text-foreground/80 hover:bg-muted"
               >
                 {t.navAdmin}
               </Link>
               <Link
                 href="/admin/users"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block mx-3 px-3 py-3.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="block mx-3 px-3 py-3.5 rounded-xl text-sm font-semibold text-foreground/80 hover:bg-muted"
               >
                 {authUser.username}
               </Link>

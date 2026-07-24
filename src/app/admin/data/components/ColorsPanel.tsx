@@ -138,70 +138,70 @@ export default function ColorsPanel() {
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / rowsPerPage));
   const pageRows = filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-  if (loading) return <p className="text-center py-4 text-sm text-gray-500">加载中...</p>;
+  if (loading) return <p className="text-center py-4 text-sm text-muted-foreground">加载中...</p>;
 
   return (
     <div>
       <div className="flex justify-end items-center mb-4 gap-3">
         <div className="relative flex-1 max-w-xs">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
-          <Input placeholder="搜索颜色、车型、品牌..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="h-9 rounded-lg pl-9 text-[13px]" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input placeholder="搜索颜色、车型、品牌..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="h-9 rounded-lg pl-9 text-2xs" />
         </div>
-        <Button onClick={openCreate} className="rounded-lg bg-[#2487ca] text-[13px] hover:bg-[#1d6fb0]"><Plus className="size-4" /> 新增颜色</Button>
+        <Button onClick={openCreate} className="rounded-lg bg-primary text-2xs hover:bg-primary/80"><Plus className="size-4" /> 新增颜色</Button>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-gray-200">
+      <div className="overflow-x-auto rounded-lg border border-border">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50/80">
-              <TableHead className="w-[60px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">预览</TableHead>
-              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">品牌</TableHead>
-              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">颜色代码</TableHead>
-              <TableHead className="w-[150px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">颜色名称</TableHead>
-              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">车型</TableHead>
-              <TableHead className="w-[80px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">类型</TableHead>
-              <TableHead className="w-[80px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">年份</TableHead>
-              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-gray-500 uppercase text-center">操作</TableHead>
+            <TableRow className="bg-muted/80">
+              <TableHead className="w-[60px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">预览</TableHead>
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">品牌</TableHead>
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">颜色代码</TableHead>
+              <TableHead className="w-[150px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">颜色名称</TableHead>
+              <TableHead className="w-[120px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">车型</TableHead>
+              <TableHead className="w-[80px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">类型</TableHead>
+              <TableHead className="w-[80px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">年份</TableHead>
+              <TableHead className="w-[100px] py-2.5 text-xs font-semibold text-muted-foreground uppercase text-center">操作</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {pageRows.map((row) => (
-              <TableRow key={`${row.colorId}-${row.year ?? 'none'}`} className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/50">
+              <TableRow key={`${row.colorId}-${row.year ?? 'none'}`} className="border-b border-border/50 last:border-b-0 hover:bg-muted/50">
                 <TableCell className="py-3 text-center">
-                  <div className="mx-auto w-10 h-6 rounded border border-gray-200" style={colorSwatchStyle(row.hex_preview)} />
+                  <div className="mx-auto w-10 h-6 rounded border border-border" style={colorSwatchStyle(row.hex_preview)} />
                 </TableCell>
                 <TableCell className="py-3 text-center">
-                  <span className="block truncate text-[13px] font-medium text-gray-900">{row.brandName}</span>
+                  <span className="block truncate text-2xs font-medium text-foreground">{row.brandName}</span>
                 </TableCell>
                 <TableCell className="py-3 text-center">
-                  <span className="text-[13px] font-medium text-gray-500">{row.color_code}</span>
+                  <span className="text-2xs font-medium text-muted-foreground">{row.color_code}</span>
                 </TableCell>
                 <TableCell className="py-3 text-center">
-                  <span className="block truncate text-[13px] text-gray-900">{row.color_name}</span>
+                  <span className="block truncate text-2xs text-foreground">{row.color_name}</span>
                 </TableCell>
                 <TableCell className="py-3 text-center">
-                  <span className="block truncate text-[13px] text-gray-500">{row.car_model || "—"}</span>
+                  <span className="block truncate text-2xs text-muted-foreground">{row.car_model || "—"}</span>
                 </TableCell>
                 <TableCell className="py-3 text-center">
-                  <span className="text-[13px] text-gray-500">{row.color_type}</span>
+                  <span className="text-2xs text-muted-foreground">{row.color_type}</span>
                 </TableCell>
                 <TableCell className="py-3 text-center">
-                  <span className="text-[13px] text-gray-400">{row.year ?? ""}</span>
+                  <span className="text-2xs text-muted-foreground">{row.year ?? ""}</span>
                 </TableCell>
                 <TableCell className="py-3 text-center">
                   <div className="flex items-center justify-center gap-1">
-                    <button onClick={() => openEdit(row.originalColor)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-primary/10 hover:text-primary"><Edit className="size-4" /></button>
-                    <button onClick={() => handleDelete(row.originalColor)} className="inline-flex size-8 items-center justify-center rounded-md text-gray-400 hover:bg-red-50 hover:text-red-500"><Trash2 className="size-4" /></button>
+                    <button onClick={() => openEdit(row.originalColor)} className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-primary/10 hover:text-primary"><Edit className="size-4" /></button>
+                    <button onClick={() => handleDelete(row.originalColor)} className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-destructive/10 hover:text-destructive"><Trash2 className="size-4" /></button>
                   </div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <div className="flex items-center justify-between border-t border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between border-t border-border px-4 py-3">
           <p className="text-sm font-semibold text-primary">Found {filteredRows.length} colors</p>
           <div className="flex items-center gap-2">
-            <span className="text-[13px] text-gray-500">{page + 1} / {totalPages}</span>
+            <span className="text-2xs text-muted-foreground">{page + 1} / {totalPages}</span>
             <Button size="icon" variant="ghost" disabled={page === 0} onClick={() => setPage(page - 1)} className="size-8 rounded-lg">‹</Button>
             <Button size="icon" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="size-8 rounded-lg">›</Button>
           </div>
@@ -214,15 +214,15 @@ export default function ColorsPanel() {
           <DialogHeader><DialogTitle>{editing ? "编辑颜色" : "新增颜色"}</DialogTitle></DialogHeader>
           <div className="flex flex-col gap-5 py-2 max-h-[70vh] overflow-y-auto">
             {/* 基本信息卡片 */}
-            <div className="rounded-xl border border-gray-200 p-5">
-              <h3 className="mb-4 text-sm font-semibold text-gray-700 border-b border-gray-100 pb-3">基本信息</h3>
+            <div className="rounded-xl border border-border p-5">
+              <h3 className="mb-4 text-sm font-semibold text-foreground/80 border-b border-border/50 pb-3">基本信息</h3>
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <Label className="text-sm font-medium text-gray-700">ID</Label>
+                  <Label className="text-sm font-medium text-foreground/80">ID</Label>
                   <Input value={form.id} onChange={(e) => { idManuallyEdited.current = true; setForm({ ...form, id: e.target.value }); }} disabled={!!editing} className="h-9 rounded-lg" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <Label className="text-sm font-medium text-gray-700">品牌</Label>
+                  <Label className="text-sm font-medium text-foreground/80">品牌</Label>
                   <Select value={form.make_id} onValueChange={(v) => setForm({ ...form, make_id: v || "" })}>
                     <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue placeholder="请选择品牌" /></SelectTrigger>
                     <SelectContent className="z-[130] max-h-[200px]">{brands.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}</SelectContent>
@@ -230,45 +230,45 @@ export default function ColorsPanel() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1.5">
-                    <Label className="text-sm font-medium text-gray-700">颜色代码</Label>
+                    <Label className="text-sm font-medium text-foreground/80">颜色代码</Label>
                     <Input value={form.color_code} onChange={(e) => setForm({ ...form, color_code: e.target.value })} className="h-9 rounded-lg" />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <Label className="text-sm font-medium text-gray-700">颜色名称</Label>
+                    <Label className="text-sm font-medium text-foreground/80">颜色名称</Label>
                     <Input value={form.color_name} onChange={(e) => setForm({ ...form, color_name: e.target.value })} className="h-9 rounded-lg" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1.5">
-                    <Label className="text-sm font-medium text-gray-700">类型</Label>
+                    <Label className="text-sm font-medium text-foreground/80">类型</Label>
                     <Select value={form.color_type} onValueChange={(v) => setForm({ ...form, color_type: (v || "solid") as Color["color_type"] })}>
                       <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue /></SelectTrigger>
                       <SelectContent className="z-[130] max-h-[200px]">{COLOR_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <Label className="text-sm font-medium text-gray-700">预览色</Label>
+                    <Label className="text-sm font-medium text-foreground/80">预览色</Label>
                     <Input type="color" value={form.hex_preview} onChange={(e) => setForm({ ...form, hex_preview: e.target.value })} className="h-9 rounded-lg p-1" />
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <Label className="text-sm font-medium text-gray-700">车型</Label>
+                  <Label className="text-sm font-medium text-foreground/80">车型</Label>
                   <Input value={form.car_model} onChange={(e) => setForm({ ...form, car_model: e.target.value })} placeholder="例如 Camry / Corolla" className="h-9 rounded-lg" />
                 </div>
               </div>
             </div>
 
             {/* 适用年份卡片 */}
-            <div className="rounded-xl border border-gray-200 p-5">
-              <h3 className="mb-4 text-sm font-semibold text-gray-700 border-b border-gray-100 pb-3">适用年份</h3>
+            <div className="rounded-xl border border-border p-5">
+              <h3 className="mb-4 text-sm font-semibold text-foreground/80 border-b border-border/50 pb-3">适用年份</h3>
               <div className="flex flex-wrap gap-2 mb-3">
                 {years.map((year) => (
-                  <span key={year} className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1 text-[13px] text-blue-700">
+                  <span key={year} className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1 text-2xs text-blue-700">
                     {year}
                     <button onClick={() => setYears(years.filter((y) => y !== year))} className="size-4 text-blue-400 hover:text-blue-600"><X className="size-3" /></button>
                   </span>
                 ))}
-                {years.length === 0 && <p className="text-[13px] text-gray-400">暂无年份</p>}
+                {years.length === 0 && <p className="text-2xs text-muted-foreground">暂无年份</p>}
               </div>
               <div className="flex gap-2">
                 <Input
@@ -289,7 +289,7 @@ export default function ColorsPanel() {
                     }
                   }}
                 />
-                <Button variant="outline" size="sm" className="rounded-lg text-[13px]" onClick={() => {
+                <Button variant="outline" size="sm" className="rounded-lg text-2xs" onClick={() => {
                   const val = parseInt(yearInput, 10);
                   if (val >= 1900 && val <= 2100 && !years.includes(val)) {
                     setYears([...years, val].sort((a, b) => a - b));
@@ -300,11 +300,11 @@ export default function ColorsPanel() {
             </div>
 
             {/* 关联变体卡片 */}
-            <div className="rounded-xl border border-gray-200 p-5">
-              <h3 className="mb-4 text-sm font-semibold text-gray-700 border-b border-gray-100 pb-3">关联变体</h3>
-              <div className="max-h-[200px] overflow-auto rounded-lg border border-gray-200 p-3">
+            <div className="rounded-xl border border-border p-5">
+              <h3 className="mb-4 text-sm font-semibold text-foreground/80 border-b border-border/50 pb-3">关联变体</h3>
+              <div className="max-h-[200px] overflow-auto rounded-lg border border-border p-3">
                 {allVariants.length === 0 ? (
-                  <p className="text-[13px] text-gray-400">暂无变体</p>
+                  <p className="text-2xs text-muted-foreground">暂无变体</p>
                 ) : (
                   <div className="flex flex-col gap-1">
                     {allVariants.map((v) => (
@@ -313,9 +313,9 @@ export default function ColorsPanel() {
                           type="checkbox"
                           checked={variantIds.includes(v.id)}
                           onChange={() => toggleVariant(v.id)}
-                          className="size-4 rounded border-gray-300 text-primary focus:ring-primary"
+                          className="size-4 rounded border-input text-primary focus:ring-primary"
                         />
-                        <span className="text-[13px] text-gray-700">{v.name} <span className="text-gray-400">({v.year_range})</span></span>
+                        <span className="text-2xs text-foreground/80">{v.name} <span className="text-muted-foreground">({v.year_range})</span></span>
                       </label>
                     ))}
                   </div>
@@ -323,11 +323,11 @@ export default function ColorsPanel() {
               </div>
             </div>
 
-            {error && <p className="text-[13px] font-medium text-red-600">{error}</p>}
+            {error && <p className="text-2xs font-medium text-destructive">{error}</p>}
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowModal(false)} className="rounded-lg">取消</Button>
-            <Button onClick={handleSave} className="rounded-lg bg-[#2487ca] hover:bg-[#1d6fb0]">保存</Button>
+            <Button variant="outline" onClick={() => setShowModal(false)} className="rounded-lg text-2xs">取消</Button>
+            <Button onClick={handleSave} className="rounded-lg bg-primary hover:bg-primary/80">保存</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

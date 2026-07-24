@@ -187,7 +187,7 @@ export default function Home() {
             >
               {/* 标题 */}
               <div className="mb-5 md:mb-7 w-full text-center">
-                <h1 className="text-lg sm:text-[22px] md:text-[30px] lg:text-[38px] leading-tight font-extrabold text-primary tracking-[-0.02em]">
+                <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl leading-tight font-extrabold text-primary tracking-tight font-heading">
                   <SplitText
                     text={`${t.heroTitlePrefix} ${t.heroTitleHighlight}`}
                     tag="span"

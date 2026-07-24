@@ -39,6 +39,7 @@ function FlagIcon({ code }: { code: string }) {
   );
 }
 
+/* LanguageSwitcher — 颜色跟随父级 data-header-theme 驱动 */
 export default function LanguageSwitcher({
   isHome,
   transitionStyle,
@@ -51,10 +52,10 @@ export default function LanguageSwitcher({
   return (
     <Select value={lang} onValueChange={(v) => setLang((v as Lang) || "en")}>
       <SelectTrigger
-        className="h-9 w-auto min-w-0 gap-1 rounded-lg border px-3 text-[13px] font-semibold transition-all duration-[1.5s] ease-in-out"
+        className="h-9 w-auto min-w-0 gap-1 rounded-lg border px-3 text-2xs font-semibold transition-all duration-[1.5s] ease-in-out lang-switcher-trigger"
         style={{
-          borderColor: isHome ? "rgb(209,213,219)" : "rgba(255,255,255,0.3)",
-          color: isHome ? "#6b7280" : "rgba(255,255,255,0.7)",
+          borderColor: isHome ? "var(--border)" : "var(--header-border)",
+          color: isHome ? "var(--color-mute)" : "var(--header-text-muted)",
           backgroundColor: "transparent",
           transition: transitionStyle,
         }}

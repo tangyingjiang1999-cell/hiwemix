@@ -30,7 +30,7 @@ export default function Toast({ message, onDone, duration = 2000 }: ToastProps) 
   return (
     <div className="fixed bottom-6 left-1/2 z-[2000] -translate-x-1/2">
       <div
-        className={`flex items-center gap-2 rounded-xl bg-[#2487ca] px-4 py-2.5 text-[13px] font-medium text-white shadow-lg transition-all duration-300 ${
+        className={`flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-2xs font-medium text-white shadow-lg transition-all duration-300 ${
           visible && !exiting ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
         }`}
       >

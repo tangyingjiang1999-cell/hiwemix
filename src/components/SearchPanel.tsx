@@ -105,7 +105,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
         {/* Row 1: Make | Color Code | Color Type */}
         <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t.make}</Label>
+          <Label className="text-sm font-medium text-foreground/80">{t.make}</Label>
           <Select value={makeId} onValueChange={(v) => setMakeId(v || "")}>
             <SelectTrigger className="h-9 w-full rounded-lg">
               <SelectValue placeholder="All" />
@@ -120,7 +120,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t.colorCode}</Label>
+          <Label className="text-sm font-medium text-foreground/80">{t.colorCode}</Label>
           <Input
             value={colorCode}
             onChange={(e) => setColorCode(e.target.value.replace(/\s/g, "").toUpperCase())}
@@ -131,7 +131,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t.colorType}</Label>
+          <Label className="text-sm font-medium text-foreground/80">{t.colorType}</Label>
           <Select value={colorType} onValueChange={(v) => setColorType(v || "")}>
             <SelectTrigger className="h-9 w-full rounded-lg">
               <SelectValue placeholder={t.colorTypeAll} />
@@ -146,7 +146,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
 
         {/* Row 2: Color Name | Year | Search + Reset buttons */}
         <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t.colorName}</Label>
+          <Label className="text-sm font-medium text-foreground/80">{t.colorName}</Label>
           <Input
             value={colorName}
             onChange={(e) => setColorName(e.target.value)}
@@ -156,7 +156,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-gray-700">{t.year}</Label>
+          <Label className="text-sm font-medium text-foreground/80">{t.year}</Label>
           <Input
             value={year}
             onChange={(e) => setYear(e.target.value)}
@@ -172,7 +172,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
             type="submit"
             disabled={isLoading}
             variant="default"
-            className="h-9 flex-1 rounded-xl bg-[#2487ca] text-[13px] font-semibold hover:bg-[#1d6fb0]"
+            className="h-9 flex-1 rounded-xl bg-primary text-2xs font-semibold hover:bg-primary/80"
           >
             <Search className="size-4" />
             {isLoading ? t.searching : t.search}
@@ -182,7 +182,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
             onClick={handleReset}
             disabled={isLoading}
             variant="outline"
-            className="h-9 flex-1 rounded-xl text-[13px] font-semibold"
+            className="h-9 flex-1 rounded-xl text-2xs font-semibold"
           >
             <RotateCcw className="size-4" />
             {t.reset}

@@ -15,14 +15,14 @@ function GuideContent({ guide }: { guide: Guide }) {
 
   return (
     <div>
-      <h2 className="mb-4 text-base font-bold text-gray-900">
+      <h2 className="mb-4 text-base font-semibold text-foreground font-heading">
         {lang === "zh" ? guide.titleZh : guide.title}
       </h2>
       <div>
         {lines.map((line, index) => {
           if (line.endsWith(":") && !line.startsWith(" ")) {
             return (
-              <h3 key={index} className="mt-5 mb-1 text-sm font-semibold text-gray-800">
+              <h3 key={index} className="mt-5 mb-1 text-sm font-semibold text-foreground">
                 {line}
               </h3>
             );
@@ -30,13 +30,13 @@ function GuideContent({ guide }: { guide: Guide }) {
           if (line.match(/^\d+\./)) {
             return (
               <div key={index} className="ml-4">
-                <p className="text-sm text-gray-600">{line}</p>
+                <p className="text-sm text-muted-foreground">{line}</p>
               </div>
             );
           }
           if (line.trim() === "") return <br key={index} />;
           return (
-            <p key={index} className="text-sm leading-relaxed text-gray-600">
+            <p key={index} className="text-sm leading-relaxed text-muted-foreground">
               {line}
             </p>
           );
@@ -88,17 +88,17 @@ export default function ApplicationGuidePage() {
       {/* Body: 三栏布局 */}
       <div className="flex flex-1 flex-col pt-16 lg:flex-row lg:overflow-hidden">
         {/* 左栏：分类菜单 */}
-        <div className="border-b border-gray-200 px-6 pt-5 pb-3 sm:px-8 md:pl-[60px] md:pr-4 lg:w-[240px] lg:flex-shrink-0 lg:border-b-0 lg:border-r lg:pt-8 lg:overflow-y-auto lg:max-h-[calc(100vh-64px)]">
-          <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <div className="border-b border-border px-6 pt-5 pb-3 sm:px-8 md:pl-[60px] md:pr-4 lg:w-[240px] lg:flex-shrink-0 lg:border-b-0 lg:border-r lg:pt-8 lg:overflow-y-auto lg:max-h-[calc(100vh-64px)]">
+          <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             {t.guideCategories}
           </span>
           <div className="flex flex-col gap-0.5">
             <button
               onClick={() => setSelectedCategory("")}
-              className={`relative rounded-lg px-3 py-2 text-left text-[13px] transition-colors ${
+              className={`relative rounded-lg px-3 py-2 text-left text-2xs transition-colors ${
                 selectedCategory === ""
                   ? "bg-blue-50/60 font-semibold text-primary"
-                  : "font-normal text-gray-600 hover:bg-gray-50"
+                  : "font-medium text-muted-foreground hover:bg-muted"
               }`}
             >
               {selectedCategory === "" && (
@@ -110,10 +110,10 @@ export default function ApplicationGuidePage() {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`relative rounded-lg px-3 py-2 text-left text-[13px] transition-colors ${
+                className={`relative rounded-lg px-3 py-2 text-left text-2xs transition-colors ${
                   selectedCategory === cat.id
                     ? "bg-blue-50/60 font-semibold text-primary"
-                    : "font-normal text-gray-600 hover:bg-gray-50"
+                    : "font-medium text-muted-foreground hover:bg-muted"
                 }`}
               >
                 {selectedCategory === cat.id && (
@@ -126,15 +126,15 @@ export default function ApplicationGuidePage() {
         </div>
 
         {/* 中栏：指南列表 */}
-        <div className="border-b border-gray-200 bg-gray-50/50 p-4 pt-4 sm:p-5 lg:w-[320px] lg:flex-shrink-0 lg:border-b-0 lg:border-r lg:pt-5 lg:overflow-y-auto lg:max-h-[calc(100vh-64px)]">
+        <div className="border-b border-border bg-muted/50 p-4 pt-4 sm:p-5 lg:w-[320px] lg:flex-shrink-0 lg:border-b-0 lg:border-r lg:pt-5 lg:overflow-y-auto lg:max-h-[calc(100vh-64px)]">
           {/* 搜索框 */}
           <div className="relative mb-3">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t.guideSearchPlaceholder}
-              className="h-9 rounded-xl pl-9 text-[13px]"
+              className="h-9 rounded-xl pl-9 text-2xs"
             />
           </div>
 
@@ -146,13 +146,13 @@ export default function ApplicationGuidePage() {
                 className={`cursor-pointer rounded-xl border px-3.5 py-3 transition-colors ${
                   selectedGuide?.id === guide.id
                     ? "border-primary bg-blue-50/30 shadow-sm"
-                    : "border-gray-200/60 bg-white hover:border-primary"
+                    : "border-border/60 bg-white hover:border-primary"
                 }`}
               >
-                <p className="text-[13px] font-semibold text-gray-900 md:text-sm">
+                <p className="text-2xs font-semibold text-foreground md:text-sm">
                   {lang === "zh" ? guide.titleZh : guide.title}
                 </p>
-                <p className="mt-1 text-xs text-gray-400">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {categories.find((c) => c.id === guide.categoryId)?.[lang === "zh" ? "nameZh" : "name"] || guide.categoryId}
                 </p>
               </div>
@@ -166,7 +166,7 @@ export default function ApplicationGuidePage() {
             <GuideContent guide={selectedGuide} />
           ) : (
             <div className="flex min-h-[256px] items-center justify-center">
-              <p className="text-sm text-gray-400">{t.guideSelectHint}</p>
+              <p className="text-sm text-muted-foreground">{t.guideSelectHint}</p>
             </div>
           )}
         </div>
