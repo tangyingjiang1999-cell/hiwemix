@@ -8,6 +8,8 @@ import KapciFormulaTable from "./KapciFormulaTable";
 import Toast from "./Toast";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { X, Printer, Copy } from "lucide-react";
 
@@ -65,9 +67,9 @@ function parseHexInput(raw: string, fallback: string): string {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-6">
-      <span className="w-28 flex-shrink-0 text-2xs text-muted-foreground md:text-base">{label}</span>
-      <span className="min-w-0 flex-1 break-words text-sm md:text-xl">{value}</span>
+    <div className="flex items-baseline border-b border-border/40 py-1.5 last:border-b-0">
+      <span className="w-28 flex-shrink-0 text-xs font-medium text-foreground/70 md:text-sm">{label}</span>
+      <span className="min-w-0 flex-1 break-words text-sm md:text-base">{value}</span>
     </div>
   );
 }
@@ -135,42 +137,61 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
   }
 
   const currentYear = initialYear?.toString() || "-";
-  const TAB_KEYS = ["info", "docs", "plastic"] as const;
 
   return (
     <>
       <Sheet open onOpenChange={(v) => { if (!v) handleClose(); }}>
         <SheetContent side="right" className="!fixed !inset-0 !w-screen !max-w-full !translate-x-0 !rounded-none p-0 gap-0 overflow-y-auto bg-white">
-          {/* Header Bar */}
-          <div className="sticky top-0 z-10 flex items-center gap-3 border-b border-border bg-white px-3 py-2 sm:px-4 sm:py-3">
-            <div
-              className="size-9 flex-shrink-0 border border-border sm:size-12"
-              style={colorSwatchStyle(previewColor)}
-            />
-            <div className="min-w-0 flex-1">
-              <h2 className="truncate text-sm font-semibold text-foreground md:text-base font-heading">{color.color_name}</h2>
-              <p className="text-xs text-muted-foreground">{color.color_code}</p>
+          {/* Header Bar: 品牌/颜色代码/名称/元数据 + 操作按钮 */}
+          <div className="sticky top-0 z-10 border-b border-border bg-white px-3 py-3 sm:px-5 sm:py-4">
+            <div className="flex items-start gap-3 sm:gap-4">
+              {/* 色块预览 */}
+              <div
+                className="size-10 flex-shrink-0 rounded-xl border border-border/60 sm:size-14"
+                style={colorSwatchStyle(previewColor)}
+              />
+
+              {/* 中间：品牌+代码 Badge → 颜色名大标题 → 元数据行 */}
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Badge variant="secondary" className="text-xs">{make}</Badge>
+                  <Badge variant="outline" className="text-xs font-mono">{color.color_code}</Badge>
+                </div>
+                <h2 className="mt-1.5 text-lg font-bold leading-tight text-foreground font-heading sm:text-xl md:text-2xl">
+                  {color.color_name}
+                </h2>
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-2xs text-muted-foreground sm:text-xs">
+                  <span>{origin}</span>
+                  <span className="text-border/70" aria-hidden="true">|</span>
+                  <span>{currentYear}</span>
+                  <span className="text-border/70" aria-hidden="true">|</span>
+                  <span>{activeFormula?.formula_type || "-"}</span>
+                  <span className="text-border/70" aria-hidden="true">|</span>
+                  <span>{t.version} {activeFormula?.version || "-"}</span>
+                </div>
+              </div>
+
+              {/* 右侧操作按钮 */}
+              <div className="flex items-center gap-1.5 flex-shrink-0">
+                <Button onClick={handlePrint} variant="outline" size="sm" className="hidden sm:inline-flex">
+                  <Printer className="size-4" />
+                  {t.print}
+                </Button>
+                <Button onClick={handlePrint} size="icon-sm" variant="ghost" className="inline-flex sm:hidden">
+                  <Printer className="size-4" />
+                </Button>
+                <Button onClick={handleCopy} variant="default" size="sm" className="hidden sm:inline-flex">
+                  <Copy className="size-4" />
+                  {t.copy}
+                </Button>
+                <Button onClick={handleCopy} size="icon-sm" className="inline-flex sm:hidden">
+                  <Copy className="size-4" />
+                </Button>
+                <Button onClick={handleClose} variant="ghost" size="icon-sm">
+                  <X className="size-5" />
+                </Button>
+              </div>
             </div>
-
-            {/* Print + Copy buttons (移动端图标-only) */}
-            <Button onClick={handlePrint} variant="outline" size="sm" className="hidden rounded-lg sm:inline-flex">
-              <Printer className="size-4" />
-              {t.print}
-            </Button>
-            <Button onClick={handlePrint} size="icon" variant="ghost" className="inline-flex sm:hidden size-9 rounded-lg text-foreground/80">
-              <Printer className="size-4" />
-            </Button>
-            <Button onClick={handleCopy} variant="default" size="sm" className="hidden rounded-lg bg-primary sm:inline-flex">
-              <Copy className="size-4" />
-              {t.copy}
-            </Button>
-            <Button onClick={handleCopy} size="icon" className="inline-flex sm:hidden size-9 rounded-lg bg-primary text-white">
-              <Copy className="size-4" />
-            </Button>
-
-            <Button onClick={handleClose} variant="ghost" size="icon" className="size-9 rounded-lg">
-              <X className="size-5" />
-            </Button>
           </div>
 
           {/* Body: 两栏布局 */}
@@ -181,19 +202,15 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                 <div>
                   {/* Version + Chips */}
                   <div className="mb-4 flex flex-wrap items-center gap-2">
-                    <span className="text-2xs font-semibold text-foreground md:text-lg">
+                    <span className="text-xs font-semibold text-muted-foreground md:text-sm">
                       {t.version} {activeFormula.version}
                     </span>
-                    <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${
-                      activeFormula?.paint_system === "2K"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-emerald-100 text-emerald-700"
-                    }`}>
+                    <Badge variant={activeFormula?.paint_system === "2K" ? "default" : "secondary"}>
                       {activeFormula?.paint_system}
-                    </span>
-                    <span className="inline-flex items-center rounded-md bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                    </Badge>
+                    <Badge variant="outline" className="border-amber-200 text-amber-700">
                       {activeFormula?.formula_type ?? ""}
-                    </span>
+                    </Badge>
                   </div>
 
                   <KapciFormulaTable
@@ -205,7 +222,7 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                   />
 
                   {activeFormula.notes && (
-                    <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50/50 p-3">
+                    <div className="mt-4 rounded-xl border border-amber-200/60 bg-amber-50/30 p-3">
                       <span className="text-xs font-semibold text-amber-700">{t.notesLabel}</span>
                       <p className="mt-1 text-xs text-amber-600">{activeFormula.notes}</p>
                     </div>
@@ -225,34 +242,23 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                   {t.colorPreview}
                 </span>
                 <div
-                  className="mt-3 h-[60px] border border-border sm:h-[120px]"
+                  className="mt-3 h-[50px] rounded-xl border border-border/60 sm:h-[80px]"
                   style={colorSwatchStyle(previewColor)}
                 />
               </div>
 
               <Separator />
 
-              {/* Tab Switcher */}
-              <div className="flex border-b border-border">
-                {[t.tabColorInfo, t.tabColorDocs, t.tabPlasticParts].map((label, idx) => (
-                  <button
-                    key={label}
-                    onClick={() => setInfoTab(idx)}
-                    className={`flex-1 py-2.5 text-center text-xs font-medium transition-colors md:text-sm ${
-                      infoTab === idx
-                        ? "border-b-2 border-primary text-primary"
-                        : "text-muted-foreground hover:text-foreground/80"
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
+              {/* Tab Switcher: shadcn 胶囊式 Tabs */}
+              <Tabs value={infoTab} onValueChange={(v) => setInfoTab(Number(v))}>
+                <TabsList variant="default" className="mx-4 mt-2 w-[calc(100%-2rem)] sm:mx-5 sm:mt-3 sm:w-[calc(100%-2.5rem)]">
+                  <TabsTrigger value={0} className="text-xs md:text-sm">{t.tabColorInfo}</TabsTrigger>
+                  <TabsTrigger value={1} className="text-xs md:text-sm">{t.tabColorDocs}</TabsTrigger>
+                  <TabsTrigger value={2} className="text-xs md:text-sm">{t.tabPlasticParts}</TabsTrigger>
+                </TabsList>
 
-              {/* Tab Panels */}
-              <div className="p-4 sm:p-5">
-                {infoTab === 0 && (
-                  <div className="flex flex-col gap-3 md:gap-5">
+                <TabsContent value={0} className="p-4 sm:p-5">
+                  <div className="flex flex-col gap-2 md:gap-3">
                     <InfoRow label={t.manufacturerLabel} value={make} />
                     <InfoRow label={t.originLabel} value={origin} />
                     <InfoRow label={t.codeLabel} value={color.color_code} />
@@ -262,13 +268,16 @@ export default function FormulaDrawer({ result, onClose, initialFormulaIdx, form
                     <InfoRow label={t.processLabel} value={activeFormula?.formula_type || "-"} />
                     <InfoRow label={t.versionLabel} value={activeFormula?.version || "-"} />
                   </div>
-                )}
-                {(infoTab === 1 || infoTab === 2) && (
-                  <div className="py-8 text-center">
-                    <p className="text-xs text-muted-foreground">{t.emptyState}</p>
-                  </div>
-                )}
-              </div>
+                </TabsContent>
+
+                <TabsContent value={1} className="py-8 text-center">
+                  <p className="text-xs text-muted-foreground">{t.emptyState}</p>
+                </TabsContent>
+
+                <TabsContent value={2} className="py-8 text-center">
+                  <p className="text-xs text-muted-foreground">{t.emptyState}</p>
+                </TabsContent>
+              </Tabs>
             </div>
           </div>
         </SheetContent>

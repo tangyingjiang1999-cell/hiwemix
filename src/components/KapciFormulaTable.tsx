@@ -103,14 +103,14 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
   return (
     <div>
       {/* 总量控制栏 */}
-      <div className="mb-4 flex flex-col flex-wrap items-stretch gap-2 rounded-lg bg-muted p-3 sm:flex-row sm:items-center">
+      <div className="mb-4 flex flex-col flex-wrap items-stretch gap-2 rounded-xl border border-border/60 bg-muted/30 p-3 sm:flex-row sm:items-center">
         <div className="flex flex-wrap items-center gap-2 flex-1">
           <span className="text-xs font-medium text-muted-foreground md:text-sm">{t.volume}</span>
           <Input
             type="number"
             value={volume}
             onChange={(e) => handleVolumeChange(e.target.value)}
-            className="h-8 w-[72px] rounded-lg text-center text-xs md:w-[90px]"
+            className="h-8 w-[72px] rounded-md text-center text-xs md:w-[90px]"
             min={0.1}
             step={0.1}
           />
@@ -181,19 +181,19 @@ export default function KapciFormulaTable({ formula, activeGroup = "Pearl Paint"
                       type="number"
                       value={weights[idx] ?? ""}
                       onChange={(e) => handleWeightChange(idx, e.target.value)}
-                      className="h-8 w-full rounded text-center text-sm md:text-xl"
+                      className="h-8 w-full border-0 bg-transparent px-1 text-center font-mono text-sm tabular-nums shadow-none focus-visible:ring-1 focus-visible:ring-ring/30 md:text-lg"
                       min={0}
                       step={0.1}
                     />
                   </TableCell>
-                  <TableCell className="py-2.5 text-sm font-semibold text-foreground tabular-nums md:text-xl">
+                  <TableCell className="py-2.5 text-right text-sm font-semibold text-foreground tabular-nums md:text-xl">
                     {running.toFixed(1)}
                   </TableCell>
                   <TableCell className="py-2.5">
                     <div
                       role="img"
                       aria-label={`${comp.toner_name} ${t.massTone}`}
-                      className="h-6 w-full min-w-[60px] border border-border md:h-7"
+                      className="mx-auto h-5 w-10 rounded-sm border border-border/60 md:h-6 md:w-12"
                       style={{ backgroundColor: massToneColor(comp) }}
                     />
                   </TableCell>

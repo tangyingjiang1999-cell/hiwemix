@@ -1,20 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useLang } from "@/components/LanguageContext";
 import { colorSwatchStyle } from "@/lib/utils";
 import type { FormulaTableRow } from "@/types";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SearchSlash, ZoomIn, ChevronLeft, ChevronRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { SearchSlash } from "lucide-react";
 
 export interface SearchResultsProps {
   rows: FormulaTableRow[];
@@ -23,76 +16,236 @@ export interface SearchResultsProps {
   onOpenFormula: (row: FormulaTableRow) => void;
 }
 
-function SkeletonRows() {
+function SkeletonGrid() {
   return (
-    <TableBody>
-      {[0, 1, 2, 3, 4].map((i) => (
-        <TableRow key={i}>
-          <TableCell><Skeleton className="h-5 w-10 rounded" /></TableCell>
-          <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-          <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-          <TableCell><Skeleton className="h-4 w-24" /></TableCell>
-          <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-20" /></TableCell>
-          <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-10" /></TableCell>
-          <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-16" /></TableCell>
-          <TableCell className="hidden md:table-cell"><Skeleton className="h-4 w-10" /></TableCell>
-          <TableCell><Skeleton className="size-7 rounded-full" /></TableCell>
-        </TableRow>
+    <div className="grid grid-cols-6 gap-x-0 gap-y-[30px] px-4 pb-4">
+      {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((i) => (
+        <Skeleton key={i} className="aspect-square w-full rounded-none" />
       ))}
-    </TableBody>
+    </div>
   );
 }
 
-// ===== 内联分页器组件 =====
-function CustomPagination({
-  totalCount,
-  page,
-  pageSize,
-  onPageChange,
-  unitName = "formulas",
+// ===== 子卡片组件：浮层内展示变体差异信息 =====
+function VariantSubCard({
+  row,
+  onClick,
 }: {
-  totalCount: number;
-  page: number;
-  pageSize: number;
-  onPageChange: (newPage: number) => void;
-  unitName?: string;
+  row: FormulaTableRow;
+  onClick: () => void;
 }) {
-  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const hex = row.color.hex_preview;
+  const displayTitle = row.variant?.name || row.formula.version;
+  const displayYear = row.variant?.year_range || row.year?.toString() || "";
+  const displayMeta = `${row.formula.paint_system} | ${row.formula.formula_type}`;
 
   return (
-    <div className="flex items-center justify-between border-t border-border px-4 py-3">
-      <p className="text-sm font-semibold text-primary" aria-live="polite">
-        Found {totalCount} {unitName}
-      </p>
-      <div className="flex items-center gap-2">
-        <span className="text-2xs text-muted-foreground">
-          {page + 1} / {totalPages}
-        </span>
-        <Button
-          size="icon"
-          variant="ghost"
-          disabled={page === 0}
-          onClick={() => onPageChange(page - 1)}
-          aria-label="Previous page"
-          className="size-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:text-muted-foreground/50"
-        >
-          <ChevronLeft className="size-4" />
-        </Button>
-        <Button
-          size="icon"
-          variant="ghost"
-          disabled={page >= totalPages - 1}
-          onClick={() => onPageChange(page + 1)}
-          aria-label="Next page"
-          className="size-8 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 disabled:text-muted-foreground/50"
-        >
-          <ChevronRight className="size-4" />
-        </Button>
+    <div
+      className="group relative h-20 w-20 cursor-pointer overflow-hidden rounded-lg transition-all duration-300 ease-in-out active:scale-[0.95]"
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+      aria-label={`${displayTitle} ${displayYear}`}
+    >
+      {/* 色块背景 */}
+      <div
+        className="absolute inset-0"
+        style={
+          hex ? colorSwatchStyle(hex) : { backgroundColor: "#d1d5db" }
+        }
+      />
+
+      {/* 悬停遮罩 */}
+      <div className="absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+      {/* 变体差异信息 */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5 p-1 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <p className="max-w-full truncate text-center font-mono text-xs font-bold text-white">
+          {displayTitle}
+        </p>
+        {displayYear && (
+          <p className="max-w-full truncate text-center text-[10px] text-white/80">
+            {displayYear}
+          </p>
+        )}
+        <p className="max-w-full truncate text-center text-[9px] leading-tight text-white/70">
+          {displayMeta}
+        </p>
       </div>
     </div>
   );
 }
 
+// ===== 母卡片组件：含 Popover 浮层展开变体子卡片 =====
+function GroupedColorCard({
+  rows,
+  onSelect,
+}: {
+  rows: FormulaTableRow[];
+  onSelect: (row: FormulaTableRow) => void;
+}) {
+  const parent = rows[0];
+  const hex = parent.color.hex_preview;
+  const hasVariants = rows.length > 1;
+  const [open, setOpen] = useState(false);
+  const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 清除所有定时器
+  const clearTimers = useCallback(() => {
+    if (openTimerRef.current) {
+      clearTimeout(openTimerRef.current);
+      openTimerRef.current = null;
+    }
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }, []);
+
+  // 组件卸载时清理
+  useEffect(() => () => clearTimers(), [clearTimers]);
+
+  // 鼠标进入母卡片：延迟打开浮层（300ms 防误触）
+  function handleMouseEnter() {
+    if (!hasVariants) return;
+    clearTimers();
+    openTimerRef.current = setTimeout(() => setOpen(true), 300);
+  }
+
+  // 鼠标离开母卡片：延迟关闭浮层
+  function handleMouseLeave() {
+    if (!hasVariants) return;
+    clearTimers();
+    closeTimerRef.current = setTimeout(() => setOpen(false), 300);
+  }
+
+  // 鼠标进入浮层区域：取消关闭定时器，保持展开
+  function handlePopoverEnter() {
+    clearTimers();
+  }
+
+  // 鼠标离开浮层区域：延迟关闭
+  function handlePopoverLeave() {
+    clearTimers();
+    closeTimerRef.current = setTimeout(() => setOpen(false), 300);
+  }
+
+  // 点击母卡片
+  function handleClick() {
+    if (!hasVariants) {
+      // 单配方：直接打开详情面板
+      onSelect(parent);
+    } else {
+      // 多变体：点击切换浮层（支持触屏设备）
+      clearTimers();
+      setOpen((prev) => !prev);
+    }
+  }
+
+  // 母卡片纯视觉内容（复用于 PopoverTrigger render 和单配方卡片）
+  const cardBody = (
+    <div
+      className="group relative aspect-square cursor-pointer overflow-hidden transition-all duration-300 ease-in-out active:scale-[0.98]"
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+      aria-label={`${parent.color.color_code} ${parent.color.color_name}`}
+    >
+      {/* 颜色底色 + 金属漆渐变光泽 */}
+      <div
+        className="absolute inset-0"
+        style={
+          hex ? colorSwatchStyle(hex) : { backgroundColor: "#d1d5db" }
+        }
+      />
+
+      {/* 悬停时半透明黑色遮罩，平滑淡入 */}
+      <div className="absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+      {/* 悬停文字内容，与遮罩同步淡入 */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <p className="max-w-full truncate text-center font-mono text-3xl font-bold tracking-tight text-white">
+          {parent.color.color_code}
+        </p>
+        <p className="max-w-full truncate text-center text-sm font-medium text-white">
+          {parent.color.color_name}
+        </p>
+        <p className="text-center text-xs capitalize text-white/80">
+          {parent.color.color_type}
+        </p>
+      </div>
+
+      {/* +N 变体徽标 */}
+      {hasVariants && (
+        <div className="pointer-events-none absolute bottom-2 right-2 z-10">
+          <Badge variant="default" className="text-xs shadow-lg">
+            +{rows.length - 1}
+          </Badge>
+        </div>
+      )}
+    </div>
+  );
+
+  // 单配方：直接返回卡片，无需 Popover
+  if (!hasVariants) {
+    return <div className="animate-card-row">{cardBody}</div>;
+  }
+
+  // 多变体：Popover 包裹，悬停弹出子卡片浮层
+  return (
+    <div className="animate-card-row">
+      <Popover
+        open={open}
+        onOpenChange={(v) => {
+          if (!v) {
+            clearTimers();
+            setOpen(false);
+          }
+        }}
+      >
+        <PopoverTrigger render={cardBody} nativeButton={false} />
+        <PopoverContent
+          side="bottom"
+          align="start"
+          sideOffset={8}
+          className="w-auto border border-border/60 bg-popover p-3 shadow-lg"
+          onMouseEnter={handlePopoverEnter}
+          onMouseLeave={handlePopoverLeave}
+        >
+          <div className="flex gap-3">
+            {rows.map((row, idx) => (
+              <VariantSubCard
+                key={idx}
+                row={row}
+                onClick={() => {
+                  setOpen(false);
+                  onSelect(row);
+                }}
+              />
+            ))}
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
+
+// ===== 主搜索结果显示组件 =====
 export default function SearchResults({
   rows,
   isLoading,
@@ -100,22 +253,14 @@ export default function SearchResults({
   onOpenFormula,
 }: SearchResultsProps) {
   const { t } = useLang();
-  const [page, setPage] = useState(0);
-  const [rowsPerPage] = useState(10);
-
-  useEffect(() => {
-    setPage(0);
-  }, [rows]);
 
   if (isLoading) {
     return (
-      <div className="p-3">
-        <div className="mb-1">
-          <Skeleton className="h-4 w-44" />
+      <div>
+        <div className="flex items-center px-4 py-3">
+          <Skeleton className="h-4 w-32" />
         </div>
-        <Table>
-          <SkeletonRows />
-        </Table>
+        <SkeletonGrid />
       </div>
     );
   }
@@ -130,90 +275,51 @@ export default function SearchResults({
 
   if (rows.length === 0) {
     return (
-      <div className="flex min-h-[300px] flex-col items-center justify-center p-3" role="status">
-        <SearchSlash aria-hidden="true" className="mb-2 size-14 text-muted-foreground" />
-        <p className="text-base font-semibold text-foreground">{t.noResults}</p>
-        <p className="mt-1 text-2xs font-medium text-muted-foreground">{t.noResultsHint}</p>
+      <div
+        className="flex min-h-[300px] flex-col items-center justify-center p-3"
+        role="status"
+      >
+        <SearchSlash
+          aria-hidden="true"
+          className="mb-2 size-14 text-muted-foreground"
+        />
+        <p className="text-base font-semibold text-foreground">
+          {t.noResults}
+        </p>
+        <p className="mt-1 text-2xs font-medium text-muted-foreground">
+          {t.noResultsHint}
+        </p>
       </div>
     );
   }
 
-  const pageRows = rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  // 按 color_code 分组：同一颜色的多个配方合并为一个母卡片
+  const groups = new Map<string, FormulaTableRow[]>();
+  for (const row of rows) {
+    const key = row.color.color_code;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(row);
+  }
+  const groupedEntries = Array.from(groups.entries());
 
   return (
-    <div className="mx-0 sm:-mx-1">
-      <div className="overflow-x-auto rounded-none border border-border border-t-2 border-t-primary">
-        <Table>
-          <caption className="sr-only">Formula search results table</caption>
-          <TableHeader>
-            <TableRow className="bg-primary hover:bg-primary">
-              <TableHead className="w-[105px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none">Color Type</TableHead>
-              <TableHead className="w-[125px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none">{t.manufacturerLabel}</TableHead>
-              <TableHead className="w-[100px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none">{t.codeLabel}</TableHead>
-              <TableHead className="w-[150px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none">{t.colorName}</TableHead>
-              <TableHead className="hidden w-[150px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none md:table-cell">{t.carModelLabel}</TableHead>
-              <TableHead className="hidden w-[120px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none md:table-cell">{t.yearsLabel}</TableHead>
-              <TableHead className="hidden w-[120px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none md:table-cell">Process</TableHead>
-              <TableHead className="hidden w-[100px] py-2.5 text-center text-xs font-semibold text-primary-foreground border-none md:table-cell">{t.versionLabel}</TableHead>
-              <TableHead className="w-[60px] py-2.5 border-none" aria-label="Actions"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {pageRows.map((row, index) => (
-              <TableRow
-                key={`${row.formula.id}-${index}`}
-                className="cursor-pointer transition-colors hover:bg-blue-50/40 border-b border-border/50 last:border-b-0"
-                onClick={() => onOpenFormula(row)}
-              >
-                <TableCell className="py-3.5 text-center">
-                  <div
-                    className="mx-auto w-[83px] h-[37px] border border-border"
-                    style={colorSwatchStyle(row.color.hex_preview)}
-                  />
-                </TableCell>
-                <TableCell className="py-3.5 text-center">
-                  <span className="text-2xs font-medium text-foreground truncate block">{row.makeName}</span>
-                </TableCell>
-                <TableCell className="py-3.5 text-center">
-                  <span className="text-2xs font-medium text-foreground/80">{row.color.color_code}</span>
-                </TableCell>
-                <TableCell className="py-3.5 text-center">
-                  <span className="text-2xs font-medium text-foreground truncate block">{row.color.color_name}</span>
-                </TableCell>
-                <TableCell className="hidden py-3.5 text-center md:table-cell">
-                  <span className="text-2xs font-medium text-foreground/80 truncate block">{row.color.car_model || "—"}</span>
-                </TableCell>
-                <TableCell className="hidden py-3.5 text-center md:table-cell">
-                  <span className="text-sm text-muted-foreground">{row.year ?? "—"}</span>
-                </TableCell>
-                <TableCell className="hidden py-3.5 text-center md:table-cell">
-                  <span className="text-2xs font-medium text-foreground/80 truncate block">{row.formula.formula_type}</span>
-                </TableCell>
-                <TableCell className="hidden py-3.5 text-center md:table-cell">
-                  <span className="text-2xs font-medium text-foreground/80">{row.formula.version}</span>
-                </TableCell>
-                <TableCell align="center" className="py-3.5">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={(e) => { e.stopPropagation(); onOpenFormula(row); }}
-                    aria-label="View formula"
-                    className="size-8 rounded-md text-muted-foreground hover:bg-primary/10 hover:text-primary"
-                  >
-                    <ZoomIn className="size-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <CustomPagination
-          totalCount={rows.length}
-          page={page}
-          pageSize={rowsPerPage}
-          onPageChange={setPage}
-          unitName="formulas"
-        />
+    <div>
+      {/* 结果计数栏 */}
+      <div className="flex items-center px-4 py-3">
+        <p className="text-sm font-semibold text-primary">
+          Found {groupedEntries.length} colors ({rows.length} formulas)
+        </p>
+      </div>
+
+      {/* 色块网格：每行 6 列，全量展示，滚轮滑动 */}
+      <div className="grid grid-cols-6 gap-x-0 gap-y-[30px] px-4 pb-4">
+        {groupedEntries.map(([colorCode, groupRows]) => (
+          <GroupedColorCard
+            key={colorCode}
+            rows={groupRows}
+            onSelect={(row) => onOpenFormula(row)}
+          />
+        ))}
       </div>
     </div>
   );

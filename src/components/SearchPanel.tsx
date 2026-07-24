@@ -1,20 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback, type FormEvent } from "react";
+import { useState, useEffect, useCallback, useRef, type FormEvent } from "react";
 import { COLOR_TYPE_OPTIONS } from "@/lib/constants";
 import { useLang } from "@/components/LanguageContext";
 import type { CarMake, SearchParams, AppSettings } from "@/types";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Search, RotateCcw } from "lucide-react";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Search, RotateCcw, ChevronDown } from "lucide-react";
 
 export interface SearchPanelProps {
   onSearch: (params: SearchParams) => void;
@@ -24,7 +17,119 @@ export interface SearchPanelProps {
   onBlurCapture?: () => void;
 }
 
-export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusCapture, onBlurCapture }: SearchPanelProps) {
+// ===== 可搜索下拉选择器：Popover + Input 模糊过滤 =====
+function SearchableSelect({
+  placeholder,
+  value,
+  onValueChange,
+  options,
+  className,
+}: {
+  placeholder: string;
+  value: string;
+  onValueChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 打开时清空搜索词并 focus
+  useEffect(() => {
+    if (open) {
+      setQuery("");
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  }, [open]);
+
+  // 模糊过滤：匹配 label（不区分大小写）
+  const filtered = query.trim()
+    ? options.filter((o) =>
+        o.label.toLowerCase().includes(query.toLowerCase())
+      )
+    : options;
+
+  // 当前选中项的 label（用于显示在触发器上）
+  const selectedLabel = options.find((o) => o.value === value)?.label || "";
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
+        className={className}
+        render={
+          <button
+            type="button"
+            className="flex h-9 w-full items-center justify-between gap-1.5 rounded-lg border border-input bg-transparent px-2.5 text-sm whitespace-nowrap outline-none transition-colors hover:bg-muted/30 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+          >
+            <span
+              className={
+                selectedLabel
+                  ? "text-foreground"
+                  : "text-muted-foreground"
+              }
+            >
+              {selectedLabel || placeholder}
+            </span>
+            <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
+          </button>
+        }
+      />
+      <PopoverContent
+        side="bottom"
+        align="start"
+        sideOffset={4}
+        className="z-50 w-(--anchor-width) p-0"
+      >
+        {/* 搜索输入 */}
+        <div className="border-b border-border p-1.5">
+          <Input
+            ref={inputRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search..."
+            className="h-7 border-0 bg-muted/50 text-xs shadow-none focus-visible:ring-0"
+          />
+        </div>
+
+        {/* 选项列表 */}
+        <div className="max-h-[160px] overflow-y-auto p-1">
+          {filtered.length === 0 ? (
+            <p className="px-2 py-3 text-center text-xs text-muted-foreground">
+              No results
+            </p>
+          ) : (
+            filtered.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                onClick={() => {
+                  onValueChange(o.value);
+                  setOpen(false);
+                }}
+                className={`flex w-full items-center rounded-md px-2 py-1.5 text-sm transition-colors ${
+                  o.value === value
+                    ? "bg-accent text-accent-foreground"
+                    : "hover:bg-muted"
+                }`}
+              >
+                {o.label}
+              </button>
+            ))
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+export default function SearchPanel({
+  onSearch,
+  isLoading,
+  onSubmitRef,
+  onFocusCapture,
+  onBlurCapture,
+}: SearchPanelProps) {
   const { t } = useLang();
 
   const [makeId, setMakeId] = useState("");
@@ -33,11 +138,24 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
   const [colorType, setColorType] = useState("");
   const [year, setYear] = useState("");
   const [carMakes, setCarMakes] = useState<CarMake[]>([]);
-  const [colorTypeOptions, setColorTypeOptions] = useState<{ value: string; label: string }[]>(
-    COLOR_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))
-  );
+  const [colorTypeOptions, setColorTypeOptions] = useState<
+    { value: string; label: string }[]
+  >(COLOR_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label })));
+  const [allYears, setAllYears] = useState<number[]>([]);
 
-  // Fetch brands
+  // 构建品牌选项列表（id -> name）
+  const makeOptions = [
+    { value: "", label: t.make },
+    ...carMakes.map((m) => ({ value: m.id, label: m.name })),
+  ];
+
+  // 构建年份选项列表
+  const yearOptions = allYears.map((y) => ({
+    value: String(y),
+    label: String(y),
+  }));
+
+  // 获取品牌列表
   useEffect(() => {
     fetch("/api/brands")
       .then((r) => (r.ok ? r.json() : []))
@@ -45,7 +163,7 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
       .catch(() => setCarMakes([]));
   }, []);
 
-  // Fetch settings (color types)
+  // 获取漆面类型 + 年份范围
   useEffect(() => {
     fetch("/api/settings")
       .then((r) => (r.ok ? r.json() : null))
@@ -53,8 +171,19 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
         if (data?.finishes?.length) {
           setColorTypeOptions([
             { value: "", label: t.colorTypeAll },
-            ...data.finishes.map((f: string) => ({ value: f.toLowerCase(), label: f })),
+            ...data.finishes.map((f: string) => ({
+              value: f.toLowerCase(),
+              label: f,
+            })),
           ]);
+        }
+        // 从 settings 生成年份列表
+        if (data?.yearMin && data?.yearMax) {
+          const years: number[] = [];
+          for (let y = data.yearMax; y >= data.yearMin; y--) {
+            years.push(y);
+          }
+          setAllYears(years);
         }
       })
       .catch(() => {});
@@ -101,72 +230,55 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
       onFocus={onFocusCapture}
       onBlur={onBlurCapture}
     >
-      {/* 2×3 网格布局 */}
+      {/* 2×3 网格布局，标签内嵌到输入框/下拉框的 placeholder */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 w-full">
-        {/* Row 1: Make | Color Code | Color Type */}
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-foreground/80">{t.make}</Label>
-          <Select value={makeId} onValueChange={(v) => setMakeId(v || "")}>
-            <SelectTrigger className="h-9 w-full rounded-lg">
-              <SelectValue placeholder="All" />
-            </SelectTrigger>
-            <SelectContent className="max-h-[200px]">
-              <SelectItem value="all">All</SelectItem>
-              {carMakes.map((m) => (
-                <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Make — 可搜索下拉 */}
+        <SearchableSelect
+          placeholder={t.make}
+          value={makeId}
+          onValueChange={setMakeId}
+          options={makeOptions}
+          className="w-full"
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-foreground/80">{t.colorCode}</Label>
-          <Input
-            value={colorCode}
-            onChange={(e) => setColorCode(e.target.value.replace(/\s/g, "").toUpperCase())}
-            placeholder={t.colorCodePlaceholder}
-            className="h-9 rounded-lg"
-            maxLength={20}
-          />
-        </div>
+        {/* Color Code */}
+        <Input
+          value={colorCode}
+          onChange={(e) =>
+            setColorCode(e.target.value.replace(/\s/g, "").toUpperCase())
+          }
+          placeholder={t.colorCode}
+          className="h-9 rounded-lg"
+          maxLength={20}
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-foreground/80">{t.colorType}</Label>
-          <Select value={colorType} onValueChange={(v) => setColorType(v || "")}>
-            <SelectTrigger className="h-9 w-full rounded-lg">
-              <SelectValue placeholder={t.colorTypeAll} />
-            </SelectTrigger>
-            <SelectContent className="max-h-[200px]">
-              {colorTypeOptions.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Color Type — 可搜索下拉 */}
+        <SearchableSelect
+          placeholder={t.colorType}
+          value={colorType}
+          onValueChange={setColorType}
+          options={colorTypeOptions}
+          className="w-full"
+        />
 
-        {/* Row 2: Color Name | Year | Search + Reset buttons */}
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-foreground/80">{t.colorName}</Label>
-          <Input
-            value={colorName}
-            onChange={(e) => setColorName(e.target.value)}
-            placeholder={t.colorNamePlaceholder}
-            className="h-9 rounded-lg"
-          />
-        </div>
+        {/* Color Name */}
+        <Input
+          value={colorName}
+          onChange={(e) => setColorName(e.target.value)}
+          placeholder={t.colorName}
+          className="h-9 rounded-lg"
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-sm font-medium text-foreground/80">{t.year}</Label>
-          <Input
-            value={year}
-            onChange={(e) => setYear(e.target.value)}
-            placeholder={t.yearPlaceholder}
-            className="h-9 rounded-lg"
-            maxLength={9}
-          />
-        </div>
+        {/* Year — 可搜索下拉 */}
+        <SearchableSelect
+          placeholder={t.year}
+          value={year}
+          onValueChange={setYear}
+          options={yearOptions}
+          className="w-full"
+        />
 
-        {/* 按钮组，放在网格最后一个单元格 */}
+        {/* 搜索 + 重置按钮 */}
         <div className="flex items-end gap-2">
           <Button
             type="submit"
@@ -191,7 +303,10 @@ export default function SearchPanel({ onSearch, isLoading, onSubmitRef, onFocusC
       </div>
 
       {isCodeTooLong && (
-        <div role="alert" className="mt-2 text-xs font-medium text-yellow-600">
+        <div
+          role="alert"
+          className="mt-2 text-xs font-medium text-yellow-600"
+        >
           {t.codeTooLong}
         </div>
       )}

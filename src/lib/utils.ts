@@ -10,7 +10,7 @@ export function colorSwatchStyle(hex: string) {
   return {
     backgroundColor: hex,
     backgroundImage:
-      "linear-gradient(to bottom, rgba(0,0,0,0.32) 0%, rgba(0,0,0,0.12) 16%, rgba(0,0,0,0) 32%, rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.50) 50%, rgba(255,255,255,0.28) 58%, rgba(0,0,0,0) 68%, rgba(0,0,0,0.12) 84%, rgba(0,0,0,0.32) 100%)",
+      "linear-gradient(45deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.04) 16%, rgba(0,0,0,0) 32%, rgba(255,255,255,0.28) 42%, rgba(255,255,255,0.50) 50%, rgba(255,255,255,0.28) 58%, rgba(0,0,0,0) 68%, rgba(0,0,0,0.04) 84%, rgba(0,0,0,0.08) 100%)",
   };
 }
 
