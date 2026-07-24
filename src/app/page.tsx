@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import SearchPanel from "@/components/SearchPanel";
 import SearchResults from "@/components/SearchResults";
 import FormulaDrawer from "@/components/FormulaDrawer";
@@ -20,41 +20,6 @@ export default function Home() {
   const [drawerFormulaId, setDrawerFormulaId] = useState<string | undefined>();
   const [drawerYear, setDrawerYear] = useState<number | undefined>();
 
-  // === 玻璃拟态状态管理 ===
-  const [isHovered, setIsHovered] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const glassRef = useRef<HTMLDivElement>(null);
-  const transitionDurationRef = useRef("1.5s");
-
-  const applyTransitionDuration = useCallback((dur: string) => {
-    transitionDurationRef.current = dur;
-    const gl = glassRef.current;
-    if (gl) gl.style.transitionDuration = dur;
-  }, []);
-
-  const shouldBeBlurred = isFocused || isHovered;
-
-  function handleGlassEnter() {
-    if (isFocused) return;
-    applyTransitionDuration("1.5s");
-    setIsHovered(true);
-  }
-  function handleGlassLeave() {
-    if (isFocused) return;
-    applyTransitionDuration("1.5s");
-    setIsHovered(false);
-  }
-  function handleGlassFocus() {
-    applyTransitionDuration("0.2s");
-    setIsFocused(true);
-  }
-  function handleGlassBlur() {
-    setIsFocused(false);
-    if (!isHovered) {
-      applyTransitionDuration("1.5s");
-    }
-  }
-
   const dataPromiseRef = useRef<Promise<{ colors: Color[]; formulas: Formula[]; brands: CarMake[] }> | null>(null);
 
   function loadData() {
@@ -69,12 +34,6 @@ export default function Home() {
   }
 
   useEffect(() => { loadData().catch(() => {}); }, []);
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    document.body.dataset.bgState = shouldBeBlurred ? "white" : "default";
-    return () => { delete document.body.dataset.bgState; };
-  }, [shouldBeBlurred]);
 
   function handleSearch(params: SearchParams) {
     setIsLoading(true);
@@ -148,73 +107,76 @@ export default function Home() {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col overflow-x-clip">
-      {/* 背景图片层 */}
-      <div
-        className="absolute inset-0 overflow-hidden z-0 hidden sm:block transition-opacity duration-[1.5s] ease-in-out"
-        style={{ opacity: shouldBeBlurred ? 0 : 1 }}
-      >
-        <img
-          src="/bg-home.jpg"
-          alt=""
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-auto max-w-none block"
-        />
-      </div>
+    <div className="relative flex min-h-screen flex-col bg-[#f4f5f7] overflow-x-clip">
+      <SiteHeader />
 
-      {/* 页面内容 */}
-      <div className="relative z-10 flex flex-col flex-1">
-        <SiteHeader />
-        <section className="flex-1 flex flex-col pt-20 md:pt-24">
-          <div className="mx-4 sm:mx-8 md:mx-[60px]">
-            <div
-              className="mb-6 md:mb-8 mt-2 md:mt-3"
-              onMouseEnter={handleGlassEnter}
-              onMouseLeave={handleGlassLeave}
-            />
+      {/* ===== Hero 英雄横幅 ===== */}
+      <section className="relative isolate">
+        {/* 背景图片层 */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <img
+            src="/bg-home.jpg"
+            alt=""
+            aria-hidden="true"
+            className="h-full w-full object-cover object-center"
+          />
+          {/* 工业感深色渐变蒙版：保证标题与卡片区域对比度 */}
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(11,22,34,0.78)_0%,rgba(11,22,34,0.45)_38%,rgba(11,22,34,0.35)_60%,rgba(244,245,247,0.96)_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(11,22,34,0.55)_0%,transparent_55%)]" />
+        </div>
 
-            {/* 玻璃拟态搜索框容器 */}
-            <div
-              ref={glassRef}
-              onMouseEnter={handleGlassEnter}
-              onMouseLeave={handleGlassLeave}
-              className="w-full max-w-[95vw] rounded-[15px] border border-white/40 py-6 md:py-8 px-5 md:px-8 transition-all duration-[1.5s] ease-in-out"
-              style={{
-                backgroundColor: shouldBeBlurred ? "rgba(255,255,255,1)" : "rgba(255,255,255,0.3)",
-                backdropFilter: shouldBeBlurred ? "blur(16px)" : "blur(8px)",
-                WebkitBackdropFilter: shouldBeBlurred ? "blur(16px)" : "blur(8px)",
-                boxShadow: shouldBeBlurred ? "none" : "0 10px 30px rgba(0,0,0,0.1)",
-              }}
-            >
-              {/* 标题 */}
-              <div className="mb-5 md:mb-7 w-full text-center">
-                <h1 className="text-lg sm:text-[22px] md:text-[30px] lg:text-[38px] leading-tight font-extrabold text-primary tracking-[-0.02em]">
-                  <SplitText
-                    text={`${t.heroTitlePrefix} ${t.heroTitleHighlight}`}
-                    tag="span"
-                    stagger={0.03}
-                    duration={0.4}
-                    from={{ opacity: 0, y: 20 }}
-                    to={{ opacity: 1, y: 0 }}
-                  />
-                </h1>
-              </div>
-              <SearchPanel
-                onSearch={handleSearch}
-                isLoading={isLoading}
-                onFocusCapture={handleGlassFocus}
-                onBlurCapture={handleGlassBlur}
+        <div className="mx-auto w-full max-w-[1240px] px-4 pt-28 sm:px-8 md:pt-32 md:px-12">
+          {/* 标题区 */}
+          <div className="max-w-3xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-3 py-1 backdrop-blur-sm">
+              <span className="size-1.5 rounded-full bg-[#4aa3e0]" />
+              <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/85">
+                {t.heroEyebrow ?? "Professional Refinish System"}
+              </span>
+            </div>
+            <h1 className="text-3xl font-extrabold leading-[1.05] tracking-[-0.02em] text-white text-balance sm:text-4xl md:text-5xl lg:text-[56px]">
+              <SplitText
+                text={`${t.heroTitlePrefix} ${t.heroTitleHighlight}`}
+                tag="span"
+                stagger={0.03}
+                duration={0.4}
+                from={{ opacity: 0, y: 20 }}
+                to={{ opacity: 1, y: 0 }}
               />
+            </h1>
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/80 sm:text-base">
+              {t.heroSubtitle ?? "精准查询汽车修补漆配方 — 按品牌、色号、颜色类型与年份快速定位。"}
+            </p>
+          </div>
+
+          {/* ===== 实心搜索卡片 ===== */}
+          <div className="relative mt-8 md:mt-10">
+            <div className="overflow-hidden rounded-2xl border border-black/5 bg-white shadow-[0_20px_60px_-15px_rgba(11,22,34,0.35)]">
+              {/* 顶部品牌色装饰条 */}
+              <div className="h-1 w-full bg-[#2487ca]" />
+              <div className="px-5 py-6 sm:px-8 sm:py-7">
+                <div className="mb-5 flex items-center gap-3">
+                  <span className="h-4 w-1 rounded-full bg-[#2487ca]" />
+                  <h2 className="text-[13px] font-bold uppercase tracking-[0.14em] text-[#171717]">
+                    {t.searchPanelTitle ?? t.search}
+                  </h2>
+                </div>
+                <SearchPanel onSearch={handleSearch} isLoading={isLoading} />
+              </div>
             </div>
           </div>
-          {hasSearched && (
-            <div className="mx-4 sm:mx-8 md:mx-[60px] mt-4 md:mt-5">
-              <SearchResults rows={tableRows} isLoading={isLoading} hasSearched={hasSearched} onOpenFormula={handleOpenFormula} />
-            </div>
-          )}
-        </section>
-        <Footer isLightBackground={shouldBeBlurred} />
-        <FormulaDrawer result={drawerResult} formulaId={drawerFormulaId} initialYear={drawerYear} onClose={() => setDrawerResult(null)} />
-      </div>
+        </div>
+      </section>
+
+      {/* ===== 结果区 ===== */}
+      <section className="mx-auto w-full max-w-[1240px] flex-1 px-4 pb-16 pt-8 sm:px-8 md:px-12">
+        {hasSearched && (
+          <SearchResults rows={tableRows} isLoading={isLoading} hasSearched={hasSearched} onOpenFormula={handleOpenFormula} />
+        )}
+      </section>
+
+      <Footer isLightBackground={true} />
+      <FormulaDrawer result={drawerResult} formulaId={drawerFormulaId} initialYear={drawerYear} onClose={() => setDrawerResult(null)} />
     </div>
   );
 }

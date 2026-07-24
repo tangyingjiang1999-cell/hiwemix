@@ -6,6 +6,9 @@ export interface I18nDict {
   brandNameShort: string;
   heroTitlePrefix: string;
   heroTitleHighlight: string;
+  heroEyebrow?: string;
+  heroSubtitle?: string;
+  searchPanelTitle?: string;
   navSearch: string;
   navProducts: string;
   navAbout: string;

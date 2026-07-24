@@ -141,8 +141,9 @@ export default function SearchResults({
   const pageRows = rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
-    <div className="mx-0 sm:-mx-1">
-      <div className="overflow-x-auto rounded-none border border-gray-200 border-t-2 border-t-primary">
+    <div className="mx-0">
+      <div className="overflow-hidden rounded-xl border border-[#e2e5ea] bg-white shadow-[0_1px_3px_rgba(11,22,34,0.06)]">
+        <div className="overflow-x-auto">
         <Table>
           <caption className="sr-only">Formula search results table</caption>
           <TableHeader>
@@ -207,6 +208,7 @@ export default function SearchResults({
             ))}
           </TableBody>
         </Table>
+        </div>
         <CustomPagination
           totalCount={rows.length}
           page={page}

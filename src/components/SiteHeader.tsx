@@ -33,12 +33,13 @@ export default function SiteHeader() {
     ? "all 1.5s ease-in-out"
     : "none";
 
+  // 首页头部叠在深色英雄蒙版上，统一使用白字以保证可读性
   const headerBg = isHome ? "transparent" : "#2487ca";
   const headerPos = isHome ? "absolute" : "fixed";
-  const headerTextColor = isHome ? "#2487ca" : "#ffffff";
-  const headerMutedColor = isHome ? "#6b7280" : "rgba(255,255,255,0.7)";
-  const headerBorderColor = isHome ? "#d1d5db" : "rgba(255,255,255,0.3)";
-  const headerHoverBg = isHome ? "rgba(36,135,202,0.04)" : "rgba(255,255,255,0.1)";
+  const headerTextColor = "#ffffff";
+  const headerMutedColor = "rgba(255,255,255,0.72)";
+  const headerBorderColor = "rgba(255,255,255,0.3)";
+  const headerHoverBg = "rgba(255,255,255,0.1)";
 
   const navItems: { label: string; href: string }[] = [
     { label: t.navFormulaSearch, href: "/" },
@@ -72,7 +73,7 @@ export default function SiteHeader() {
               src="/hiwemix2-01.png"
               alt="HIWE MIX"
               className="h-5 w-auto object-contain block md:h-8 transition-all duration-[1.5s] ease-in-out"
-              style={{ filter: isHome ? "none" : "brightness(0) invert(1)" }}
+              style={{ filter: "brightness(0) invert(1)" }}
             />
           </Link>
 

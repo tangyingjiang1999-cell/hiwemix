@@ -27,7 +27,10 @@ type TabKey = (typeof TABS)[number]["key"];
 function SideNav({ activeTab, onSelect, onClose }: { activeTab: TabKey; onSelect: (k: TabKey) => void; onClose?: () => void }) {
   return (
     <nav>
-      <div className="flex flex-col gap-0.5 px-3 py-3">
+      <div className="px-5 pt-6 pb-3">
+        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-400">Data Management</p>
+      </div>
+      <div className="flex flex-col gap-0.5 px-3 pb-3">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.key;
@@ -35,10 +38,10 @@ function SideNav({ activeTab, onSelect, onClose }: { activeTab: TabKey; onSelect
             <button
               key={tab.key}
               onClick={() => { onSelect(tab.key); onClose?.(); }}
-              className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-left text-[13px] transition-colors ${
+              className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition-colors ${
                 active
-                  ? "bg-blue-50/80 font-semibold text-primary"
-                  : "font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+                  ? "bg-[#2487ca]/8 font-semibold text-[#2487ca]"
+                  : "font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-800"
               }`}
               aria-current={active ? "page" : undefined}
             >
@@ -106,12 +109,15 @@ export default function DataManagementPage() {
         </Sheet>
 
         {/* 右侧主区 */}
-        <main className="flex-1 min-h-[calc(100vh-64px)] px-6 py-6 sm:px-8 md:px-[60px]">
-          {/* 面包屑 */}
-          <div className="mb-4 flex items-center gap-2 text-[13px] text-gray-400 md:mb-5">
-            <span>Data Management</span>
-            <span>/</span>
-            <span className="font-medium text-gray-900">{activeLabel}</span>
+        <main className="flex-1 min-h-[calc(100vh-64px)] px-6 py-8 sm:px-8 md:px-12">
+          {/* 页头 */}
+          <div className="mb-6 border-b border-gray-200 pb-5">
+            <div className="mb-2 flex items-center gap-2 text-xs text-gray-400">
+              <span>Data Management</span>
+              <span aria-hidden="true">/</span>
+              <span className="font-medium text-gray-700">{activeLabel}</span>
+            </div>
+            <h1 className="text-2xl font-bold tracking-[-0.01em] text-gray-900">{activeLabel}</h1>
           </div>
 
           {activeTab === "brands" && <BrandsPanel />}
